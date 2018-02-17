@@ -1,0 +1,20 @@
+{
+  "name": "eac.js-cli",
+  "version": "1.0.0",
+  "description": "Commandline tool written in javascript to interact with the Ethereum Alarm Clock",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "bignumber.js": "^6.0.0",
+    "clear": "0.0.1",
+    "commander": "^2.14.1",
+    "eac.js-client": "^1.0.0",
+    "ethereumjs-util": "^5.1.4",
+    "ora": "^1.4.0",
+    "readline-sync": "^1.4.8"
+  }
+}
