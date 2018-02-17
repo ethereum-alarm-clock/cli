@@ -1,5 +1,5 @@
 const BigNumber = require('bignumber.js')
-const LightWallet = require('../client/lightWallet.js')
+const { LightWallet } = require('eac.js-client')
 const { Util } = require('eac.js-lib')()
 
 // @returns Promise<[txObjs]>

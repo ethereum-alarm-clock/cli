@@ -1,4 +1,4 @@
-const LightWallet = require('../client/lightWallet.js')
+const { LightWallet } = require('eac.js-client')
 const { Util } = require('eac.js-lib')()
 
 // TODO before mainnet - change the default gas / gasPrice

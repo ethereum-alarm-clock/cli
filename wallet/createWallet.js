@@ -1,4 +1,4 @@
-const LightWallet = require('../client/lightWallet.js')
+const { LightWallet } = require('eac.js-client')
 
 const createWallet = async (web3, num, file, password) => {
   const wallet = new LightWallet(web3)
