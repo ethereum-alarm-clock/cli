@@ -6,8 +6,21 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ethereum-alarm-clock/eac.js-cli.git"
+  },
+  "keywords": [
+    "ethereum",
+    "smart-contracts",
+    "ethereum-alarm-clock"
+  ],
+  "author": "lsaether",
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ethereum-alarm-clock/eac.js-cli/issues"
+  },
+  "homepage": "https://github.com/ethereum-alarm-clock/eac.js-cli#readme",
   "dependencies": {
     "bignumber.js": "^6.0.0",
     "clear": "0.0.1",
