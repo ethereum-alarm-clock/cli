@@ -6,6 +6,7 @@ const ethUtil = require("ethereumjs-util")
 const ora = require("ora")
 const program = require("commander")
 const readlineSync = require("readline-sync")
+const loki = require("lokijs")
 
 // CLI Imports
 const Logger = require("./logger")
@@ -168,7 +169,7 @@ const main = async (_) => {
 
     conf.client = "parity"
     conf.chain = chain
-    conf.statsdb = new StatsDB(conf.web3)
+    conf.statsdb = new StatsDB(conf.web3, new loki("stats.json"))
 
     // Determines wallet support
     if (conf.wallet) {

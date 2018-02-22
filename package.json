@@ -28,6 +28,7 @@
     "eac.js-client": "^1.4.0",
     "ethereumjs-util": "^5.1.4",
     "ora": "^1.4.0",
-    "readline-sync": "^1.4.9"
+    "readline-sync": "^1.4.9",
+    "lokijs": "^1.5.2"
   }
 }
