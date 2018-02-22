@@ -1,4 +1,5 @@
-const { LightWallet } = require('eac.js-client')
+const fs = require('fs')
+const { Wallet } = require('eac.js-client')
 const { Util } = require('eac.js-lib')()
 
 // TODO before mainnet - change the default gas / gasPrice
@@ -24,13 +25,15 @@ const fund = (web3, recip, value) => {
 }
 
 const fundAccounts = async (web3, etherAmount, file, password) => {
-    const wallet = new LightWallet(web3)
-    await wallet.decryptAndLoad(file, password)
+    const wallet = new Wallet(web3)
+    const keystore = fs.readFileSync(file, 'utf-8')
+    const ks = JSON.parse(keystore)
+    wallet.decrypt(ks, password)
 
     const amt = web3.toWei(etherAmount, 'ether')
 
-    return Promise.all(wallet.getAccounts().map(account => {
-        return fund(web3, account, amt)
+    return Promise.all(wallet.getAddresses().map(address => {
+        return fund(web3, address, amt)
     }))
 }
 
