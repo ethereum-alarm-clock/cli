@@ -26,7 +26,7 @@ const drainWallet = require('../wallet/drainWallet.js')
 
 // Parse the command line options using commander.
 program
-  .version("1.4.0")
+  .version("1.4.4")
   .option(
   "--scan <spread>",
   "sets the scanning spread (ie +- from current block",
