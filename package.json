@@ -25,9 +25,10 @@
     "bignumber.js": "^6.0.0",
     "clear": "0.0.1",
     "commander": "^2.14.1",
-    "eac.js-client": "^1.4.0",
+    "eac.js-client": "^2.0.0",
     "ethereumjs-util": "^5.1.4",
     "ora": "^1.4.0",
-    "readline-sync": "^1.4.9"
+    "readline-sync": "^1.4.9",
+    "lokijs": "^1.5.2"
   }
 }
