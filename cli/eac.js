@@ -193,7 +193,8 @@ const main = async (_) => {
       conf.statsdb.initialize([account])
     }
 
-    Scanner.start(program.milliseconds, conf)
+    const scanner = new Scanner(program.milliseconds, conf)
+    scanner.start(program.milliseconds, conf)
     setTimeout(() => Repl.start(conf, program.milliseconds), 1200)
 
   } else if (program.schedule) {
