@@ -11,7 +11,8 @@ const start = (conf, ms) => {
     async action() {
       if (conf.wallet) {
         conf.wallet.getAccounts().forEach(async (account) => {
-          console.log(`${account} | Balance: ${web3.fromWei(await eac.Util.getBalance(account))}`)
+          const address = account.getAddressString();
+          console.log(`${address} | Balance: ${web3.fromWei(await eac.Util.getBalance(address))}`)
         })
       } else {
         const account = web3.eth.defaultAccount
@@ -41,7 +42,8 @@ const start = (conf, ms) => {
   replServer.defineCommand("logLevel", {
     help: "Defines the level to log, 1 - debug/cache, 2 - info, 3- error.",
     action(level) {
-      if (level < 0 || level > 3) {
+      if (level < 1 || level > 3) {
+        console.log('inner')
         console.log("Please define 1 for debug, 2 for info, 3 for error.")
         return
       }
