@@ -43,7 +43,6 @@ const start = (conf, ms) => {
     help: "Defines the level to log, 1 - debug/cache, 2 - info, 3- error.",
     action(level) {
       if (level < 1 || level > 3) {
-        console.log('inner')
         console.log("Please define 1 for debug, 2 for info, 3 for error.")
         return
       }
