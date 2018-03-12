@@ -162,7 +162,7 @@ const main = async (_) => {
       web3, // conf.web3
       eac, // conf.eac
       provider: program.provider, // conf.provider
-      wallet: program.wallet, // conf.wallet
+      walletFile: program.wallet, // conf.wallet
       password: program.password, // wallet password
       autostart: program.autostart
     })
@@ -175,10 +175,12 @@ const main = async (_) => {
     if (conf.wallet) {
       console.log('Wallet support: Enabled')
       console.log('\nExecuting from accounts:')
-      conf.wallet.getAccounts().forEach(async account => {
+      const addressList = conf.wallet.getAccounts().map(account => account.getAddressString());
+      addressList.forEach(async account => {
         console.log(`${account} | Balance: ${web3.fromWei(await eac.Util.getBalance(account))}`)
       })
-      conf.statsdb.initialize(conf.wallet.getAccounts())
+
+      conf.statsdb.initialize(addressList)
     } else { 
       console.log('Wallet support: Disabled')
       // Loads the default account.
