@@ -26,7 +26,7 @@
     "clear": "0.0.1",
     "commander": "^2.14.1",
     "eac.js-client": "file:../eac.js-client",
-    "eac.js-lib": "^1.1.1",
+    "eac.js-lib": "^1.2.0",
     "ethereumjs-util": "^5.1.5",
     "lokijs": "^1.5.2",
     "ora": "^1.4.0",

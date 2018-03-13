@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+const fs = require('fs');
 const BigNumber = require("bignumber.js")
 const clear = require("clear")
 const ethUtil = require("ethereumjs-util")
@@ -38,7 +39,7 @@ program
   4000
   )
   .option("--logfile [path]", "specifies the output logifle", "default")
-  .option("--logLevel [0,1,2,3]", "sets the log level", 2)
+  .option("--logLevel [1,2,3]", "sets the log level", 2)
   .option(
   "--provider <string>",
   "set the HttpProvider to use",
@@ -147,11 +148,10 @@ const main = async (_) => {
     // Parses the logfile
     if (program.logfile === "console") {
       console.log("Logging to console")
-    } else {
-
     }
 
     const logger = new Logger(program.logfile, program.logLevel)
+    const encKeystore = fs.readFileSync(program.wallet, 'utf8');
 
     // Loads conf
     let conf = await Config.create({
@@ -162,7 +162,7 @@ const main = async (_) => {
       web3, // conf.web3
       eac, // conf.eac
       provider: program.provider, // conf.provider
-      walletFile: program.wallet, // conf.wallet
+      walletStore: encKeystore, // conf.walletStore
       password: program.password, // wallet password
       autostart: program.autostart
     })
@@ -196,6 +196,7 @@ const main = async (_) => {
     }
 
     const scanner = new Scanner(program.milliseconds, conf)
+
     scanner.start(program.milliseconds, conf)
     setTimeout(() => Repl.start(conf, program.milliseconds), 1200)
 
