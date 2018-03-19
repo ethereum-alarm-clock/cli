@@ -55,6 +55,7 @@ program
   .option('--fundWallet <ether amt>', 'funds each account in wallet the <ether amt>')
   .option('--drainWallet <target>', 'sends the target address all ether in the wallet')
   .option("--autostart", "starts scanning automatically")
+  .option("--analytics [on,off]", "Allow or disable network analytics")
   .parse(process.argv)
 
 // Create the web3 object by using the chosen provider, defaults to localhost:8545
@@ -164,7 +165,8 @@ const main = async (_) => {
       provider: program.provider, // conf.provider
       walletStore: encKeystore, // conf.walletStore
       password: program.password, // wallet password
-      autostart: program.autostart
+      autostart: program.autostart,
+      analytics: program.analytics //conf.analytics
     })
 
     conf.client = "parity"
