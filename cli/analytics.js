@@ -6,8 +6,7 @@ const COLLECTIONS = {
 };
 
 // 5 minutes in milliseconds
-const ACTIVE_CLINODES_POLLING_INTERVAL = 5 * 60 * 1000;
-const ACTIVE_CLINODES_NOTIFY_INTERVAL = 2.6 * 60 * 1000;
+const ACTIVE_CLINODES_POLLING_INTERVAL = 2 * 60 * 1000;
 
 class Analytics {
 
@@ -90,14 +89,14 @@ class Analytics {
 
     notifyNetworkNodeActive(nodeAddress) {
         this.sendActiveTimeNodeEvent(nodeAddress)
-        this.notifyInterval = setInterval(() => this.sendActiveTimeNodeEvent(nodeAddress), ACTIVE_CLINODES_NOTIFY_INTERVAL);
+        this.notifyInterval = setInterval(() => this.sendActiveTimeNodeEvent(nodeAddress), ACTIVE_CLINODES_POLLING_INTERVAL);
     }
 
     getActiveClinodesCount(networkId) {
         const count = new KeenAnalysis.Query('count_unique', {
             event_collection: COLLECTIONS.TIMENODES,
             target_property: 'nodeAddress',
-            timeframe: 'previous_5_minutes',
+            timeframe: 'previous_2_minutes',
             filters: [
                 {
                     property_name: 'networkId',
