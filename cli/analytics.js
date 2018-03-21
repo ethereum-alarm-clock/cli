@@ -17,7 +17,7 @@ class Analytics {
 
         this._web3 = web3;
 
-        this.activeClinodes = 0;
+        this.activeNodes = 0;
         this.networkId = null;
         this.analysisClient = null;
         this.trackingClient = null;
@@ -93,7 +93,7 @@ class Analytics {
     }
 
     getActiveClinodesCount(networkId) {
-        const count = new KeenAnalysis.Query('count_unique', {
+        const count = new KeenAnalysis.Query('count', {
             event_collection: COLLECTIONS.TIMENODES,
             target_property: 'nodeAddress',
             timeframe: 'previous_2_minutes',
@@ -104,11 +104,6 @@ class Analytics {
                     property_value: networkId
                 },
                 {
-                    property_name: 'nodeType',
-                    operator: 'eq',
-                    property_value: 'cli'
-                },
-                {
                     property_name: 'status',
                     operator: 'eq',
                     property_value: 'active'
@@ -117,7 +112,7 @@ class Analytics {
         });
 
         this.analysisClient.run(count, (err, response) => {
-            this.activeClinodes = response.result;
+            this.activeNodes = response.result;
         });
     }
 
