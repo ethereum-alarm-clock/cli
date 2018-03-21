@@ -15,7 +15,6 @@ class Analytics {
 
         this._web3 = web3;
 
-        this.activeNodes = 0;
         this.networkId = null;
         this.trackingClient = null;
         this.initialize();
