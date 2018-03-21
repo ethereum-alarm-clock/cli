@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+require('dotenv').config();
 
 const fs = require('fs');
 const BigNumber = require("bignumber.js")
@@ -10,6 +11,7 @@ const readlineSync = require("readline-sync")
 const loki = require("lokijs")
 
 // CLI Imports
+const { Analytics } = require("./analytics")
 const Logger = require("./logger")
 const Repl = require("./repl")
 
@@ -55,6 +57,7 @@ program
   .option('--fundWallet <ether amt>', 'funds each account in wallet the <ether amt>')
   .option('--drainWallet <target>', 'sends the target address all ether in the wallet')
   .option("--autostart", "starts scanning automatically")
+  .option("--analytics [on,off]", "Allow or disable network analytics")
   .parse(process.argv)
 
 // Create the web3 object by using the chosen provider, defaults to localhost:8545
@@ -145,6 +148,13 @@ const main = async (_) => {
     const requestFactory = await eac.requestFactory()
     const requestTracker = await eac.requestTracker()
 
+    let analytics;
+    analytics = program.analytics && program.analytics.toLowerCase() === 'off' ? false : true;
+
+    if (analytics) {
+      analytics = new Analytics(web3);
+    }
+
     // Parses the logfile
     if (program.logfile === "console") {
       console.log("Logging to console")
@@ -181,7 +191,7 @@ const main = async (_) => {
       })
 
       conf.statsdb.initialize(addressList)
-    } else { 
+    } else {
       console.log('Wallet support: Disabled')
       // Loads the default account.
       const account = web3.eth.accounts[0]
@@ -199,6 +209,11 @@ const main = async (_) => {
 
     scanner.start(program.milliseconds, conf)
     setTimeout(() => Repl.start(conf, program.milliseconds), 1200)
+
+    if (analytics) {
+      const addresses = conf.wallet.getAddresses()
+      analytics.startAnalytics(addresses[0]);
+    }
 
   } else if (program.schedule) {
     if (!await eac.Util.checkNetworkID()) {
