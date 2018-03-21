@@ -7,6 +7,7 @@ const COLLECTIONS = {
 
 // 5 minutes in milliseconds
 const ACTIVE_CLINODES_POLLING_INTERVAL = 5 * 60 * 1000;
+const ACTIVE_CLINODES_NOTIFY_INTERVAL = 2.6 * 60 * 1000;
 
 class Analytics {
 
@@ -19,6 +20,8 @@ class Analytics {
 
         this.activeClinodes = 0;
         this.networkId = null;
+        this.analysisClient = null;
+        this.trackingClient = null;
         this.initialize();
     }
 
@@ -31,8 +34,8 @@ class Analytics {
         })
     }
 
-    async initialize() {
-        await this.getActiveNetwork();
+    initialize() {
+        this.getActiveNetwork();
 
         this.analysisClient = new KeenAnalysis({
             projectId: this.projectId,
@@ -46,19 +49,20 @@ class Analytics {
     }
 
     async awaitInitialized() {
-        if (!this.analysisClient || !this.trackingClient) {
+        if (!this.analysisClient || !this.trackingClient || !this.networkId) {
             return new Promise((resolve) => {
                 setTimeout(async () => {
                     resolve(await this.awaitInitialized());
                 }, 700);
             })
+        } else {
+            return true;
         }
-        return true;
     }
 
     async startAnalytics(nodeAddress) {
-        nodeAddress = this._web3.sha3(nodeAddress);
         await this.awaitInitialized();
+        nodeAddress = this._web3.sha3(nodeAddress);
         this.notifyNetworkNodeActive(nodeAddress);
         this.pollActiveClinodesCount();
     }
@@ -84,9 +88,9 @@ class Analytics {
         this.trackingClient.recordEvent(COLLECTIONS.TIMENODES, event);
     }
 
-    notifyNetworkNodeActive(nodeAddress, networkId = this.networkId) {
-        this.sendActiveTimeNodeEvent(nodeAddress, networkId)
-        this.notifyInterval = setInterval(() => this.sendActiveTimeNodeEvent(nodeAddress, networkId), ACTIVE_CLINODES_POLLING_INTERVAL);
+    notifyNetworkNodeActive(nodeAddress) {
+        this.sendActiveTimeNodeEvent(nodeAddress)
+        this.notifyInterval = setInterval(() => this.sendActiveTimeNodeEvent(nodeAddress), ACTIVE_CLINODES_NOTIFY_INTERVAL);
     }
 
     getActiveClinodesCount(networkId) {
