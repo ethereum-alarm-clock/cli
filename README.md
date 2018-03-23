@@ -2,6 +2,7 @@
 
 _Note: `eac.js` is operational but still considered alpha software, released to the public for expirmentation and testing. We do not recommend using it on the mainnet as it will lose you money under certain situations._ 
 
+[![npm version](https://badge.fury.io/js/eac.js-cli.svg)](https://badge.fury.io/js/eac.js-cli)
 # eac.js-cli
 
 This is a part of eac.js family that includes 
