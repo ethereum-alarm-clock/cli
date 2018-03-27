@@ -10,4 +10,4 @@ COPY wallet--79a92e6fe6baecf1e0a895d2d960e2321331697c /app
 RUN cd /app
 RUN npm install
 
-CMD ["sh", "-c", "node cli/eac.js -c --logfile console --logLevel 2 -w wallet--79a92e6fe6baecf1e0a895d2d960e2321331697c -p ${PASSWORD} --provider ${PROVIDER}"]
+CMD ["sh", "-c", "node cli/eac.js -c --autostart --logfile console --logLevel 2 -w wallet--79a92e6fe6baecf1e0a895d2d960e2321331697c -p ${PASSWORD} --provider ${PROVIDER}"]
