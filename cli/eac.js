@@ -183,7 +183,7 @@ const main = async (_) => {
       web3, // conf.web3
       eac, // conf.eac
       provider: program.provider, // conf.provider
-      walletStore: encKeystore, // conf.walletStore
+      walletStores: encKeystores, // conf.walletStore
       password: program.password, // wallet password
       autostart: program.autostart
     })
