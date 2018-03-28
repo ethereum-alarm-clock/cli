@@ -50,8 +50,11 @@ program
   .option("-s, --schedule", "schedules a transactions")
   .option("--block")
   .option("--timestamp")
-  .option('-w, --wallet [path]', 'specify the path to the keyfile you would like to unlock')
-  .option('-p, --password [string]', 'the password to unlock your keystore file')
+  .option('-w, --wallet [path...]', 'specify the path to the keyfile you would like to unlock (For multiple wallet files, pass in each file with -w option)', function (path, paths) {
+    paths.push(path);
+    return paths;
+  }, [])
+  .option('-p, --password [string]', 'the password to unlock your keystore file(s) (For multiple wallets, all wallets must have the same password')
   .option("-c, --client", "starts the executing client")
   .option('--createWallet', 'guides you through creating a new wallet.')
   .option('--fundWallet <ether amt>', 'funds each account in wallet the <ether amt>')
@@ -161,7 +164,15 @@ const main = async (_) => {
     }
 
     const logger = new Logger(program.logfile, program.logLevel)
-    const encKeystore = fs.readFileSync(program.wallet, 'utf8');
+    let encKeystores = [];
+    program.wallet.map( file => {
+      const fileStore = fs.readFileSync(file, 'utf8');
+      if (typeof JSON.parse(fileStore).length !== 'undefined' ) {
+        encKeystores = encKeystores.concat(JSON.parse(fileStore));
+      } else {
+        encKeystores.push(fileStore)
+      }
+    });
 
     // Loads conf
     let conf = await Config.create({
