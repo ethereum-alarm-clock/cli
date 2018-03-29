@@ -65,9 +65,7 @@ program
   .parse(process.argv)
 
 // Create the web3 object by using the chosen provider, defaults to localhost:8545
-const Web3 = require("web3")
-
-let providerType;
+const Web3 = require("web3");
 const provider = (() => {
   if ( new RegExp('http://').test(program.provider) || new RegExp('https://').test(program.provider) ) {
     return new Web3.providers.HttpProvider(`${program.provider}`);
