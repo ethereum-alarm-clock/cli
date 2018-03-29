@@ -5,6 +5,7 @@ const fs = require('fs');
 const BigNumber = require("bignumber.js")
 const clear = require("clear")
 const ethUtil = require("ethereumjs-util")
+const Web3WsProvider = require('web3-providers-ws');
 const ora = require("ora")
 const program = require("commander")
 const readlineSync = require("readline-sync")
@@ -66,9 +67,18 @@ program
 // Create the web3 object by using the chosen provider, defaults to localhost:8545
 const Web3 = require("web3")
 
-const provider = new Web3.providers.HttpProvider(`${program.provider}`)
-const web3 = new Web3(provider)
+let providerType;
+const provider = (() => {
+  if ( new RegExp('http://').test(program.provider) || new RegExp('https://').test(program.provider) ) {
+    return new Web3.providers.HttpProvider(`${program.provider}`);
+  } else if (new RegExp('ws://').test(program.provider) || new RegExp('wss://').test(program.provider) ) {
+    const ws = new Web3WsProvider(`${program.provider}`);
+    ws.__proto__.sendAsync = ws.__proto__.send;
+    return ws;
+  }
+})();
 
+const web3 = new Web3(provider)
 const eac = require('eac.js-lib')(web3)
 
 const main = async (_) => {
