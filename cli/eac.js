@@ -229,7 +229,7 @@ const main = async (_) => {
     scanner.start(program.milliseconds, conf)
     setTimeout(() => Repl.start(conf, program.milliseconds), 1200)
 
-    if (analytics) {
+    if (analytics && conf.wallet) {
       const addresses = conf.wallet.getAddresses()
       analytics.startAnalytics(addresses[0]);
     }
