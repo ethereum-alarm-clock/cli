@@ -30,7 +30,7 @@
     "clear": "0.0.1",
     "commander": "^2.14.1",
     "dotenv": "^5.0.1",
-    "eac.js-client": "^2.3.0",
+    "eac.js-client": "^2.4.0",
     "eac.js-lib": "^1.2.0",
     "ethereumjs-util": "^5.1.5",
     "keen-tracking": "^1.4.0",
