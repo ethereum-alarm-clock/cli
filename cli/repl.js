@@ -99,6 +99,11 @@ const start = (conf, ms) => {
         value: endowment,
       })
 
+      // we're using a wallet.
+      if (conf.wallet) {
+        spinner.fail('Currently unavailable feature.')
+      }
+
       scheduler.blockSchedule(
         "0x009f7EfeD908c05df5101DA1557b7CaaB38EE4Ce",
         web3.fromAscii("s0x".repeat(Math.floor(Math.random() * 10))),
