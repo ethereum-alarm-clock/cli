@@ -1,3 +1,4 @@
+const BigNumber = require("bignumber.js")
 const repl = require("repl")
 
 const start = (conf, ms) => {
@@ -70,19 +71,53 @@ const start = (conf, ms) => {
   replServer.defineCommand("testTx", {
     help:
       "Send a test transaction to the network (requires unlocked local account).",
-    action() {
+    async action() {
       const ora = require("ora")
       const spinner = ora("Sending test transaction to network...").start()
-      const testScheduler = require("../scheduling/testTx")
-      testScheduler(conf.chain, web3)
-        .then((receipt) => {
-          if (receipt.status != 1) {
-            spinner.fail("Transaction failed.")
-            return
-          }
-          spinner.succeed(`Transaction mined! Hash ${receipt.transactionHash}`)
-        })
-        .catch(err => spinner.fail(err))
+      const scheduler = await eac.scheduler()
+
+      // Set some meaningless defaults
+      const windowStart = web3.eth.blockNumber + 30
+      const gasPrice = web3.toWei("100", "gwei")
+      const requiredDeposit = 1
+      const callGas = 1212121
+      const callValue = 123454321
+      const fee = 50
+      const bounty = web3.toWei("500", "finney")
+
+      const endowment = scheduler.calcEndowment(
+        new BigNumber(callGas),
+        new BigNumber(callValue),
+        new BigNumber(gasPrice),
+        new BigNumber(fee),
+        new BigNumber(bounty)
+      )
+    
+      scheduler.initSender({
+        from: web3.eth.defaultAccount,
+        gas: 3000000,
+        value: endowment,
+      })
+
+      scheduler.blockSchedule(
+        "0x009f7EfeD908c05df5101DA1557b7CaaB38EE4Ce",
+        web3.fromAscii("s0x".repeat(Math.floor(Math.random() * 10))),
+        callGas,
+        callValue,
+        255, // windowSize
+        windowStart,
+        gasPrice,
+        fee, // fee
+        bounty, // bounty
+        requiredDeposit
+      ).then((receipt) => {
+        if (receipt.status != '0x1') {
+          spinner.fail("Transaction failed.")
+          return
+        } else {
+          spinner.succeed(`Transaction mined! Hash - ${receipt.transactionHash}`)
+        }
+      }).catch(err => spinner.fail(err))
     },
   })
   replServer.defineCommand("getStats", {

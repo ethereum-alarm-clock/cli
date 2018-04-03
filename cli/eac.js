@@ -210,6 +210,7 @@ const main = async (_) => {
       })
 
       conf.statsdb.initialize(addressList)
+      web3.eth.defaultAccount = conf.wallet.getAccounts()[0]
     } else {
       console.log('Wallet support: Disabled')
       // Loads the default account.
