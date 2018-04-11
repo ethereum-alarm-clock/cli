@@ -17,6 +17,9 @@ install globally: `npm i -g eac.js-cli`
 run from command line: `eac.js -c`  
 view options: `eac.js --h`
 
+### Docker
+[ Instructions ](https://github.com/ethereum-alarm-clock/eac.js-cli/tree/docker-setup)
+
 ## Testing
 
 Install mocha `npm i -g mocha` and `mocha` at the root of the directory to run the test script on an isolated virtual blockchain using mocha. 
