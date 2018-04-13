@@ -157,7 +157,6 @@ const main = async (_) => {
 
     // Loads the contracts
     const requestFactory = await eac.requestFactory()
-    const requestTracker = await eac.requestTracker()
 
     let analytics;
     analytics = program.analytics && program.analytics.toLowerCase() === 'off' ? false : true;
@@ -187,7 +186,6 @@ const main = async (_) => {
       scanSpread: program.scan, // conf.scanSpread
       logger,
       factory: requestFactory, // conf.factory
-      tracker: requestTracker, // conf.tracker
       web3, // conf.web3
       eac, // conf.eac
       provider: program.provider, // conf.provider
