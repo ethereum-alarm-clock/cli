@@ -64,6 +64,7 @@ program
   .option("--analytics [on,off]", "Allow or disable network analytics")
   .parse(process.argv)
 
+
 // Create the web3 object by using the chosen provider, defaults to localhost:8545
 const Web3 = require("web3");
 const provider = (() => {
@@ -78,6 +79,118 @@ const provider = (() => {
 
 const web3 = new Web3(provider)
 const eac = require('eac.js-lib')(web3)
+
+const defaultSchedulingValues = {
+  callGas: 100000,
+  callValue: web3.toWei("100", "gwei"),
+  windowSize: 255,
+  gasPrice: web3.eth.gasPrice,
+  fee: web3.toWei("10", "gwei"),
+  bounty: web3.eth.gasPrice * 100000,
+  deposit: web3.toWei("20", "gwei"),
+  minimumPeriodBeforeSchedule: 25
+}
+
+const readTemporalUnit = () => {
+  let temporalUnit
+
+  if (program.block) {
+    temporalUnit = 1;
+  }
+  else if (program.timestamp) {
+    temporalUnit = 2;
+  }
+  else {
+    const unit = readlineSync.question("Do you want to use block or timestamps as the unit? [block/timestamp]\n");
+    if (unit.toLowerCase() === "block") {
+      temporalUnit = 1;
+    }
+    else if (unit.toLowerCase() === "timestamp") {
+      temporalUnit = 2;
+    }
+    else {
+      throw new Error("Invalid temporal unit.");
+    }
+  }
+  return temporalUnit;
+}
+
+const readRecipientAddress = () => {
+  let toAddress = readlineSync.question(`Enter the recipient address: [press enter for ${web3.eth.defaultAccount}]\n`)
+  if (!toAddress) {
+    toAddress = web3.eth.defaultAccount
+  }
+
+  // Validate the address
+  toAddress = ethUtil.addHexPrefix(toAddress)
+  if (!eac.Util.checkValidAddress(toAddress)) {
+    console.log("Not a valid address")
+    console.log("[FATAL] exiting...")
+    process.exit(1)
+  }
+
+  return toAddress
+}
+
+const readCallData = () => {
+  let callData = readlineSync.question("Enter call data: [press enter to skip]\n")
+
+  if (!callData) {
+    callData = "0x0"
+  }
+  callData = web3.toHex(callData)
+
+  return callData
+}
+
+const readCallGas = () => {
+  const callGas = readlineSync.question(`Enter the call gas: [press enter for ${defaultSchedulingValues.callGas}]\n`)
+
+  return callGas || defaultSchedulingValues.callGas 
+}
+
+const readCallValue = () => {
+  const callValue = readlineSync.question(`Enter call value: [press enter for ${defaultSchedulingValues.callValue}] \n`)
+
+  return callValue || defaultSchedulingValues.callValue
+}
+
+const readWindowSize = () => {
+  const windowSize = readlineSync.question(`Enter window size: [press enter for ${defaultSchedulingValues.windowSize}]\n`)
+  
+  return windowSize || defaultSchedulingValues.windowSize
+}
+
+const readWindowStart = currentBlockNumber => {
+  const defaultWindowStart = currentBlockNumber + defaultSchedulingValues.minimumPeriodBeforeSchedule + 5
+  const windowStart = readlineSync.question(`Enter window start: [press enter for ${defaultWindowStart}]\n`)
+
+  return windowStart || defaultWindowStart
+}
+
+const readGasPrice = () => {
+  const gasPrice = readlineSync.question(`Enter a gas price: [press enter for ${defaultSchedulingValues.gasPrice}]\n`)
+
+  return gasPrice || defaultSchedulingValues.gasPrice
+}
+
+const readFee = () => {
+  const fee = readlineSync.question(`Enter fee amount: [press enter for ${defaultSchedulingValues.fee}]\n`)
+
+  return fee || defaultSchedulingValues.fee
+}
+
+const readBounty = () => {
+  const bounty = readlineSync.question(`Enter bounty amount: [press enter for ${defaultSchedulingValues.bounty}]\n`)
+
+  return bounty || defaultSchedulingValues.bounty
+}
+
+const readDeposit= () => {
+  const deposit = readlineSync.question(`Enter deposit amount: [press enter for ${defaultSchedulingValues.deposit}]\n`)
+
+  return deposit || defaultSchedulingValues.deposit
+}
 
 const main = async (_) => {
   if (program.createWallet) {
@@ -248,95 +361,26 @@ const main = async (_) => {
     clear()
     console.log("🧙 🧙 🧙  Schedule a transaction  🧙 🧙 🧙\n")
 
-    let temporalUnit
-    if (program.block) {
-      temporalUnit = 1
-    } else if (program.timestamp) {
-      temporalUnit = 2
-    } else {
-      const unit = readlineSync.question("Do you want to use block or timestamps as the unit? [block/timestamp]\n")
-      if (unit.toLowerCase() === "block") {
-        temporalUnit = 1
-      } else if (unit.toLowerCase() === "timestamp") {
-        temporalUnit = 2
-      } else {
-        throw new Error("Invalid temporal unit.")
-      }
-    }
+    const temporalUnit = readTemporalUnit()
+    const toAddress = readRecipientAddress()
+    const callData = readCallData()
+    const callGas = readCallGas()
+    const callValue = readCallValue()
+    
+    const currentBlockNumber = await eac.Util.getBlockNumber()
+    
+    const windowStart = readWindowStart(currentBlockNumber)
+    const windowSize = readWindowSize()
 
-    let toAddress = readlineSync.question("Enter the recipient address:\n")
-    if (!toAddress) {
-      toAddress = "0xbbf5029fd710d227630c8b7d338051b8e76d50b3"
-    }
-
-    // Validate the address
-    toAddress = ethUtil.addHexPrefix(toAddress)
-    if (!eac.Util.checkValidAddress(toAddress)) {
-      console.log("Not a valid address")
-      console.log("[FATAL] exiting...")
-      process.exit(1)
-    }
-
-    let callData = readlineSync.question("Enter call data: [press enter to skip]\n")
-
-    if (!callData) {
-      callData = "0x0"
-    }
-    callData = web3.toHex(callData)
-
-    let callGas = readlineSync.question(`Enter the call gas: [press enter for recommended]\n`)
-
-    if (!callGas) {
-      callGas = 3000000
-    }
-
-    let callValue = readlineSync.question("Enter call value:\n")
-
-    if (!callValue) {
-      callValue = 123454321
-    }
-
-    let windowSize = readlineSync.question("Enter window size:\n")
-
-    if (!windowSize) {
-      windowSize = 255
-    }
-
-    const blockNum = await eac.Util.getBlockNumber()
-    let windowStart = readlineSync.question(`Enter window start: [Current block number - ${blockNum}\n`)
-
-    if (!windowStart) {
-      windowStart = blockNum + 50
-    }
-
-    if (windowStart < blockNum + 25) {
+    if (windowStart < currentBlockNumber + defaultSchedulingValues.minimumPeriodBeforeSchedule) {
       console.log("That window start time is too soon!")
       process.exit(1)
     }
 
-    let gasPrice = readlineSync.question("Enter a gas price:\n")
-
-    if (!gasPrice) {
-      gasPrice = web3.toWei("50", "gwei")
-    }
-
-    let fee = readlineSync.question("Enter fee amount:\n")
-
-    if (!fee) {
-      fee = 33
-    }
-
-    let bounty = readlineSync.question("Enter bounty amount:\n")
-
-    if (!bounty) {
-      bounty = 10
-    }
-
-    let requiredDeposit = readlineSync.question("Enter required claim deposit:\n")
-
-    if (!requiredDeposit) {
-      requiredDeposit = web3.toWei("20", "finney")
-    }
+    const gasPrice = readGasPrice()
+    const fee = readFee()
+    const bounty = readBounty()
+    const requiredDeposit = readDeposit()
 
     clear()
 
@@ -375,7 +419,7 @@ Endowment: ${web3.fromWei(endowment.toString())}
 
     eacScheduler.initSender({
       from: web3.eth.defaultAccount,
-      gas: 3000000,
+      gas: 1500000,
       value: endowment,
     })
 
@@ -421,7 +465,7 @@ Endowment: ${web3.fromWei(endowment.toString())}
         requiredDeposit
         )
         .then((receipt) => {
-          if (receipt.status !== '0x1') {
+          if (receipt.status != '0x1') {
             spinner.fail(`Transaction was mined but failed. No transaction scheduled.`)
             process.exit(1)
           }
