@@ -382,7 +382,6 @@ Endowment: ${web3.fromWei(endowment.toString())}
     console.log("\n")
     const spinner = ora("Sending transaction! Waiting for a response...").start()
 
-
     temporalUnit === 1
       ? eacScheduler
         .blockSchedule(
