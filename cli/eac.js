@@ -442,7 +442,6 @@ Endowment: ${web3.fromWei(endowment.toString())}
         )
         .then((receipt) => {
           if (receipt.status != '0x1') {
-            console.log(receipt)
             spinner.fail(`Transaction was mined but failed. No transaction scheduled.`)
             process.exit(1)
           }
