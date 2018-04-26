@@ -84,9 +84,9 @@ const defaultSchedulingValues = {
   callGas: 100000,
   callValue: web3.toWei("100", "gwei"),
   windowSize: 255,
-  gasPrice: web3.toWei("20", "gwei"),
+  gasPrice: web3.eth.gasPrice,
   fee: web3.toWei("10", "gwei"),
-  bounty: web3.toWei("20", "gwei"),
+  bounty: web3.eth.gasPrice * 100000,
   deposit: web3.toWei("20", "gwei"),
   minimumPeriodBeforeSchedule: 25
 }
