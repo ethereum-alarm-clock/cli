@@ -382,6 +382,7 @@ Endowment: ${web3.fromWei(endowment.toString())}
     console.log("\n")
     const spinner = ora("Sending transaction! Waiting for a response...").start()
 
+
     temporalUnit === 1
       ? eacScheduler
         .blockSchedule(
@@ -397,7 +398,7 @@ Endowment: ${web3.fromWei(endowment.toString())}
         requiredDeposit
         )
         .then((receipt) => {
-          if (receipt.status !== '0x1') {
+          if (receipt.status != '0x1') {
             spinner.fail(`Transaction was mined but failed. No transaction scheduled.`)
             process.exit(1)
           }
