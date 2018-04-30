@@ -28,17 +28,17 @@
   "dependencies": {
     "bignumber.js": "^6.0.0",
     "clear": "0.0.1",
-    "commander": "^2.14.1",
+    "commander": "^2.15.1",
     "dotenv": "^5.0.1",
-    "eac.js-client": "github:ethereum-alarm-clock/eac.js-client#1.0.0-beta.2",
-    "eac.js-lib": "github:ethereum-alarm-clock/eac.js-lib#1.0.0-beta.2",
+    "eac.js-client": "github:ethereum-alarm-clock/eac.js-client#1.0.0-beta.3",
+    "eac.js-lib": "github:ethereum-alarm-clock/eac.js-lib#1.0.0-beta.3",
     "ethereumjs-util": "^5.1.5",
     "keen-tracking": "^1.4.0",
-    "lokijs": "^1.5.2",
+    "lokijs": "^1.5.3",
     "ora": "^1.4.0",
     "readline-sync": "^1.4.9",
-    "web3": "^0.20.5",
-    "web3-providers-ws": "^1.0.0-beta.33"
+    "web3": "^0.20.6",
+    "web3-providers-ws": "^1.0.0-beta.34"
   },
   "engines": {
     "node": ">=8"
