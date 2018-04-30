@@ -10,7 +10,7 @@
     "type": "git",
     "url": "git+https://github.com/ethereum-alarm-clock/eac.js-cli.git"
   },
-  "preferGlobal": "true",
+  "preferGlobal": true,
   "directories": {
     "bin": "./bin"
   },
