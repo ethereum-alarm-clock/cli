@@ -26,7 +26,7 @@ const fund = (web3, recip, value) => {
 
 const fundAccounts = async (web3, etherAmount, file, password) => {
     const wallet = new Wallet(web3)
-    const keystore = fs.readFileSync(file, 'utf-8')
+    const keystore = fs.readFileSync(file.toString(), 'utf-8')
     const ks = JSON.parse(keystore)
     wallet.decrypt(ks, password)
 
