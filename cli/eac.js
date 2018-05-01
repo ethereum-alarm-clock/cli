@@ -51,6 +51,7 @@ program
   .option("-s, --schedule", "schedules a transactions")
   .option("--block")
   .option("--timestamp")
+  .option("--json <object>", "Uses the parameters contained in <object> to schedule a transaction.")
   .option('-w, --wallet [path...]', 'specify the path to the keyfile you would like to unlock (For multiple wallet files, pass in each file with -w option)', function (path, paths) {
     paths.push(path);
     return paths;
@@ -355,32 +356,35 @@ const main = async (_) => {
     }
     if (!await eac.Util.checkForUnlockedAccount()) process.exit(1)
 
+    let scheduleParams = {}
+    if (program.json) scheduleParams = JSON.parse(program.json)
+
     const eacScheduler = await eac.scheduler()
 
     // Starts the scheduling wizard.
     clear()
     console.log("🧙 🧙 🧙  Schedule a transaction  🧙 🧙 🧙\n")
 
-    const temporalUnit = readTemporalUnit()
-    const toAddress = readRecipientAddress()
-    const callData = readCallData()
-    const callGas = readCallGas()
-    const callValue = readCallValue()
+    const temporalUnit = scheduleParams.temporalUnit || readTemporalUnit()
+    const toAddress = scheduleParams.recipient || readRecipientAddress()
+    const callData = scheduleParams.callData || readCallData()
+    const callGas = scheduleParams.callGas || readCallGas()
+    const callValue = scheduleParams.callValue || readCallValue()
     
     const currentBlockNumber = await eac.Util.getBlockNumber()
     
-    const windowStart = readWindowStart(currentBlockNumber)
-    const windowSize = readWindowSize()
+    const windowStart = scheduleParams.windowStart || readWindowStart(currentBlockNumber)
+    const windowSize = scheduleParam.windowSize || readWindowSize()
 
     if (windowStart < currentBlockNumber + defaultSchedulingValues.minimumPeriodBeforeSchedule) {
       console.log("That window start time is too soon!")
       process.exit(1)
     }
 
-    const gasPrice = readGasPrice()
-    const fee = readFee()
-    const bounty = readBounty()
-    const requiredDeposit = readDeposit()
+    const gasPrice = scheduleParams.gasPrice || readGasPrice()
+    const fee = scheduleParams.fee || readFee()
+    const bounty = scheduleParams.bounty ||  readBounty()
+    const requiredDeposit = scheduleParam.deposit || readDeposit()
 
     clear()
 
