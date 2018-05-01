@@ -10,9 +10,31 @@ This is a part of eac.js family that includes
 * [eac.js-client](https://github.com/ethereum-alarm-clock/eac.js-client)
 * [eac.js-cli](https://github.com/ethereum-alarm-clock/eac.js-cli)
 
-Eac.js-cli is the command line tool that allows you to run your executing agent for the Ethereum Alarm Clock protocol.
+Eac.js-cli is the command line tool that allows you to schedule transactions or run a timenode 
+on the Ethereum Alarm Clock protocol.
 
 ## Running
+Download this repository locally using `git clone` and install packages from NPM:
+
+```
+git clone git@github.com:ethereum-alarm-clock/eac.js-cli.git
+cd eac.jc-cli
+npm i
+```
+
+You will need to install and run the latest version of the Parity client on the __kovan__
+network. Make sure to follow the steps to unlock a local account.
+
+After starting up your Parity node, you can start the execution client (Timenode)
+by using the `-c` option. This will use your default unlocked account as the account
+from which to begin executing transactions from.
+
+```
+node bin/eac.js -c
+```
+
+You can install globablly from NPM:
+
 install globally: `npm i -g eac.js-cli`  
 run from command line: `eac.js -c`  
 view options: `eac.js --h`
