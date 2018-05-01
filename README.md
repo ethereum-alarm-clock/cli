@@ -33,6 +33,30 @@ from which to begin executing transactions from.
 node bin/eac.js -c
 ```
 
+If you would like to schedule instead you can use the `-s` flag to signify
+that you would like to enter the scheduling wizard. The wizard will walk you
+through the steps to enter in the required paramters for scheduling a new
+transaction with the alarm clock. If instead, you already know the parameters
+and would like to skip the wizard, use the `--json` flag and feed it a string 
+of the JSON object containing some or all of the following parameters in the example input"
+
+```
+node bin/eac.js -s --json '{
+    "temporalUnit": 1,
+    "recipient": "0x75E7F640bf6968b6f32C47a3Cd82C3C2C9dCae68",
+    "callData": "0x1337",
+    "callGas": 23,
+    "callValue": 1001,
+    "windowStart": 7770777,
+    "windowSize": 100,
+    "gasPrice": 12,
+    "fee": 9090,
+    "bounty": 8080,
+    "deposit": 707
+}'
+```
+
+## Install From NPM
 You can install globablly from NPM:
 
 install globally: `npm i -g eac.js-cli`  

@@ -374,7 +374,7 @@ const main = async (_) => {
     const currentBlockNumber = await eac.Util.getBlockNumber()
     
     const windowStart = scheduleParams.windowStart || readWindowStart(currentBlockNumber)
-    const windowSize = scheduleParam.windowSize || readWindowSize()
+    const windowSize = scheduleParams.windowSize || readWindowSize()
 
     if (windowStart < currentBlockNumber + defaultSchedulingValues.minimumPeriodBeforeSchedule) {
       console.log("That window start time is too soon!")
@@ -384,7 +384,7 @@ const main = async (_) => {
     const gasPrice = scheduleParams.gasPrice || readGasPrice()
     const fee = scheduleParams.fee || readFee()
     const bounty = scheduleParams.bounty ||  readBounty()
-    const requiredDeposit = scheduleParam.deposit || readDeposit()
+    const requiredDeposit = scheduleParams.deposit || readDeposit()
 
     clear()
 
