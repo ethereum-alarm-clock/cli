@@ -81,7 +81,6 @@ const provider = (() => {
 const web3 = new Web3(provider)
 const eac = require('eac.js-lib')(web3)
 
-//Scheduling Default values
 let defaultSchedulingValues;
 const getDefaultSchedulingValues = async () => {
   const gasPrice = await Bb.fromCallback(callback => web3.eth.getGasPrice(callback));
