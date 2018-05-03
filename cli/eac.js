@@ -3,6 +3,7 @@ require('dotenv').config();
 
 const fs = require('fs');
 const BigNumber = require("bignumber.js")
+const Bb = require("bluebird")
 const clear = require("clear")
 const ethUtil = require("ethereumjs-util")
 const Web3WsProvider = require('web3-providers-ws');
@@ -81,16 +82,21 @@ const provider = (() => {
 const web3 = new Web3(provider)
 const eac = require('eac.js-lib')(web3)
 
-const defaultSchedulingValues = {
-  callGas: 100000,
-  callValue: web3.toWei("100", "gwei"),
-  windowSize: 255,
-  gasPrice: web3.eth.gasPrice,
-  fee: web3.toWei("10", "gwei"),
-  bounty: web3.eth.gasPrice * 100000,
-  deposit: web3.toWei("20", "gwei"),
-  minimumPeriodBeforeSchedule: 25
-}
+//Scheduling Default values
+let defaultSchedulingValues;
+const getDefaultSchedulingValues = async() => {
+  const gasPrice = await Bb.fromCallback(callback => web3.eth.getGasPrice(callback));
+  return {
+    callGas: 100000,
+    callValue: web3.toWei("100", "gwei"),
+    windowSize: 255,
+    gasPrice,
+    fee: web3.toWei("10", "gwei"),
+    bounty: gasPrice * 100000,
+    deposit: web3.toWei("20", "gwei"),
+    minimumPeriodBeforeSchedule: 25
+  } 
+};
 
 const readTemporalUnit = () => {
   let temporalUnit
@@ -194,6 +200,7 @@ const readDeposit= () => {
 }
 
 const main = async (_) => {
+  
   if (program.createWallet) {
 
     const numAccounts = readlineSync.question('How many accounts would you like in your wallet? [1 - 10]\n> ')
@@ -348,6 +355,7 @@ const main = async (_) => {
     }
 
   } else if (program.schedule) {
+    defaultSchedulingValues = await getDefaultSchedulingValues();
     if (!await eac.Util.checkNetworkID()) {
       console.log("  error: must be running a localnode on the Ropsten or Kovan networks")
       process.exit(1)
