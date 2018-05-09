@@ -130,9 +130,9 @@ const start = (conf, ms) => {
     action() {
       const stats = conf.statsdb.getStats()
       stats.forEach((accountStats) => {
-        const profit = web3.fromWei(accountStats.profit, 'ether')
         const bounties = web3.fromWei(accountStats.bounties, 'ether')
         const costs = web3.fromWei(accountStats.costs, 'ether')
+        const profit = bounties - costs
 
         const stringToFixed = (string) => parseFloat(string).toFixed(6)
 
