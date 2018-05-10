@@ -66,10 +66,6 @@ view options: `eac.js --h`
 ### Docker
 [ Instructions ](https://github.com/ethereum-alarm-clock/eac.js-cli/tree/docker-setup)
 
-## Testing
-
-Install mocha `npm i -g mocha` and `mocha` at the root of the directory to run the test script on an isolated virtual blockchain using mocha. 
-
 ## Contributing
 
 Pull requests are always welcome. Not all functionalities of the Ethereum Alarm Clock smart contracts are translated to this library, it was mostly just utilities needed to write the client and grew from there. If you need some functionality and are not finding it in the API docs, please open a issue or contribute a pull request.
