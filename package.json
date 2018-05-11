@@ -1,7 +1,7 @@
 {
   "name": "eac.js-cli",
   "version": "1.8.1",
-  "description": "Commandline tool written in javascript to interact with the Ethereum Alarm Clock",
+  "description": "Command line tool written in JavaScript to interact with the Ethereum Alarm Clock",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -33,10 +33,10 @@
     "dotenv": "^5.0.1",
     "eac.js-client": "^3.0.0",
     "eac.js-lib": "^2.0.0",
-    "ethereumjs-util": "^5.1.5",
+    "ethereumjs-util": "^5.2.0",
     "keen-tracking": "^1.4.0",
     "lokijs": "^1.5.3",
-    "ora": "^1.4.0",
+    "ora": "^2.1.0",
     "readline-sync": "^1.4.9",
     "web3": "^0.20.6",
     "web3-providers-ws": "^1.0.0-beta.34"
