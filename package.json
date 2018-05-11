@@ -1,7 +1,7 @@
 {
   "name": "eac.js-cli",
   "version": "1.8.1",
-  "description": "Commandline tool written in javascript to interact with the Ethereum Alarm Clock",
+  "description": "Command line tool written in JavaScript to interact with the Ethereum Alarm Clock",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
