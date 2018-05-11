@@ -57,6 +57,7 @@ program
     paths.push(path);
     return paths;
   }, [])
+  .option("-i, --walletIndex [number]", "if not using a wallet file, choose index of web3 provider account (defaults to index 0)")
   .option('-p, --password [string]', 'the password to unlock your keystore file(s) (For multiple wallets, all wallets must have the same password')
   .option("-c, --client", "starts the executing client")
   .option('--createWallet', 'guides you through creating a new wallet.')
@@ -334,7 +335,7 @@ const main = async (_) => {
     } else {
       console.log('Wallet support: Disabled')
       // Loads the default account.
-      const account = web3.eth.accounts[0]
+      const account = web3.eth.accounts[program.walletIndex ? program.walletIndex : 0]
       /* eslint-disable */
       web3.eth.defaultAccount = account
       /* eslin-enable */

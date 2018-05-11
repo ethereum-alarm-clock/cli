@@ -130,11 +130,17 @@ const start = (conf, ms) => {
     action() {
       const stats = conf.statsdb.getStats()
       stats.forEach((accountStats) => {
-        let etherGain = accountStats.currentEther.minus(accountStats.startingEther)
-        etherGain = web3.fromWei(etherGain.toString())
+        const bounties = web3.fromWei(accountStats.bounties, 'ether')
+        const costs = web3.fromWei(accountStats.costs, 'ether')
+        const profit = bounties - costs
+
+        const stringToFixed = (string) => parseFloat(string).toFixed(6)
+
         console.log(`${accountStats.account} | Claimed: ${
           accountStats.claimed
-        } | Executed: ${accountStats.executed} | Ether gain: ${etherGain}`)
+        } | Executed: ${accountStats.executed} | Ether gain: ${
+          stringToFixed(profit)
+        } (${stringToFixed(bounties)} - ${stringToFixed(costs)})`)
       })
     },
   })
