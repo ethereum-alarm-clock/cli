@@ -98,6 +98,19 @@ const getDefaultSchedulingValues = async () => {
   } 
 };
 
+const readUntilValid = (funcName) => {
+  let read = false
+  while (!read) {
+    try {
+      const value = funcName()
+      read = true
+      return value
+    } catch (err) {
+      console.log(`[ERROR] ${err.message} Please try again.`)
+    }
+  }
+}
+
 const readTemporalUnit = () => {
   let temporalUnit
 
@@ -195,8 +208,12 @@ const readBounty = () => {
 
 const readDeposit= () => {
   const deposit = readlineSync.question(`Enter deposit amount: [press enter for ${defaultSchedulingValues.deposit}]\n`)
+  const minDeposit = web3.toWei("1", "gwei")
 
-  return deposit || defaultSchedulingValues.deposit
+  if (!deposit) return defaultSchedulingValues.deposit
+  if (deposit < minDeposit) throw new Error(`Deposit has to be higher than ${minDeposit}.`);
+
+  return deposit
 }
 
 const main = async (_) => {
@@ -371,7 +388,7 @@ const main = async (_) => {
     clear()
     console.log("🧙 🧙 🧙  Schedule a transaction  🧙 🧙 🧙\n")
 
-    const temporalUnit = scheduleParams.temporalUnit || readTemporalUnit()
+    const temporalUnit = scheduleParams.temporalUnit || readUntilValid(readTemporalUnit)
     const toAddress = scheduleParams.recipient || readRecipientAddress()
     const callData = scheduleParams.callData || readCallData()
     const callGas = scheduleParams.callGas || readCallGas()
@@ -390,7 +407,7 @@ const main = async (_) => {
     const gasPrice = scheduleParams.gasPrice || readGasPrice()
     const fee = scheduleParams.fee || readFee()
     const bounty = scheduleParams.bounty ||  readBounty()
-    const requiredDeposit = scheduleParams.deposit || readDeposit()
+    const requiredDeposit = scheduleParams.deposit || readUntilValid(readDeposit)
 
     clear()
 
