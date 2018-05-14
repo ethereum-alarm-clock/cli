@@ -101,8 +101,7 @@ const getDefaultSchedulingValues = async () => {
 const readUntilValid = (funcName) => {
   while (true) {
     try {
-      const value = funcName()
-      return value
+      return funcName()
     } catch (err) {
       console.log(`[ERROR] ${err.message} Please try again.`)
     }
