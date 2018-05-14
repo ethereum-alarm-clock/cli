@@ -103,7 +103,7 @@ const readUntilValid = (funcName) => {
     try {
       return funcName()
     } catch (err) {
-      console.log(`[ERROR] ${err.message} Please try again.`)
+      console.error(`[ERROR] ${err.message} Please try again.`)
     }
   }
 }
