@@ -22,6 +22,7 @@ const {
   Config,
   Scanner,
   StatsDB,
+  PROFITABILITY_INDEX
 } = require('eac.js-client')
 
 // Wallet Imports
@@ -92,7 +93,7 @@ const getDefaultSchedulingValues = async () => {
     windowSize: 255,
     gasPrice,
     fee: web3.toWei("10", "gwei"),
-    bounty: gasPrice * 100000,
+    bounty: parseInt(gasPrice * (PROFITABILITY_INDEX * 1.1)), // Bounty slightly higher than profitable
     deposit: web3.toWei("20", "gwei"),
     minimumPeriodBeforeSchedule: 25
   } 
