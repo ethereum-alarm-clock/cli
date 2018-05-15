@@ -1,4 +1,3 @@
-
 const BigNumber = require("bignumber.js")
 const drainWallet = require('../wallet/drainWallet')
 const { assert, expect }  = require("chai")
