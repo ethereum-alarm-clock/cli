@@ -17,7 +17,7 @@ class Analytics {
 
         this.versions = {
             'eac-client': versions.client,
-            'eac-contracts': version.contracts,
+            'eac-contracts': versions.contracts,
             'eac-lib': versions.lib
         }
 
