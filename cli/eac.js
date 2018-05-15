@@ -99,11 +99,20 @@ const getDefaultSchedulingValues = async () => {
 };
 
 const readUntilValid = (funcName) => {
-  while (true) {
+  const numTriesBeforeFail = 3;
+  let tryNum = 0;
+  
+  while (tryNum < numTriesBeforeFail) {
     try {
       return funcName()
     } catch (err) {
-      console.error(`[ERROR] ${err.message} Please try again.`)
+      tryNum += 1
+      if (tryNum === numTriesBeforeFail) {
+        console.error(`[ERROR] ${err.message} Exiting.`)
+        process.exit(1)
+      } else {
+        console.error(`${err.message} Please try again.`)
+      }
     }
   }
 }
