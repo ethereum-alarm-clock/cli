@@ -1,10 +1,10 @@
 {
   "name": "eac.js-cli",
   "version": "2.0.0",
-  "description": "Command line tool written in JavaScript to interact with the Ethereum Alarm Clock",
+  "description": "Command-line tool written in JavaScript to interact with the Ethereum Alarm Clock",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
@@ -43,5 +43,9 @@
   },
   "engines": {
     "node": ">=8"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^5.1.1"
   }
 }

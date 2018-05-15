@@ -24,17 +24,10 @@ const fund = (web3, recip, value) => {
     })
 }
 
-const fundAccounts = async (web3, etherAmount, file, password) => {
-    const wallet = new Wallet(web3)
-    const keystore = fs.readFileSync(file.toString(), 'utf-8')
-    const ks = JSON.parse(keystore)
-    wallet.decrypt(ks, password)
+const fundAccounts = async (web3, etherAmount, wallet) => {
+    const amountInWei = web3.toWei(etherAmount, 'ether')
 
-    const amt = web3.toWei(etherAmount, 'ether')
-
-    return Promise.all(wallet.getAddresses().map(address => {
-        return fund(web3, address, amt)
-    }))
+    return Promise.all(wallet.getAddresses().map(address => fund(web3, address, amountInWei)))
 }
 
 module.exports = fundAccounts
