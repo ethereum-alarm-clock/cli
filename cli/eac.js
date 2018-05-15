@@ -214,10 +214,9 @@ const readBounty = () => {
 
 const readDeposit= () => {
   const deposit = readlineSync.question(`Enter deposit amount: [press enter for ${defaultSchedulingValues.deposit}]\n`)
-  const minDeposit = web3.toWei("1", "gwei")
 
   if (!deposit) return defaultSchedulingValues.deposit
-  if (deposit < minDeposit) throw new Error(`Deposit has to be higher than ${minDeposit}.`);
+  if (deposit <= 0) throw new Error(`Deposit has to be higher than 0.`);
 
   return deposit
 }
