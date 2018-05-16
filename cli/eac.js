@@ -28,6 +28,8 @@ const {
 const createWallet = require('../wallet/createWallet.js')
 const fundAccounts = require('../wallet/fundWallet')
 const drainWallet = require('../wallet/drainWallet.js')
+const { loadWalletFromKeystoreFile } = require('./utils');
+
 
 // Parse the command line options using commander.
 program
@@ -100,7 +102,7 @@ const getDefaultSchedulingValues = async () => {
     bounty: gasPrice * 100000,
     deposit: web3.toWei("20", "gwei"),
     minimumPeriodBeforeSchedule: 25
-  } 
+  }
 };
 
 const readTemporalUnit = () => {
@@ -158,7 +160,7 @@ const readCallData = () => {
 const readCallGas = () => {
   const callGas = readlineSync.question(`Enter the call gas: [press enter for ${defaultSchedulingValues.callGas}]\n`)
 
-  return callGas || defaultSchedulingValues.callGas 
+  return callGas || defaultSchedulingValues.callGas
 }
 
 const readCallValue = () => {
@@ -169,7 +171,7 @@ const readCallValue = () => {
 
 const readWindowSize = () => {
   const windowSize = readlineSync.question(`Enter window size: [press enter for ${defaultSchedulingValues.windowSize}]\n`)
-  
+
   return windowSize || defaultSchedulingValues.windowSize
 }
 
@@ -205,7 +207,7 @@ const readDeposit= () => {
 }
 
 const main = async (_) => {
-  
+
   if (program.createWallet) {
 
     const numAccounts = readlineSync.question('How many accounts would you like in your wallet? [1 - 10]\n> ')
@@ -232,7 +234,8 @@ const main = async (_) => {
     if (!await eac.Util.checkForUnlockedAccount()) process.exit(1)
 
     const spinner = ora('Sending the funding transactions...').start()
-    fundAccounts(web3, program.fundWallet, program.wallet, program.password)
+    const wallet = loadWalletFromKeystoreFile(web3, program.wallet, program.password)
+    fundAccounts(web3, program.fundWallet, wallet)
     // .then(Res => console.log(Res))
     .then(res => {
       res.forEach(txObj => {
@@ -260,7 +263,8 @@ const main = async (_) => {
     const gasPrice = await eac.Util.getGasPrice()
 
     try {
-      await drainWallet(web3, gasPrice, program.drainWallet, program.wallet, program.password)
+      const wallet = loadWalletFromKeystoreFile(web3, program.wallet, program.password)
+      await drainWallet(web3, gasPrice, program.drainWallet, wallet)
       spinner.succeed('Wallet drained!')
     } catch (err) {
       spinner.fail(err)
@@ -276,7 +280,7 @@ const main = async (_) => {
 
     if (program.logfile === "default") {
       program.logfile = `${require("os").homedir()}/.eac.log`
-    }  
+    }
 
     // Assigns chain to the name of the network ID
     const chain = await eac.Util.getChainName()
@@ -381,9 +385,9 @@ const main = async (_) => {
     const callData = scheduleParams.callData || readCallData()
     const callGas = scheduleParams.callGas || readCallGas()
     const callValue = scheduleParams.callValue || readCallValue()
-    
+
     const currentBlockNumber = await eac.Util.getBlockNumber()
-    
+
     const windowStart = scheduleParams.windowStart || readWindowStart(currentBlockNumber)
     const windowSize = scheduleParams.windowSize || readWindowSize()
 
