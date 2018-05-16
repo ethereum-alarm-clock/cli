@@ -14,9 +14,7 @@ class Analytics {
         this.writeKey = process.env.KEEN_WRITE_KEY;
 
         this._web3 = web3;
-
         this.versions = versions;
-        console.log(this.versions)
 
         this.networkId = null;
         this.trackingClient = null;
