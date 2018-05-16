@@ -15,11 +15,8 @@ class Analytics {
 
         this._web3 = web3;
 
-        this.versions = {
-            'eac-client': versions.client,
-            'eac-contracts': versions.contracts,
-            'eac-lib': versions.lib
-        }
+        this.versions = versions;
+        console.log(this.versions)
 
         this.networkId = null;
         this.trackingClient = null;
@@ -73,7 +70,7 @@ class Analytics {
         const event = {
             nodeAddress,
             networkId,
-            versions: this.versions,
+            eacVersions: this.versions,
             nodeType:'cli',
             status: 'active'
         };
