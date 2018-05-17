@@ -9,11 +9,12 @@ const ACTIVE_CLINODES_POLLING_INTERVAL = 2 * 60 * 1000;
 
 class Analytics {
 
-    constructor(web3) {
+    constructor(web3, versions) {
         this.projectId = process.env.KEEN_PROJECT_ID;
         this.writeKey = process.env.KEEN_WRITE_KEY;
 
         this._web3 = web3;
+        this.versions = versions;
 
         this.networkId = null;
         this.trackingClient = null;
@@ -67,6 +68,7 @@ class Analytics {
         const event = {
             nodeAddress,
             networkId,
+            eacVersions: this.versions,
             nodeType:'cli',
             status: 'active'
         };

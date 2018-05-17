@@ -84,6 +84,11 @@ const provider = (() => {
 
 const web3 = new Web3(provider)
 const eac = require('eac.js-lib')(web3)
+const dependencyVersions = {
+  client: require('eac.js-client').version,
+  contracts: eac.contracts,
+  lib: eac.version
+}
 
 let defaultSchedulingValues;
 const getDefaultSchedulingValues = async () => {
@@ -287,7 +292,7 @@ const main = async (_) => {
     analytics = program.analytics && program.analytics.toLowerCase() === 'off' ? false : true;
 
     if (analytics) {
-      analytics = new Analytics(web3);
+      analytics = new Analytics(web3, dependencyVersions);
     }
 
     // Parses the logfile
