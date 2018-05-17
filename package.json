@@ -28,7 +28,7 @@
   "dependencies": {
     "bignumber.js": "^6.0.0",
     "bluebird": "^3.5.1",
-    "clear": "0.0.1",
+    "clear": "0.1.0",
     "commander": "^2.15.1",
     "dotenv": "^5.0.1",
     "eac.js-client": "^3.0.0",
