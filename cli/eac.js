@@ -100,6 +100,25 @@ const getDefaultSchedulingValues = async () => {
   }
 };
 
+const readUntilValid = (funcName) => {
+  const numTriesBeforeFail = 3;
+  let tryNum = 0;
+  
+  while (tryNum < numTriesBeforeFail) {
+    try {
+      return funcName()
+    } catch (err) {
+      tryNum += 1
+      if (tryNum === numTriesBeforeFail) {
+        console.error(`[ERROR] ${err.message} Exiting.`)
+        process.exit(1)
+      } else {
+        console.error(`${err.message} Please try again.`)
+      }
+    }
+  }
+}
+
 const readTemporalUnit = () => {
   let temporalUnit
 
@@ -198,7 +217,10 @@ const readBounty = () => {
 const readDeposit= () => {
   const deposit = readlineSync.question(`Enter deposit amount: [press enter for ${defaultSchedulingValues.deposit}]\n`)
 
-  return deposit || defaultSchedulingValues.deposit
+  if (!deposit) return defaultSchedulingValues.deposit
+  if (deposit <= 0) throw new Error(`Deposit has to be higher than 0.`);
+
+  return deposit
 }
 
 const main = async (_) => {
@@ -375,7 +397,7 @@ const main = async (_) => {
     clear()
     console.log("🧙 🧙 🧙  Schedule a transaction  🧙 🧙 🧙\n")
 
-    const temporalUnit = scheduleParams.temporalUnit || readTemporalUnit()
+    const temporalUnit = scheduleParams.temporalUnit || readUntilValid(readTemporalUnit)
     const toAddress = scheduleParams.recipient || readRecipientAddress()
     const callData = scheduleParams.callData || readCallData()
     const callGas = scheduleParams.callGas || readCallGas()
@@ -394,7 +416,7 @@ const main = async (_) => {
     const gasPrice = scheduleParams.gasPrice || readGasPrice()
     const fee = scheduleParams.fee || readFee()
     const bounty = scheduleParams.bounty ||  readBounty()
-    const requiredDeposit = scheduleParams.deposit || readDeposit()
+    const requiredDeposit = scheduleParams.deposit || readUntilValid(readDeposit)
 
     clear()
 
