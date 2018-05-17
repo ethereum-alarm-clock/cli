@@ -28,7 +28,7 @@ const {
 const createWallet = require('../wallet/createWallet.js')
 const fundAccounts = require('../wallet/fundWallet')
 const drainWallet = require('../wallet/drainWallet.js')
-const { loadWalletFromKeystoreFile } = require('./utils');
+const { loadWalletFromKeystoreFile } = require('../wallet/utils');
 
 
 // Parse the command line options using commander.
