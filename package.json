@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/ethereum-alarm-clock/eac.js-cli#readme",
   "dependencies": {
-    "bignumber.js": "^6.0.0",
+    "bignumber.js": "^7.2.1",
     "bluebird": "^3.5.1",
     "clear": "0.1.0",
     "commander": "^2.15.1",
