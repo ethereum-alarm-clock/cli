@@ -126,12 +126,23 @@ const main = async (_) => {
       process.exit(1)
     }
 
+    const executedAfter = (executedAt, tx) => {
+      const windowStart = tx.windowStart * 1
+      executedAt = executedAt * 1
+
+      return executedAt - windowStart
+    }
+
     const tx = rawTx.split('\n')
     const requests = await Promise.all(tx.filter(t => !!t).map(async (t) => {
       const tx = eac.transactionRequest(t)
       await tx.fillData()
 
-      return pick(tx, ["address", "windowStart", "claimedBy", "requiredDeposit", "bounty", "wasSuccessful"])
+      const res = pick(tx, ["address", "windowStart", "claimedBy", "requiredDeposit", "bounty", "wasSuccessful"])
+      const { blockNumber } = await tx.getExecutedEvent()
+      const accuracy = ((blockNumber * 1) - (tx.windowStart * 1)) / (tx.wind)
+
+      return Object.assign(res, {executedAfter: executedAfter(blockNumber, tx)})
     }))
 
     console.table(requests)
