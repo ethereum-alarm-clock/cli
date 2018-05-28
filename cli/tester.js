@@ -9,27 +9,11 @@ const ethUtil = require("ethereumjs-util")
 const Web3WsProvider = require('web3-providers-ws');
 const ora = require("ora")
 const program = require("commander")
-const readlineSync = require("readline-sync")
-const loki = require("lokijs")
+const cTable = require('console.table');
 
 // CLI Imports
 const { Analytics } = require("./analytics")
 const Logger = require("./logger")
-const Repl = require("./repl")
-
-// Client Imports
-const {
-  Config,
-  Scanner,
-  StatsDB,
-} = require('eac.js-client')
-
-// Wallet Imports
-const createWallet = require('../wallet/createWallet.js')
-const fundAccounts = require('../wallet/fundWallet')
-const drainWallet = require('../wallet/drainWallet.js')
-const { loadWalletFromKeystoreFile } = require('../wallet/utils');
-
 
 // Parse the command line options using commander.
 program
@@ -49,6 +33,7 @@ program
   .option("-i, --walletIndex [number]", "if not using a wallet file, choose index of web3 provider account (defaults to index 0)")
   .option('-p, --password [string]', 'the password to unlock your keystore file(s) (For multiple wallets, all wallets must have the same password')
   .option('-n, --repeat [number]', 'specify the number of transaction to send')
+  .option('-s, --stats', 'generates stats based on tx history')
   .parse(process.argv)
 
 
@@ -126,116 +111,147 @@ const readWindowStart = currentBlockNumber => {
   return windowStart || defaultWindowStart
 }
 
+const pick = (obj, keys) => {
+  return keys.map(k => k in obj ? {[k]: obj[k]} : {})
+             .reduce((res, o) => Object.assign(res, o), {});
+}
+
 const main = async (_) => {
-  let scheduleParams = await getDefaultSchedulingValues()
-  if (!await eac.Util.checkNetworkID()) {
-    console.log("  error: must be running a localnode on the Ropsten or Kovan networks")
-    process.exit(1)
-  }
-  if (!await eac.Util.checkForUnlockedAccount()) process.exit(1)
-  if (program.json) scheduleParams = JSON.parse(program.json)
+  if (program.stats) {
+    let rawTx = []
+    try {
+      rawTx = fs.readFileSync('scheduled.txt','utf8')
+    } catch (e) {
+      console.log("Unable to read scheduled.txt file")
+      process.exit(1)
+    }
 
-  const eacScheduler = await eac.scheduler()
+    const tx = rawTx.split('\n')
+    const requests = await Promise.all(tx.filter(t => !!t).map(async (t) => {
+      const tx = eac.transactionRequest(t)
+      await tx.fillData()
 
-  // Starts the scheduling wizard.
-  clear()
-  console.log("🧙 🧙 🧙  Schedule a transaction  🧙 🧙 🧙\n")
+      return pick(tx, ["address", "windowStart", "claimedBy", "requiredDeposit", "bounty", "wasSuccessful"])
+    }))
 
-  const temporalUnit = scheduleParams.temporalUnit || readTemporalUnit()
-  const toAddress = scheduleParams.recipient || web3.eth.defaultAccount
-  const callData = scheduleParams.callData || "0x0"
-  const callGas = scheduleParams.callGas
-  const callValue = scheduleParams.callValue
+    console.table(requests)
+  } else {
+    let scheduleParams = await getDefaultSchedulingValues()
+    if (!await eac.Util.checkNetworkID()) {
+      console.log("  error: must be running a localnode on the Ropsten or Kovan networks")
+      process.exit(1)
+    }
+    if (!await eac.Util.checkForUnlockedAccount()) process.exit(1)
+    if (program.json) scheduleParams = JSON.parse(program.json)
 
-  const currentBlockNumber = await eac.Util.getBlockNumber()
+    const eacScheduler = await eac.scheduler()
 
-  const windowStart = scheduleParams.windowStart || currentBlockNumber + scheduleParams.minimumPeriodBeforeSchedule + 5
-  const windowSize = scheduleParams.windowSize
+    // Starts the scheduling wizard.
+    clear()
+    console.log("🧙 🧙 🧙  Schedule a transaction  🧙 🧙 🧙\n")
 
-  const gasPrice = scheduleParams.gasPrice
-  const fee = scheduleParams.fee
-  const bounty = scheduleParams.bounty
-  const requiredDeposit = scheduleParams.deposit
+    const temporalUnit = scheduleParams.temporalUnit || readTemporalUnit()
+    const toAddress = scheduleParams.recipient || web3.eth.defaultAccount
+    const callData = scheduleParams.callData || "0x0"
+    const callGas = scheduleParams.callGas
+    const callValue = scheduleParams.callValue
 
-  let repeat = program.repeat || 1
+    const currentBlockNumber = await eac.Util.getBlockNumber()
 
-  const endowment = eac.Util.calcEndowment(
-    new BigNumber(callGas),
-    new BigNumber(callValue),
-    new BigNumber(gasPrice),
-    new BigNumber(fee),
-    new BigNumber(bounty)
-  )
+    const windowStart = scheduleParams.windowStart || currentBlockNumber + scheduleParams.minimumPeriodBeforeSchedule + 5
+    const windowSize = scheduleParams.windowSize
 
-  console.log(`
-toAddress       - ${toAddress}
-callData        - ${callData}
-callGas         - ${callGas}
-callValue       - ${callValue}
-windowSize      - ${windowSize}
-windowStart     - ${windowStart}
-gasPrice        - ${gasPrice}
-fee             - ${fee}
-bounty          - ${bounty}
-requiredDeposit - ${requiredDeposit}
+    const gasPrice = scheduleParams.gasPrice
+    const fee = scheduleParams.fee
+    const bounty = scheduleParams.bounty
+    const requiredDeposit = scheduleParams.deposit
 
-Sending from ${web3.eth.defaultAccount}
-Endowment: ${web3.fromWei(endowment.toString())}
-`)
+    let repeat = program.repeat || 1
 
-  eacScheduler.initSender({
-    from: web3.eth.defaultAccount,
-    gas: 1000000,
-    value: endowment,
-  })
+    const endowment = eac.Util.calcEndowment(
+      new BigNumber(callGas),
+      new BigNumber(callValue),
+      new BigNumber(gasPrice),
+      new BigNumber(fee),
+      new BigNumber(bounty)
+    )
 
-  console.log("\n")
-  const spinner = ora(`Sending ${repeat} transactions! Waiting for a response...`).start()
+    console.log(`
+  toAddress       - ${toAddress}
+  callData        - ${callData}
+  callGas         - ${callGas}
+  callValue       - ${callValue}
+  windowSize      - ${windowSize}
+  windowStart     - ${windowStart}
+  gasPrice        - ${gasPrice}
+  fee             - ${fee}
+  bounty          - ${bounty}
+  requiredDeposit - ${requiredDeposit}
 
-  const transactions = []
-  while(repeat--) {
-    let tx = temporalUnit === 1
-    ? eacScheduler
-      .blockSchedule(
-      toAddress,
-      callData,
-      callGas,
-      callValue,
-      windowSize,
-      windowStart,
-      gasPrice,
-      fee,
-      bounty,
-      requiredDeposit
-      )
-    : eacScheduler
-      .timestampSchedule(
-      toAddress,
-      callData,
-      callGas,
-      callValue,
-      windowSize,
-      windowStart,
-      gasPrice,
-      fee,
-      bounty,
-      requiredDeposit
-      )
-    
-    tx = tx.then((receipt) => {
-      if (receipt.status != '0x1') {
-        spinner.fail(`Transaction was mined but failed. No transaction scheduled.`)
-      } else {
-        spinner.succeed(`Transaction successful! Hash: ${receipt.transactionHash}, Address: ${eac.Util.getTxRequestFromReceipt(receipt)}`)
-      }
-    })
-    .catch((err) => {
-      spinner.fail(err)
+  Sending from ${web3.eth.defaultAccount}
+  Endowment: ${web3.fromWei(endowment.toString())}
+  `)
+
+    eacScheduler.initSender({
+      from: web3.eth.defaultAccount,
+      gas: 1000000,
+      value: endowment,
     })
 
-    transactions.push(tx)
+    console.log("\n")
+    const spinner = ora(`Sending ${repeat} transactions! Waiting for a response...`).start()
+
+    const transactions = []
+    const succeeded = []
+
+    while(repeat--) {
+      let tx = temporalUnit === 1
+      ? eacScheduler
+        .blockSchedule(
+        toAddress,
+        callData,
+        callGas,
+        callValue,
+        windowSize,
+        windowStart,
+        gasPrice,
+        fee,
+        bounty,
+        requiredDeposit
+        )
+      : eacScheduler
+        .timestampSchedule(
+        toAddress,
+        callData,
+        callGas,
+        callValue,
+        windowSize,
+        windowStart,
+        gasPrice,
+        fee,
+        bounty,
+        requiredDeposit
+        )
+      
+      tx = tx.then((receipt) => {
+        if (receipt.status != '0x1') {
+          spinner.fail(`Transaction was mined but failed. No transaction scheduled.`)
+        } else {
+          const address = eac.Util.getTxRequestFromReceipt(receipt)
+          spinner.succeed(`Transaction successful! Hash: ${receipt.transactionHash}, Address: ${address}`)
+          succeeded.push(address)
+        }
+      })
+      .catch((err) => {
+        spinner.fail(err)
+      })
+
+      transactions.push(tx)
+    }
+    await Promise.all(transactions)
+
+    fs.appendFileSync("scheduled.txt", '\n' + succeeded.join('\n'))
   }
-  await Promise.all(transactions)
 }
 
 main().catch((e) => {
