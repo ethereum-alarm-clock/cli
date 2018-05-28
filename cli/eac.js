@@ -22,6 +22,7 @@ const {
   Config,
   Scanner,
   StatsDB,
+  DEFAULT_PROFITABILITY_INDEX
 } = require('eac.js-client')
 
 // Wallet Imports
@@ -67,6 +68,7 @@ program
   .option('--drainWallet <target>', 'sends the target address all ether in the wallet')
   .option("--autostart", "starts scanning automatically")
   .option("--analytics [on,off]", "Allow or disable network analytics")
+  .option("--profitabilityIndex [number]", `specify the claiming profitability index (defaults to ${DEFAULT_PROFITABILITY_INDEX})`)
   .parse(process.argv)
 
 
@@ -99,7 +101,7 @@ const getDefaultSchedulingValues = async () => {
     windowSize: 255,
     gasPrice,
     fee: web3.toWei("10", "gwei"),
-    bounty: gasPrice * 100000,
+    bounty: parseInt(gasPrice * (DEFAULT_PROFITABILITY_INDEX * 1.1)), // Bounty slightly higher than profitable
     deposit: web3.toWei("20", "gwei"),
     minimumPeriodBeforeSchedule: 25
   }
@@ -321,7 +323,8 @@ const main = async (_) => {
       provider: program.provider, // conf.provider
       walletStores: encKeystores, // conf.walletStore
       password: program.password, // wallet password
-      autostart: program.autostart
+      autostart: program.autostart,
+      profitabilityIndex: program.profitabilityIndex // conf.profitabilityIndex
     })
 
     conf.client = "parity"
