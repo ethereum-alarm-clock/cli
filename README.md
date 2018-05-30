@@ -58,6 +58,13 @@ node bin/eac.js -s --json '{
 }'
 ```
 
+## Tools
+For testing purposes you can use `tools/tester.js` which provides 2 features:
+
+* `node tools/tester.js -b -n 10` sends 10 transactions from and to `web3.eth.defaultAccount`
+
+* `node tools/tester.js -s` shows the information about tx sent by using script above (it recommended to combine with tools like `watch` for e.g. `watch -n5 node tools/tester.js -s` 
+
 ## Install From NPM
 You can install globablly from NPM:
 
