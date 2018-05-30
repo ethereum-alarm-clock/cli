@@ -116,6 +116,28 @@ const pick = (obj, keys) => {
              .reduce((res, o) => Object.assign(res, o), {});
 }
 
+const renderTable = async (transactions) => {
+  const executedAfter = (executedAt, tx) => {
+    const windowStart = tx.windowStart * 1
+    executedAt = executedAt * 1
+
+    return executedAt - windowStart
+  }
+
+  const requests = await Promise.all(transactions.filter(t => !!t).map(async (t) => {
+    const tx = eac.transactionRequest(t)
+    await tx.fillData()
+
+    const res = pick(tx, ["address", "windowStart", "claimedBy", "requiredDeposit", "bounty", "wasSuccessful"])
+    const { blockNumber } = await tx.getExecutedEvent()
+    const accuracy = ((blockNumber * 1) - (tx.windowStart * 1)) / (tx.wind)
+
+    return Object.assign(res, {executedAfter: executedAfter(blockNumber, tx)})
+  }))
+
+  console.table(requests)
+}
+
 const main = async (_) => {
   if (program.stats) {
     let rawTx = []
@@ -126,26 +148,8 @@ const main = async (_) => {
       process.exit(1)
     }
 
-    const executedAfter = (executedAt, tx) => {
-      const windowStart = tx.windowStart * 1
-      executedAt = executedAt * 1
-
-      return executedAt - windowStart
-    }
-
-    const tx = rawTx.split('\n')
-    const requests = await Promise.all(tx.filter(t => !!t).map(async (t) => {
-      const tx = eac.transactionRequest(t)
-      await tx.fillData()
-
-      const res = pick(tx, ["address", "windowStart", "claimedBy", "requiredDeposit", "bounty", "wasSuccessful"])
-      const { blockNumber } = await tx.getExecutedEvent()
-      const accuracy = ((blockNumber * 1) - (tx.windowStart * 1)) / (tx.wind)
-
-      return Object.assign(res, {executedAfter: executedAfter(blockNumber, tx)})
-    }))
-
-    console.table(requests)
+    const transactions = rawTx.split('\n')
+    await renderTable(transactions)
   } else {
     let scheduleParams = await getDefaultSchedulingValues()
     if (!await eac.Util.checkNetworkID()) {
@@ -169,7 +173,7 @@ const main = async (_) => {
 
     const currentBlockNumber = await eac.Util.getBlockNumber()
 
-    const windowStart = scheduleParams.windowStart || currentBlockNumber + scheduleParams.minimumPeriodBeforeSchedule + 5
+    const windowStart = scheduleParams.windowStart || (currentBlockNumber + scheduleParams.minimumPeriodBeforeSchedule + 5)
     const windowSize = scheduleParams.windowSize
 
     const gasPrice = scheduleParams.gasPrice
@@ -243,7 +247,7 @@ const main = async (_) => {
         bounty,
         requiredDeposit
         )
-      
+
       tx = tx.then((receipt) => {
         if (receipt.status != '0x1') {
           spinner.fail(`Transaction was mined but failed. No transaction scheduled.`)
