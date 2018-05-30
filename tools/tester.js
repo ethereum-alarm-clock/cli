@@ -5,15 +5,10 @@ const fs = require('fs');
 const BigNumber = require("bignumber.js")
 const Bb = require("bluebird")
 const clear = require("clear")
-const ethUtil = require("ethereumjs-util")
 const Web3WsProvider = require('web3-providers-ws');
 const ora = require("ora")
 const program = require("commander")
 const cTable = require('console.table');
-
-// CLI Imports
-const { Analytics } = require("./analytics")
-const Logger = require("./logger")
 
 // Parse the command line options using commander.
 program
@@ -85,30 +80,6 @@ const readTemporalUnit = () => {
     throw new Error("Invalid temporal unit. Please use --block or --timestamp");
   }
   return temporalUnit;
-}
-
-const readRecipientAddress = () => {
-  let toAddress = readlineSync.question(`Enter the recipient address: [press enter for ${web3.eth.defaultAccount}]\n`)
-  if (!toAddress) {
-    toAddress = web3.eth.defaultAccount
-  }
-
-  // Validate the address
-  toAddress = ethUtil.addHexPrefix(toAddress)
-  if (!eac.Util.checkValidAddress(toAddress)) {
-    console.log("Not a valid address")
-    console.log("[FATAL] exiting...")
-    process.exit(1)
-  }
-
-  return toAddress
-}
-
-const readWindowStart = currentBlockNumber => {
-  const defaultWindowStart = currentBlockNumber + defaultSchedulingValues.minimumPeriodBeforeSchedule + 5
-  const windowStart = readlineSync.question(`Enter window start: [press enter for ${defaultWindowStart}]\n`)
-
-  return windowStart || defaultWindowStart
 }
 
 const pick = (obj, keys) => {
