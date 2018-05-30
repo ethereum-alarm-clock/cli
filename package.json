@@ -30,6 +30,7 @@
     "bluebird": "^3.5.1",
     "clear": "0.1.0",
     "commander": "^2.15.1",
+    "console.table": "^0.10.0",
     "dotenv": "^5.0.1",
     "eac.js-client": "^3.0.1",
     "eac.js-lib": "^2.0.2",

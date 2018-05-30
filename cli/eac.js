@@ -33,7 +33,7 @@ const { loadWalletFromKeystoreFile } = require('../wallet/utils');
 
 // Parse the command line options using commander.
 program
-  .version("1.4.4")
+  .version(require('../package.json').version)
   .option(
   "--scan <spread>",
   "sets the scanning spread (ie +- from current block",
@@ -445,7 +445,7 @@ Endowment: ${web3.fromWei(endowment.toString())}
     console.log("\n")
     const spinner = ora("Sending transaction! Waiting for a response...").start()
 
-    temporalUnit === 1
+    const tx = temporalUnit === 1
       ? eacScheduler
         .blockSchedule(
         toAddress,
@@ -459,17 +459,6 @@ Endowment: ${web3.fromWei(endowment.toString())}
         bounty,
         requiredDeposit
         )
-        .then((receipt) => {
-          if (receipt.status != '0x1') {
-            spinner.fail(`Transaction was mined but failed. No transaction scheduled.`)
-            process.exit(1)
-          }
-          spinner.succeed(`Transaction successful! Hash: ${receipt.transactionHash}\n`)
-          console.log(`Address of the transaction request: ${eac.Util.getTxRequestFromReceipt(receipt)}`)
-        })
-        .catch((err) => {
-          spinner.fail(err)
-        })
       : eacScheduler
         .timestampSchedule(
         toAddress,
@@ -483,19 +472,20 @@ Endowment: ${web3.fromWei(endowment.toString())}
         bounty,
         requiredDeposit
         )
-        .then((receipt) => {
-          if (receipt.status != '0x1') {
-            spinner.fail(`Transaction was mined but failed. No transaction scheduled.`)
-            process.exit(1)
-          }
-          spinner.succeed(`Transaction successful! Hash: ${receipt.transactionHash}\n`)
-          console.log(`Address of the transaction request: ${eac.Util.getTxRequestFromReceipt(receipt)}`)
-        })
-        .catch((err) => {
-          spinner.fail(err)
-        })
+
+    tx.then((receipt) => {
+      if (receipt.status != '0x1') {
+        spinner.fail(`Transaction was mined but failed. No transaction scheduled.`)
+        process.exit(1)
+      }
+      spinner.succeed(`Transaction successful! Hash: ${receipt.transactionHash}\n`)
+      console.log(`Address of the transaction request: ${eac.Util.getTxRequestFromReceipt(receipt)}`)
+    })
+    .catch((err) => {
+      spinner.fail(err)
+    })
   } else {
-    console.log("\n  error: please start eac in either client `-c` or sheduling `-s` mode")
+    console.log("\n  error: please start eac in either client `-c` or scheduling `-s` mode")
     process.exit(1)
   }
 }
