@@ -27,8 +27,11 @@ program
   }, [])
   .option("-i, --walletIndex [number]", "if not using a wallet file, choose index of web3 provider account (defaults to index 0)")
   .option('-p, --password [string]', 'the password to unlock your keystore file(s) (For multiple wallets, all wallets must have the same password')
-  .option('-n, --repeat [number]', 'specify the number of transaction to send')
+  .option('-n, --repeat [number]', 'specify the number of transaction to send', 1)
   .option('-s, --stats', 'generates stats based on tx history')
+  .option('--windowStart [number]', 'define the windowStart for transactions')
+  .option('--windowStartSpread [number]', 'define the block/timestamp spread between consecutive transactions', 0)
+  .option('--randomizeBounty')
   .parse(process.argv)
 
 
@@ -58,12 +61,14 @@ const getDefaultSchedulingValues = async () => {
   return {
     callGas: 100000,
     callValue: web3.toWei("100", "gwei"),
-    windowSize: 255,
+    windowSizeBlock: 255,
+    windowSizeTimestamp: 255 * 15,
     gasPrice,
     fee: web3.toWei("10", "gwei"),
     bounty: gasPrice * 100000,
     deposit: web3.toWei("20", "gwei"),
-    minimumPeriodBeforeSchedule: 25
+    minimumPeriodBeforeSchedule: 25,
+    minimumPeriodBeforeScheduleInSeconds: 180,
   }
 };
 
@@ -88,11 +93,17 @@ const pick = (obj, keys) => {
 }
 
 const renderTable = async (transactions) => {
-  const executedAfter = (executedAt, tx) => {
+  const getExecutedAfter = async (executedAt, tx) => {
     const windowStart = tx.windowStart * 1
-    executedAt = executedAt * 1
+    const unit = tx.temporalUnit == 1 ? "b" : "s"
 
-    return executedAt - windowStart
+    executedAt *= 1
+
+    if (tx.temporalUnit == 2) {
+      executedAt = await eac.Util.getTimestampForBlock(executedAt)
+    }
+
+    return (executedAt - windowStart) + unit
   }
 
   const requests = await Promise.all(transactions.filter(t => !!t).map(async (t) => {
@@ -101,12 +112,29 @@ const renderTable = async (transactions) => {
 
     const res = pick(tx, ["address", "windowStart", "claimedBy", "requiredDeposit", "bounty", "wasSuccessful"])
     const { blockNumber } = await tx.getExecutedEvent()
-    const accuracy = ((blockNumber * 1) - (tx.windowStart * 1)) / (tx.wind)
+    const executedAfter = blockNumber ? await getExecutedAfter(blockNumber, tx) : "-"
 
-    return Object.assign(res, {executedAfter: executedAfter(blockNumber, tx)})
+    return Object.assign(res, { executedAfter })
   }))
 
   console.table(requests)
+}
+
+const getDefaultWindowStart = async (scheduleParams) => {
+  if (program.block) {
+    const currentBlockNumber = await eac.Util.getBlockNumber()
+    return currentBlockNumber + scheduleParams.minimumPeriodBeforeSchedule + 5
+  }
+  else if (program.timestamp) {
+    const currentTimestamp = await eac.Util.getTimestamp()
+    return currentTimestamp + scheduleParams.minimumPeriodBeforeScheduleInSeconds + 180
+  }
+}
+
+const getRandomBountyModifier = () => {
+  const random = Math.random()
+  const bounty = parseInt(random * 100000000000000)
+  return random < 0.5 ? bounty * -1 : bounty
 }
 
 const main = async (_) => {
@@ -144,53 +172,60 @@ const main = async (_) => {
 
     const currentBlockNumber = await eac.Util.getBlockNumber()
 
-    const windowStart = scheduleParams.windowStart || (currentBlockNumber + scheduleParams.minimumPeriodBeforeSchedule + 5)
-    const windowSize = scheduleParams.windowSize
+    const windowStart = (program.windowStart * 1) || scheduleParams.windowStart || await getDefaultWindowStart(scheduleParams)
+    const windowStartSpread = (program.windowStartSpread * 1) || scheduleParams.windowStartSpread
+    const windowSize = temporalUnit == 1 ? scheduleParams.windowSizeBlock : scheduleParams.windowSizeTimestamp
 
     const gasPrice = scheduleParams.gasPrice
     const fee = scheduleParams.fee
-    const bounty = scheduleParams.bounty
+    let bounty = scheduleParams.bounty
     const requiredDeposit = scheduleParams.deposit
 
-    let repeat = program.repeat || 1
-
-    const endowment = eac.Util.calcEndowment(
-      new BigNumber(callGas),
-      new BigNumber(callValue),
-      new BigNumber(gasPrice),
-      new BigNumber(fee),
-      new BigNumber(bounty)
-    )
+    let repeat = program.repeat
 
     console.log(`
-  toAddress       - ${toAddress}
-  callData        - ${callData}
-  callGas         - ${callGas}
-  callValue       - ${callValue}
-  windowSize      - ${windowSize}
-  windowStart     - ${windowStart}
-  gasPrice        - ${gasPrice}
-  fee             - ${fee}
-  bounty          - ${bounty}
-  requiredDeposit - ${requiredDeposit}
+  toAddress         - ${toAddress}
+  callData          - ${callData}
+  callGas           - ${callGas}
+  callValue         - ${callValue}
+  windowSize        - ${windowSize}
+  windowStart       - ${windowStart}
+  gasPrice          - ${gasPrice}
+  fee               - ${fee}
+  bounty            - ${bounty}
+  requiredDeposit   - ${requiredDeposit}
+  windowStartSpread - ${windowStartSpread}
+  randomizeBounty   - ${program.randomizeBounty}
 
   Sending from ${web3.eth.defaultAccount}
-  Endowment: ${web3.fromWei(endowment.toString())}
   `)
-
-    eacScheduler.initSender({
-      from: web3.eth.defaultAccount,
-      gas: 1000000,
-      value: endowment,
-    })
-
     console.log("\n")
     const spinner = ora(`Sending ${repeat} transactions! Waiting for a response...`).start()
 
     const transactions = []
     const succeeded = []
+    let spread = windowStartSpread
 
     while(repeat--) {
+      if (program.randomizeBounty) {
+        bounty += getRandomBountyModifier()
+        console.log(bounty)
+      }
+
+      const endowment = eac.Util.calcEndowment(
+        new BigNumber(callGas),
+        new BigNumber(callValue),
+        new BigNumber(gasPrice),
+        new BigNumber(fee),
+        new BigNumber(bounty)
+      )
+
+      eacScheduler.initSender({
+        from: web3.eth.defaultAccount,
+        gas: 1000000,
+        value: endowment,
+      })
+
       let tx = temporalUnit === 1
       ? eacScheduler
         .blockSchedule(
@@ -199,7 +234,7 @@ const main = async (_) => {
         callGas,
         callValue,
         windowSize,
-        windowStart,
+        windowStart + spread,
         gasPrice,
         fee,
         bounty,
@@ -212,7 +247,7 @@ const main = async (_) => {
         callGas,
         callValue,
         windowSize,
-        windowStart,
+        windowStart + spread,
         gasPrice,
         fee,
         bounty,
@@ -231,6 +266,8 @@ const main = async (_) => {
       .catch((err) => {
         spinner.fail(err)
       })
+
+      spread += spread
 
       transactions.push(tx)
     }
