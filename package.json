@@ -1,6 +1,6 @@
 {
   "name": "eac.js-cli",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "Command-line tool written in JavaScript to interact with the Ethereum Alarm Clock",
   "main": "index.js",
   "scripts": {
