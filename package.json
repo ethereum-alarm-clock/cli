@@ -33,7 +33,7 @@
     "console.table": "0.10.0",
     "dotenv": "5.0.1",
     "eac.js-client": "file:../eac.js-client",
-    "eac.js-lib": "2.0.2",
+    "eac.js-lib": "file:../eac.js-lib",
     "ethereumjs-util": "5.2.0",
     "keen-tracking": "1.4.0",
     "lokijs": "1.5.3",

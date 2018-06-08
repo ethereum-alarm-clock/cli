@@ -19,7 +19,8 @@ const Repl = require("./repl")
 
 const {
   Config,
-  TimeNode
+  TimeNode, 
+  Wallet,
 } = require('eac.js-client');
 
 // Wallet Imports
@@ -47,7 +48,7 @@ program
   .option(
   "--provider <string>",
   "set the HttpProvider to use",
-  "http://localhost:8545"
+  "https://rarely-suitable-shark.quiknode.io/87817da9-942d-4275-98c0-4176eee51e1a/aB5gwSfQdN4jmkS65F1HyA==/"
   )
   .option("-s, --schedule", "schedules a transactions")
   .option("--block")
@@ -130,7 +131,7 @@ const readTemporalUnit = () => {
 const readRecipientAddress = () => {
   let toAddress = readlineSync.question(`Enter the recipient address: [press enter for ${web3.eth.defaultAccount}]\n`)
   if (!toAddress) {
-    toAddress = web3.eth.defaultAccount
+    toAddress = '0x0010f94b296A852aAac52EA6c5Ac72e03afD032D';
   }
 
   // Validate the address
@@ -369,7 +370,17 @@ const main = async (_) => {
       console.log("  error: must be running a localnode on the Ropsten or Kovan networks")
       process.exit(1)
     }
-    if (!await eac.Util.checkForUnlockedAccount()) process.exit(1)
+    // if (!await eac.Util.checkForUnlockedAccount()) process.exit(1)
+
+    if (!program.wallet || !program.password) throw new Error('Use a wallet');
+
+    const wallet = new Wallet(web3);
+    // console.log(program.wallet);
+    // console.log(fs.readFileSync(program.wallet[0], 'utf-8'))
+    wallet.decrypt(JSON.parse(fs.readFileSync(program.wallet[0])), program.password);
+
+    // console.log(wallet)
+    // throw new Error('stop')
 
     let scheduleParams = {}
     if (program.json) scheduleParams = JSON.parse(program.json)
@@ -436,54 +447,80 @@ Endowment: ${web3.fromWei(endowment.toString())}
       return
     }
 
-    eacScheduler.initSender({
-      from: web3.eth.defaultAccount,
-      gas: 1500000,
-      value: endowment,
-    })
-
     console.log("\n")
     const spinner = ora("Sending transaction! Waiting for a response...").start()
 
-    const tx = temporalUnit === 1
-      ? eacScheduler
-        .blockSchedule(
-        toAddress,
-        callData,
-        callGas,
-        callValue,
-        windowSize,
-        windowStart,
-        gasPrice,
-        fee,
-        bounty,
-        requiredDeposit
-        )
-      : eacScheduler
-        .timestampSchedule(
-        toAddress,
-        callData,
-        callGas,
-        callValue,
-        windowSize,
-        windowStart,
-        gasPrice,
-        fee,
-        bounty,
-        requiredDeposit
-        )
+    const bScheduler = eacScheduler.blockScheduler;
 
-    tx.then((receipt) => {
-      if (receipt.status != '0x1') {
-        spinner.fail(`Transaction was mined but failed. No transaction scheduled.`)
-        process.exit(1)
-      }
-      spinner.succeed(`Transaction successful! Hash: ${receipt.transactionHash}\n`)
-      console.log(`Address of the transaction request: ${eac.Util.getTxRequestFromReceipt(receipt)}`)
+
+    const data = bScheduler.schedule.getData(
+      toAddress,
+      callData,
+      [
+        callGas,
+        callValue,
+        windowSize,
+        windowStart,
+        gasPrice,
+        fee,
+        bounty,
+        requiredDeposit,
+      ]
+    );
+
+    const { receipt } = await wallet.sendFromNext({
+      to: bScheduler.address,
+      value: endowment,
+      gas: 3000000,
+      gasPrice: web3.toWei('8', 'gwei'),
+      data,
     })
-    .catch((err) => {
-      spinner.fail(err)
-    })
+
+    if (!receipt.status) {
+      spinner.fail('Transaction mined but transaction failed');
+      process.exit(1)
+    }
+    spinner.succeed(`Transaction successful! Hash: ${receipt.transactionHash}\n`);
+    console.log(`Address of the transaction request: ${eac.Util.getTxRequestFromReceipt(receipt)}`)
+
+    // const tx = temporalUnit === 1
+    //   ? eacScheduler
+    //     .blockSchedule(
+    //     toAddress,
+    //     callData,
+    //     callGas,
+    //     callValue,
+    //     windowSize,
+    //     windowStart,
+    //     gasPrice,
+    //     fee,
+    //     bounty,
+    //     requiredDeposit
+    //     )
+    //   : eacScheduler
+    //     .timestampSchedule(
+    //     toAddress,
+    //     callData,
+    //     callGas,
+    //     callValue,
+    //     windowSize,
+    //     windowStart,
+    //     gasPrice,
+    //     fee,
+    //     bounty,
+    //     requiredDeposit
+    //     )
+
+    // tx.then((receipt) => {
+    //   if (receipt.status != '0x1') {
+    //     spinner.fail(`Transaction was mined but failed. No transaction scheduled.`)
+    //     process.exit(1)
+    //   }
+    //   spinner.succeed(`Transaction successful! Hash: ${receipt.transactionHash}\n`)
+    // })
+    // .catch((err) => {
+    //   spinner.fail(err)
+    // })
   } else {
     console.log("\n  error: please start eac in either client `-c` or scheduling `-s` mode")
     process.exit(1)
