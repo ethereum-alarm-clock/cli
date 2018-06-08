@@ -14,15 +14,13 @@ const loki = require("lokijs")
 
 // CLI Imports
 const { Analytics } = require("./analytics")
-const Logger = require("./logger")
+// const Logger = require("./logger")
 const Repl = require("./repl")
 
-// Client Imports
 const {
   Config,
-  Scanner,
-  StatsDB,
-} = require('eac.js-client')
+  TimeNode
+} = require('eac.js-client');
 
 // Wallet Imports
 const createWallet = require('../wallet/createWallet.js')
@@ -300,7 +298,7 @@ const main = async (_) => {
       console.log("Logging to console")
     }
 
-    const logger = new Logger(program.logfile, program.logLevel)
+    // const logger = new Logger(program.logfile, program.logLevel)
     let encKeystores = [];
     program.wallet.map( file => {
       const fileStore = fs.readFileSync(file, 'utf8');
@@ -312,9 +310,9 @@ const main = async (_) => {
     });
 
     // Loads conf
-    let conf = await Config.create({
+    let config = new Config({
+      ms: program.ms,
       scanSpread: program.scan, // conf.scanSpread
-      logger,
       factory: requestFactory, // conf.factory
       web3, // conf.web3
       eac, // conf.eac
@@ -324,21 +322,21 @@ const main = async (_) => {
       autostart: program.autostart
     })
 
-    conf.client = "parity"
-    conf.chain = chain
-    conf.statsdb = new StatsDB(conf.web3, new loki("stats.json"))
+    config.client = "parity"
+    config.chain = chain
+    // config.statsdb = new StatsDB(config.web3, new loki("stats.json"))
 
     // Determines wallet support
-    if (conf.wallet) {
+    if (config.wallet) {
       console.log('Wallet support: Enabled')
       console.log('\nExecuting from accounts:')
-      const addressList = conf.wallet.getAccounts().map(account => account.getAddressString());
+      const addressList = config.wallet.getAccounts().map(account => account.getAddressString());
       addressList.forEach(async account => {
         console.log(`${account} | Balance: ${web3.fromWei(await eac.Util.getBalance(account))}`)
       })
 
-      conf.statsdb.initialize(addressList)
-      web3.eth.defaultAccount = conf.wallet.getAccounts()[0].getAddressString()
+      // conf.statsdb.initialize(addressList)
+      web3.eth.defaultAccount = config.wallet.getAccounts()[0].getAddressString()
     } else {
       console.log('Wallet support: Disabled')
       // Loads the default account.
@@ -350,16 +348,18 @@ const main = async (_) => {
         throw new Error("Wallet is disabled but you do not have a local account unlocked.")
       }
       console.log(`\nExecuting from account: ${account} | Balance: ${web3.fromWei(await eac.Util.getBalance(account))}`)
-      conf.statsdb.initialize([account])
+      // conf.statsdb.initialize([account])
     }
 
-    const scanner = new Scanner(program.milliseconds, conf)
 
-    scanner.start(program.milliseconds, conf)
-    setTimeout(() => Repl.start(conf, program.milliseconds), 1200)
+    // console.log(config)
+    const timenode = new TimeNode(config)
 
-    if (analytics && conf.wallet) {
-      const addresses = conf.wallet.getAddresses()
+    timenode.startScanning();
+    setTimeout(() => Repl.start(config, program.milliseconds), 1200)
+
+    if (analytics && config.wallet) {
+      const addresses = config.wallet.getAddresses()
       analytics.startAnalytics(addresses[0]);
     }
 
