@@ -21,6 +21,7 @@ const {
   Config,
   TimeNode, 
   Wallet,
+  StatsDB
 } = require('eac.js-client');
 
 // Wallet Imports
@@ -312,7 +313,8 @@ const main = async (_) => {
 
     // Loads conf
     let config = new Config({
-      ms: program.ms,
+      logger: false,
+      ms: 4000,
       scanSpread: program.scan, // conf.scanSpread
       factory: requestFactory, // conf.factory
       web3, // conf.web3
@@ -320,12 +322,13 @@ const main = async (_) => {
       provider: program.provider, // conf.provider
       walletStores: encKeystores, // conf.walletStore
       password: program.password, // wallet password
-      autostart: program.autostart
+      autostart: program.autostart,
+      // statsDb: statsDB,
     })
 
     config.client = "parity"
     config.chain = chain
-    // config.statsdb = new StatsDB(config.web3, new loki("stats.json"))
+    config.statsdb = new StatsDB(config.web3, new loki("stats.json"))
 
     // Determines wallet support
     if (config.wallet) {
@@ -338,31 +341,17 @@ const main = async (_) => {
 
       // conf.statsdb.initialize(addressList)
       web3.eth.defaultAccount = config.wallet.getAccounts()[0].getAddressString()
-    } else {
-      console.log('Wallet support: Disabled')
-      // Loads the default account.
-      const account = web3.eth.accounts[program.walletIndex ? program.walletIndex : 0]
-      /* eslint-disable */
-      web3.eth.defaultAccount = account
-      /* eslin-enable */
-      if (!eac.Util.checkValidAddress(web3.eth.defaultAccount)) {
-        throw new Error("Wallet is disabled but you do not have a local account unlocked.")
-      }
-      console.log(`\nExecuting from account: ${account} | Balance: ${web3.fromWei(await eac.Util.getBalance(account))}`)
-      // conf.statsdb.initialize([account])
     }
 
-
-    // console.log(config)
     const timenode = new TimeNode(config)
 
     timenode.startScanning();
-    setTimeout(() => Repl.start(config, program.milliseconds), 1200)
+    // setTimeout(() => Repl.start(config, program.milliseconds), 1200)
 
-    if (analytics && config.wallet) {
-      const addresses = config.wallet.getAddresses()
-      analytics.startAnalytics(addresses[0]);
-    }
+    // if (analytics && config.wallet) {
+    //   const addresses = config.wallet.getAddresses()
+    //   analytics.startAnalytics(addresses[0]);
+    // }
 
   } else if (program.schedule) {
     defaultSchedulingValues = await getDefaultSchedulingValues();
