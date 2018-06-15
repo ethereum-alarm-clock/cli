@@ -67,6 +67,9 @@ program
   .option('--drainWallet <target>', 'sends the target address all ether in the wallet')
   .option("--autostart", "starts scanning automatically")
   .option("--analytics [on,off]", "Allow or disable network analytics")
+  .option("--maxDeposit [eth]", "Only claim transactions that require a deposit lower than maxDeposit")
+  .option("--minBalance [eth]", "Only claim transactions if my balance is higher than minBalance")
+  .option("--minProfitability [eth]", "Only claim transactions with a bounty higher than minProfitability")
   .parse(process.argv)
 
 
@@ -342,6 +345,20 @@ const main = async (_) => {
       // conf.statsdb.initialize(addressList)
       web3.eth.defaultAccount = config.wallet.getAccounts()[0].getAddressString()
     }
+
+    const ethToWei = (num) => {
+      if (typeof num === 'undefined') {
+        num = 0;
+      }
+      num = new BigNumber(num);
+      return web3.toWei(num, 'ether');
+    }
+
+    config.economicStrategy = {
+      maxDeposit: ethToWei(program.maxDeposit),
+      minBalance: ethToWei(program.minBalance),
+      minProfitability: ethToWei(program.minProfitability),
+    };
 
     const timenode = new TimeNode(config)
 
