@@ -16,7 +16,7 @@ const Reader = require('./reader');
 
 // CLI Imports
 const { Analytics } = require("./analytics")
-// const Logger = require("./logger")
+const Logger = require("./logger")
 const Repl = require("./repl")
 
 const {
@@ -217,7 +217,7 @@ const main = async (_) => {
 
     // Loads conf
     let config = new Config({
-      logger: false,
+      logger: new Logger(program.logfile, program.logLevel),
       ms: 4000,
       scanSpread: program.scan, // conf.scanSpread
       factory: requestFactory, // conf.factory
@@ -242,7 +242,6 @@ const main = async (_) => {
         console.log(`${account} | Balance: ${web3.fromWei(await eac.Util.getBalance(account))}`)
       })
 
-      // conf.statsdb.initialize(addressList)
       web3.eth.defaultAccount = config.wallet.getAccounts()[0].getAddressString()
     }
 
@@ -263,12 +262,12 @@ const main = async (_) => {
     const timenode = new TimeNode(config)
 
     timenode.startScanning();
-    // setTimeout(() => Repl.start(config, program.milliseconds), 1200)
+    setTimeout(() => Repl.start(config, program.milliseconds), 1200)
 
-    // if (analytics && config.wallet) {
-    //   const addresses = config.wallet.getAddresses()
-    //   analytics.startAnalytics(addresses[0]);
-    // }
+    if (analytics && config.wallet) {
+      const addresses = config.wallet.getAddresses()
+      analytics.startAnalytics(addresses[0]);
+    }
 
   } else if (program.schedule) {
     defaultSchedulingValues = await getDefaultSchedulingValues();
@@ -276,17 +275,11 @@ const main = async (_) => {
       console.log("  error: must be running a localnode on the Ropsten or Kovan networks")
       process.exit(1)
     }
-    // if (!await eac.Util.checkForUnlockedAccount()) process.exit(1)
 
     if (!program.wallet || !program.password) throw new Error('Use a wallet');
 
     const wallet = new Wallet(web3);
-    // console.log(program.wallet);
-    // console.log(fs.readFileSync(program.wallet[0], 'utf-8'))
     wallet.decrypt(JSON.parse(fs.readFileSync(program.wallet[0])), program.password);
-
-    // console.log(wallet)
-    // throw new Error('stop')
 
     let scheduleParams = {}
     if (program.json) scheduleParams = JSON.parse(program.json)
