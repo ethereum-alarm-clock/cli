@@ -12,6 +12,8 @@ const program = require("commander")
 const readlineSync = require("readline-sync")
 const loki = require("lokijs")
 
+const Reader = require('./reader');
+
 // CLI Imports
 const { Analytics } = require("./analytics")
 // const Logger = require("./logger")
@@ -107,107 +109,6 @@ const getDefaultSchedulingValues = async () => {
     minimumPeriodBeforeSchedule: 25
   }
 };
-
-const readTemporalUnit = () => {
-  let temporalUnit
-
-  if (program.block) {
-    temporalUnit = 1;
-  }
-  else if (program.timestamp) {
-    temporalUnit = 2;
-  }
-  else {
-    const unit = readlineSync.question("Do you want to use block or timestamps as the unit? [block/timestamp]\n");
-    if (unit.toLowerCase() === "block") {
-      temporalUnit = 1;
-    }
-    else if (unit.toLowerCase() === "timestamp") {
-      temporalUnit = 2;
-    }
-    else {
-      throw new Error("Invalid temporal unit.");
-    }
-  }
-  return temporalUnit;
-}
-
-const readRecipientAddress = () => {
-  let toAddress = readlineSync.question(`Enter the recipient address: [press enter for ${web3.eth.defaultAccount}]\n`)
-  if (!toAddress) {
-    toAddress = '0x0010f94b296A852aAac52EA6c5Ac72e03afD032D';
-  }
-
-  // Validate the address
-  toAddress = ethUtil.addHexPrefix(toAddress)
-  if (!eac.Util.checkValidAddress(toAddress)) {
-    console.log("Not a valid address")
-    console.log("[FATAL] exiting...")
-    process.exit(1)
-  }
-
-  return toAddress
-}
-
-const readCallData = () => {
-  let callData = readlineSync.question("Enter call data: [press enter to skip]\n")
-
-  if (!callData) {
-    callData = "0x0"
-  }
-  callData = web3.toHex(callData)
-
-  return callData
-}
-
-const readCallGas = () => {
-  const callGas = readlineSync.question(`Enter the call gas: [press enter for ${defaultSchedulingValues.callGas}]\n`)
-
-  return callGas || defaultSchedulingValues.callGas
-}
-
-const readCallValue = () => {
-  const callValue = readlineSync.question(`Enter call value: [press enter for ${defaultSchedulingValues.callValue}] \n`)
-
-  return callValue || defaultSchedulingValues.callValue
-}
-
-const readWindowSize = () => {
-  const windowSize = readlineSync.question(`Enter window size: [press enter for ${defaultSchedulingValues.windowSize}]\n`)
-
-  return windowSize || defaultSchedulingValues.windowSize
-}
-
-const readWindowStart = currentBlockNumber => {
-  const defaultWindowStart = currentBlockNumber + defaultSchedulingValues.minimumPeriodBeforeSchedule + 5
-  const windowStart = readlineSync.question(`Enter window start: [press enter for ${defaultWindowStart}]\n`)
-
-  return windowStart || defaultWindowStart
-}
-
-const readGasPrice = () => {
-  const gasPrice = readlineSync.question(`Enter a gas price: [press enter for ${defaultSchedulingValues.gasPrice}]\n`)
-
-  return gasPrice || defaultSchedulingValues.gasPrice
-}
-
-const readFee = () => {
-  const fee = readlineSync.question(`Enter fee amount: [press enter for ${defaultSchedulingValues.fee}]\n`)
-
-  return fee || defaultSchedulingValues.fee
-}
-
-const readBounty = () => {
-  const bounty = readlineSync.question(`Enter bounty amount: [press enter for ${defaultSchedulingValues.bounty}]\n`)
-
-  return bounty || defaultSchedulingValues.bounty
-}
-
-const readDeposit= () => {
-  const deposit = readlineSync.question(`Enter deposit amount: [press enter for ${defaultSchedulingValues.deposit}]\n`)
-
-  return deposit || defaultSchedulingValues.deposit
-}
 
 const main = async (_) => {
 
@@ -326,12 +227,11 @@ const main = async (_) => {
       walletStores: encKeystores, // conf.walletStore
       password: program.password, // wallet password
       autostart: program.autostart,
-      // statsDb: statsDB,
+      statsDb: new StatsDB(web3, new loki("stats.json")),
     })
 
     config.client = "parity"
     config.chain = chain
-    config.statsdb = new StatsDB(config.web3, new loki("stats.json"))
 
     // Determines wallet support
     if (config.wallet) {
@@ -393,30 +293,33 @@ const main = async (_) => {
 
     const eacScheduler = await eac.scheduler()
 
+    // Init the reader
+    const reader = new Reader(web3, program, defaultSchedulingValues);
+
     // Starts the scheduling wizard.
     clear()
     console.log("🧙 🧙 🧙  Schedule a transaction  🧙 🧙 🧙\n")
 
-    const temporalUnit = scheduleParams.temporalUnit || readTemporalUnit()
-    const toAddress = scheduleParams.recipient || readRecipientAddress()
-    const callData = scheduleParams.callData || readCallData()
-    const callGas = scheduleParams.callGas || readCallGas()
-    const callValue = scheduleParams.callValue || readCallValue()
+    const temporalUnit = scheduleParams.temporalUnit || reader.readTemporalUnit()
+    const toAddress = scheduleParams.recipient || reader.readRecipientAddress()
+    const callData = scheduleParams.callData || reader.readCallData()
+    const callGas = scheduleParams.callGas || reader.readCallGas()
+    const callValue = scheduleParams.callValue || reader.readCallValue()
 
     const currentBlockNumber = await eac.Util.getBlockNumber()
 
-    const windowStart = scheduleParams.windowStart || readWindowStart(currentBlockNumber)
-    const windowSize = scheduleParams.windowSize || readWindowSize()
+    const windowStart = scheduleParams.windowStart || reader.readWindowStart(currentBlockNumber)
+    const windowSize = scheduleParams.windowSize || reader.readWindowSize()
 
     if (windowStart < currentBlockNumber + defaultSchedulingValues.minimumPeriodBeforeSchedule) {
       console.log("That window start time is too soon!")
       process.exit(1)
     }
 
-    const gasPrice = scheduleParams.gasPrice || readGasPrice()
-    const fee = scheduleParams.fee || readFee()
-    const bounty = scheduleParams.bounty ||  readBounty()
-    const requiredDeposit = scheduleParams.deposit || readDeposit()
+    const gasPrice = scheduleParams.gasPrice || reader.readGasPrice()
+    const fee = scheduleParams.fee || reader.readFee()
+    const bounty = scheduleParams.bounty ||  reader.readBounty()
+    const requiredDeposit = scheduleParams.deposit || reader.readDeposit()
 
     clear()
 
