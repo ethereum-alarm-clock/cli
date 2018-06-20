@@ -360,76 +360,62 @@ Endowment: ${web3.fromWei(endowment.toString())}
     const spinner = ora("Sending transaction! Waiting for a response...").start()
 
     const bScheduler = eacScheduler.blockScheduler;
+    const tsScheduler = eacScheduler.timestampScheduler;
 
+    let data;
+    let target;
+    if (temporalUnit === 1) {
+      target = bScheduler.address;
+      data = bScheduler.schedule.getData(
+        toAddress,
+        callData,
+        [
+          callGas,
+          callValue,
+          windowSize,
+          windowStart,
+          gasPrice,
+          fee,
+          bounty,
+          requiredDeposit,
+        ]
+      );
+    } else if (temporalUnit === 2) {
+      target = tsScheduler.address;
+      data = tsScheduler.schedule.getData(
+        toAddress,
+        callData,
+        [
+          callGas,
+          callValue,
+          windowSize,
+          windowStart,
+          gasPrice,
+          fee,
+          bounty,
+          requiredDeposit,
+        ]
+      );
+    } else { throw new Error('INVALID TEMPORAL UNIT'); }
 
-    const data = bScheduler.schedule.getData(
-      toAddress,
-      callData,
-      [
-        callGas,
-        callValue,
-        windowSize,
-        windowStart,
-        gasPrice,
-        fee,
-        bounty,
-        requiredDeposit,
-      ]
-    );
+    try {
+      const { receipt } = await wallet.sendFromNext({
+        to: target,
+        value: endowment,
+        gas: 3000000,
+        gasPrice: web3.toWei('8', 'gwei'),
+        data,
+      })
 
-    const { receipt } = await wallet.sendFromNext({
-      to: bScheduler.address,
-      value: endowment,
-      gas: 3000000,
-      gasPrice: web3.toWei('8', 'gwei'),
-      data,
-    })
-
-    if (!receipt.status) {
-      spinner.fail('Transaction mined but transaction failed');
-      process.exit(1)
+      if (!receipt.status) {
+        spinner.fail('Transaction mined but transaction failed');
+        throw new Error('Transaction failed.')
+      }
+      spinner.succeed(`Transaction successful! Hash: ${receipt.transactionHash}\n`);
+      console.log(`Address of the transaction request: ${eac.Util.getTxRequestFromReceipt(receipt)}`)
+    } catch (e) {
+      spinner.fail(e);
     }
-    spinner.succeed(`Transaction successful! Hash: ${receipt.transactionHash}\n`);
-    console.log(`Address of the transaction request: ${eac.Util.getTxRequestFromReceipt(receipt)}`)
-
-    // const tx = temporalUnit === 1
-    //   ? eacScheduler
-    //     .blockSchedule(
-    //     toAddress,
-    //     callData,
-    //     callGas,
-    //     callValue,
-    //     windowSize,
-    //     windowStart,
-    //     gasPrice,
-    //     fee,
-    //     bounty,
-    //     requiredDeposit
-    //     )
-    //   : eacScheduler
-    //     .timestampSchedule(
-    //     toAddress,
-    //     callData,
-    //     callGas,
-    //     callValue,
-    //     windowSize,
-    //     windowStart,
-    //     gasPrice,
-    //     fee,
-    //     bounty,
-    //     requiredDeposit
-    //     )
-
-    // tx.then((receipt) => {
-    //   if (receipt.status != '0x1') {
-    //     spinner.fail(`Transaction was mined but failed. No transaction scheduled.`)
-    //     process.exit(1)
-    //   }
-    //   spinner.succeed(`Transaction successful! Hash: ${receipt.transactionHash}\n`)
-    // })
-    // .catch((err) => {
-    //   spinner.fail(err)
-    // })
   } else {
     console.log("\n  error: please start eac in either client `-c` or scheduling `-s` mode")
     process.exit(1)
