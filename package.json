@@ -32,7 +32,7 @@
     "commander": "2.15.1",
     "console.table": "0.10.0",
     "dotenv": "5.0.1",
-    "eac.js-client": "3.0.2",
+    "eac.js-client": "github:ethereum-alarm-clock/eac.js-client",
     "eac.js-lib": "2.0.2",
     "ethereumjs-util": "5.2.0",
     "keen-tracking": "1.4.0",

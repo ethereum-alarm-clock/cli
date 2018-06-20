@@ -50,6 +50,25 @@ const start = (conf, ms) => {
       conf.logger.logLevel = level
     },
   })
+  replServer.defineCommand("getStats", {
+    help: "Get some interesting stats on your executing accounts.",
+    action() {
+      const stats = conf.statsDb.getStats()
+      stats.forEach((accountStats) => {
+        const bounties = web3.fromWei(accountStats.bounties, 'ether')
+        const costs = web3.fromWei(accountStats.costs, 'ether')
+        const profit = bounties - costs
+
+        const stringToFixed = (string) => parseFloat(string).toFixed(6)
+
+        console.log(`${accountStats.account} | Claimed: ${
+          accountStats.claimed
+        } | Executed: ${accountStats.executed} | Ether gain: ${
+          stringToFixed(profit)
+        } (${stringToFixed(bounties)} - ${stringToFixed(costs)})`)
+      })
+    },
+  })
   replServer.defineCommand("start", {
     help: "Starts the execution client.",
     action() {
@@ -123,25 +142,6 @@ const start = (conf, ms) => {
           spinner.succeed(`Transaction mined! Hash - ${receipt.transactionHash}`)
         }
       }).catch(err => spinner.fail(err))
-    },
-  })
-  replServer.defineCommand("getStats", {
-    help: "Get some interesting stats on your executing accounts.",
-    action() {
-      const stats = conf.statsdb.getStats()
-      stats.forEach((accountStats) => {
-        const bounties = web3.fromWei(accountStats.bounties, 'ether')
-        const costs = web3.fromWei(accountStats.costs, 'ether')
-        const profit = bounties - costs
-
-        const stringToFixed = (string) => parseFloat(string).toFixed(6)
-
-        console.log(`${accountStats.account} | Claimed: ${
-          accountStats.claimed
-        } | Executed: ${accountStats.executed} | Ether gain: ${
-          stringToFixed(profit)
-        } (${stringToFixed(bounties)} - ${stringToFixed(costs)})`)
-      })
     },
   })
   replServer.defineCommand("requestInfo", {
