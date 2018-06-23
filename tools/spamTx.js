@@ -1,5 +1,15 @@
 #!/usr/bin/env node
 
+/**
+ * To run
+ *  ./tools/spamTx.js --wallet <wallet_file> --password <string> --repeat <num_txs>
+ * 
+ * Will alternate between transactions using block number and timestamps as the 
+ * temporal unit. Creates transactions so that they will immediately be in the claim
+ * window and that a TimeNode with `--maxDeposit 1` set will claim. Executions take
+ * place in a short while.
+ */
+
 const BigNumber = require('bignumber.js');
 const Bb = require('bluebird');
 const { Wallet } = require('eac.js-client');
