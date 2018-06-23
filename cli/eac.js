@@ -261,7 +261,10 @@ const main = async (_) => {
 
     const timenode = new TimeNode(config)
 
-    timenode.startScanning();
+    try {
+      await timenode.startScanning();
+    } catch (e) { throw e; }
+
     setTimeout(() => Repl.start(config, program.milliseconds), 1200)
 
     if (analytics && config.wallet) {

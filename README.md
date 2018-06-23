@@ -1,84 +1,54 @@
 [<img src="https://s3.amazonaws.com/chronologic.network/ChronoLogic_logo.svg" width="128px">](https://github.com/chronologic)
 
-_Note: `eac.js` is operational but still considered alpha software, released to the public for expirmentation and testing. We do not recommend using it on the mainnet as it will lose you money under certain situations._ 
-
-[![npm version](https://badge.fury.io/js/eac.js-cli.svg)](https://badge.fury.io/js/eac.js-cli)
-# eac.js-cli
+[![npm version](https://badge.fury.io/js/eac.js-cli.svg)](https://badge.fury.io/js/eac.js-client)
 
 [![Greenkeeper badge](https://badges.greenkeeper.io/ethereum-alarm-clock/eac.js-cli.svg)](https://greenkeeper.io/)
 
-This is a part of eac.js family that includes 
-* [eac.js-lib](https://github.com/ethereum-alarm-clock/eac.js-lib)
-* [eac.js-client](https://github.com/ethereum-alarm-clock/eac.js-client)
-* [eac.js-cli](https://github.com/ethereum-alarm-clock/eac.js-cli)
+# EAC.JS-CLI
 
-Eac.js-cli is the command line tool that allows you to schedule transactions or run a timenode 
-on the Ethereum Alarm Clock protocol.
+This package allows you to run an [Ethereum Alarm Clock](https://github.com/ethereum-alarm-clock/ethereum-alarm-clock) TimeNode and to schedule transactions. It contains testing utilties too. 
 
-## Running
-Download this repository locally using `git clone` and install packages from NPM:
+## Contribute
 
-```
-git clone git@github.com:ethereum-alarm-clock/eac.js-cli.git
-cd eac.jc-cli
-npm i
-```
+If you would like to hack on EAC.JS or notice a bug, please open an issue or come find us on the Ethereum Alarm Clock Gitter channel and tell us. If you're feeling more ambitious and would like to contribute directly via a pull request, that's cool too. We will review all pull requests and issues opened on this repository. Even if you think something isn't working right or that it should work another way, we would really appreciate if you helped us by opening an issue!
 
-You will need to install and run the latest version of the Parity client on the __kovan__
-network. Make sure to follow the steps to unlock a local account.
+## How to use
 
-After starting up your Parity node, you can start the execution client (Timenode)
-by using the `-c` option. This will use your default unlocked account as the account
-from which to begin executing transactions from.
+To run a TimeNode or schedule a transaction you will need to create a keystore. `eac.js-cli` contains some utilities to help out with this.
 
 ```
-node bin/eac.js -c
+./bin/eac.js --createWallet
 ```
 
-If you would like to schedule instead you can use the `-s` flag to signify
-that you would like to enter the scheduling wizard. The wizard will walk you
-through the steps to enter in the required paramters for scheduling a new
-transaction with the alarm clock. If instead, you already know the parameters
-and would like to skip the wizard, use the `--json` flag and feed it a string 
-of the JSON object containing some or all of the following parameters in the example input"
+will guide you through the steps of creating a keystore.
 
 ```
-node bin/eac.js -s --json '{
-    "temporalUnit": 1,
-    "recipient": "0x75E7F640bf6968b6f32C47a3Cd82C3C2C9dCae68",
-    "callData": "0x1337",
-    "callGas": 23,
-    "callValue": 1001,
-    "windowStart": 7770777,
-    "windowSize": 100,
-    "gasPrice": 12,
-    "fee": 9090,
-    "bounty": 8080,
-    "deposit": 707
-}'
+./bin/eac.js --fundWallet <amt> --wallet <wallet_path> --password <string> --provider <path>
 ```
 
-## Tools
-For testing purposes you can use `tools/tester.js` which provides 2 features:
+will send `<amt>` ether to each account in the passed in wallet from a **local unlocked account**. Notice, you must be running a local node with a **local unlocked account** to use this utility. Otherwise you can send ether to your wallet accounts in any other way.
 
-* `node tools/tester.js -b -n 10` sends 10 transactions from and to `web3.eth.defaultAccount`
+If you ever get tired of running a TimeNode, you can drain the funds held in the wallet to an external account like so:
 
-* `node tools/tester.js -s` shows the information about tx sent by using script above (it recommended to combine with tools like `watch` for e.g. `watch -n5 node tools/tester.js -s` 
+```
+./bin/eac.js --drainWallet <target_address> --wallet <wallet_path> --password <string>
+```
 
-## Install From NPM
-You can install globablly from NPM:
+Once you have your wallet set up and funded, run a TimeNode with some default params like so:
 
-install globally: `npm i -g eac.js-cli`  
-run from command line: `eac.js -c`  
-view options: `eac.js --h`
+```
+./bin/eac.js -c --wallet <wallet_path> --password <string> --provider <path> --maxDeposit 1
+```
 
-### Docker
-[ Instructions ](https://github.com/ethereum-alarm-clock/eac.js-cli/tree/docker-setup)
+Open up `~/.eac.log` for the output, I prefer to follow the output in a new screen:
 
-## Contributing
+```
+tail -f ~/.eac.log
+```
 
-Pull requests are always welcome. Not all functionalities of the Ethereum Alarm Clock smart contracts are translated to this library, it was mostly just utilities needed to write the client and grew from there. If you need some functionality and are not finding it in the API docs, please open a issue or contribute a pull request.
+## Want more?
 
-## Questions or Concerns?
-
-Since this is alpha software, we highly encourage you to test it, use it and try to break it. We would love your feedback if you get stuck somewhere or you think something is not working the way it should be. Please open an issue if you need to report a bug or would like to leave a suggestion. Pull requests are welcome.
+This package is a part of EAC.JS family ~
+* [EAC.JS-LIB](https://github.com/ethereum-alarm-clock/eac.js-lib)
+* [EAC.JS-CLIENT](https://github.com/ethereum-alarm-clock/eac.js-client)
+* [EAC.JS-CLI](https://github.com/ethereum-alarm-clock/eac.js-cli)
