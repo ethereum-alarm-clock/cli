@@ -123,9 +123,11 @@ const main = async () => {
       if (!receipt.status) {
         throw 'Sending transaction failed.';
       }
+      const addressOf = eac.Util.getTxRequestFromReceipt(receipt);
       console.log(
-        `Address of txRequest: ${eac.Util.getTxRequestFromReceipt(receipt)} TransactionHash: ${receipt.transactionHash}\n`
+        `Address of txRequest: ${addressOf} TransactionHash: ${receipt.transactionHash}\n`
       );
+      fs.appendFileSync('scheduled.txt', `${addressOf}\n`);
     } catch (e) { console.error(e); }
   }
 }
