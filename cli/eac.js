@@ -33,48 +33,6 @@ const drainWallet = require('../wallet/drainWallet.js')
 const { loadWalletFromKeystoreFile } = require('../wallet/utils');
 
 
-// Parse the command line options using commander.
-program
-  .version(require('../package.json').version)
-  .option(
-  "--scan <spread>",
-  "sets the scanning spread (ie +- from current block",
-  75
-  )
-  .option(
-  "-m, --milliseconds <ms>",
-  "tells the client to scan every <ms> seconds",
-  4000
-  )
-  .option("--logfile [path]", "specifies the output logifle", "default")
-  .option("--logLevel [1,2,3]", "sets the log level", 2)
-  .option(
-  "--provider <string>",
-  "set the HttpProvider to use",
-  "https://rarely-suitable-shark.quiknode.io/87817da9-942d-4275-98c0-4176eee51e1a/aB5gwSfQdN4jmkS65F1HyA==/"
-  )
-  .option("-s, --schedule", "schedules a transactions")
-  .option("--block")
-  .option("--timestamp")
-  .option("--json <object>", "Uses the parameters contained in <object> to schedule a transaction.")
-  .option('-w, --wallet [path...]', 'specify the path to the keyfile you would like to unlock (For multiple wallet files, pass in each file with -w option)', function (path, paths) {
-    paths.push(path);
-    return paths;
-  }, [])
-  .option("-i, --walletIndex [number]", "if not using a wallet file, choose index of web3 provider account (defaults to index 0)")
-  .option('-p, --password [string]', 'the password to unlock your keystore file(s) (For multiple wallets, all wallets must have the same password')
-  .option("-c, --client", "starts the executing client")
-  .option('--createWallet', 'guides you through creating a new wallet.')
-  .option('--fundWallet <ether amt>', 'funds each account in wallet the <ether amt>')
-  .option('--drainWallet <target>', 'sends the target address all ether in the wallet')
-  .option("--autostart", "starts scanning automatically")
-  .option("--analytics [on,off]", "Allow or disable network analytics")
-  .option("--maxDeposit [eth]", "Only claim transactions that require a deposit lower than maxDeposit")
-  .option("--minBalance [eth]", "Only claim transactions if my balance is higher than minBalance")
-  .option("--minProfitability [eth]", "Only claim transactions with a bounty higher than minProfitability")
-  .parse(process.argv)
-
-
 // Create the web3 object by using the chosen provider, defaults to localhost:8545
 const Web3 = require("web3");
 const provider = (() => {
