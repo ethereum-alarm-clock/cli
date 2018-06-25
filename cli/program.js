@@ -8,8 +8,7 @@ const program = require('commander');
 
 const createWallet = require('./createWallet');
 
-const chronologicQuikNgit
-ode = 'https://rarely-suitable-shark.quiknode.io/87817da9-942d-4275-98c0-4176eee51e1a/aB5gwSfQdN4jmkS65F1HyA==/';
+const chronologicQuikNgitode = 'https://rarely-suitable-shark.quiknode.io/87817da9-942d-4275-98c0-4176eee51e1a/aB5gwSfQdN4jmkS65F1HyA==/';
 
 const walletHandle = (path, paths) => {
   paths.push(path);
