@@ -71,15 +71,27 @@ const start = (timenode) => {
     },
   })
   replServer.defineCommand("start", {
-    help: "Starts the execution client.",
+    help: "Starts the TimeNode.",
     action() {
       timenode.startScanning();
     },
   })
   replServer.defineCommand("stop", {
-    help: "Stops the execution client.",
+    help: "Stops the TimeNode.",
     action() {
       timenode.stopScanning();
+    },
+  })
+  replServer.defineCommand("startClaiming", {
+    help: "Starts the TimeNode claiming.",
+    action() {
+      timenode.startClaiming();
+    },
+  })
+  replServer.defineCommand("stopClaiming", {
+    help: "Stops the TimeNode claiming.",
+    action() {
+      timenode.stopClaiming();
     },
   })
   replServer.defineCommand("sweepCache", {
