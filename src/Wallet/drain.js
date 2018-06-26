@@ -3,16 +3,17 @@ const ethUtil = require('ethereumjs-util');
 const ora = require('ora');
 const Web3 = require('web3');
 
-const { loadWalletFromKeystoreFile } = require('../wallet/utils');
+const { 
+  checkOptionsForWalletAndPassword,
+  loadWalletFromKeystoreFile,
+} = require('./utils');
 
-const drainWallet = async (target, options) => {
+const drain = async (target, options) => {
   // Init Web3
   const web3 = new Web3(options.provider);
   const eac = require('eac.js-lib')(web3);
 
-  if (!options.wallet || !options.password) {
-    throw 'Please provide --wallet and --password flags!';
-  }
+  checkOptionsForWalletAndPassword(options);
 
   if (!ethUtil.isValidAddress(target)) {
     throw 'Please provide a valid Ethereum address as the target.';
@@ -54,4 +55,4 @@ const drainWallet = async (target, options) => {
   } catch (e) { spinner.fail(e); }
 }
 
-module.exports = drainWallet;
+module.exports = drain;

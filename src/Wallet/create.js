@@ -3,7 +3,7 @@ const rls = require('readline-sync');
 const { Wallet } = require('eac.js-client');
 const Web3 = require('web3');
 
-const createWallet = (options) => {
+const create = (options) => {
   // Create web3
   const web3 = new Web3(options.provider);
 
@@ -44,4 +44,4 @@ const createWallet = (options) => {
   );
 }
 
-module.exports = createWallet;
+module.exports = create;

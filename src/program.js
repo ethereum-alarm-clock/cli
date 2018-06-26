@@ -6,8 +6,10 @@
 
 const program = require('commander');
 
-const createWallet = require('./createWallet');
-const drainWallet = require('./drainWallet');
+const createWallet = require('./wallet/create');
+const drainWallet = require('./wallet/drain');
+const fundWallet = require('./wallet/fund');
+
 const chronologicQuikNode = 'https://rarely-suitable-shark.quiknode.io/87817da9-942d-4275-98c0-4176eee51e1a/aB5gwSfQdN4jmkS65F1HyA==/';
 
 const walletHandle = (path, paths) => {
@@ -38,7 +40,7 @@ program
 program
   .command('fundWallet <amt>')
   .description('Funds each account in wallet the <amt> in ether')
-  .action((amt, options) => {})
+  .action(fundWallet)
 
 /** Schedule */
 program
