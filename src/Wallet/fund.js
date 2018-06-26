@@ -1,4 +1,4 @@
-const Web3 = require('web3');
+const initWeb3 = require('../initWeb3');
 
 const { 
   checkOptionsForWalletAndPassword,
@@ -6,7 +6,7 @@ const {
 } = require('./utils');
 
 const fund = async (amt, program) => {
-  const web3 = new Web3(program.provider);
+  const web3 = initWeb3(program.provider);
   const eac = require('eac.js-lib')(web3);
   
   checkOptionsForWalletAndPassword(program);

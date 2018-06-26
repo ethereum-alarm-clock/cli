@@ -26,6 +26,10 @@ program
   .option('--provider <string>', 'Sets the HTTP or WebSockets provider', chronologicQuikNode)
   .option('--wallet <path>', 'Sets the path to the keystore to use', walletHandle, [])
  
+program
+  .command('test')
+  .action(() => console.log(program.provider))
+
 /** Create Wallet */
 program
   .command('createWallet')
@@ -61,7 +65,7 @@ program
   .option('--autostart', 'Sets autostart')
   .option('--logFile <path>', 'Sets the file to output logs', 'default')
   .option('--logLevel <number>', 'Sets the logging level', 2)
-  .option('--maxDeposit <eth>', 'Only claim transactions that require a deposit lower')
+  .option('--maxDeposit <eth>', 'Only claim transactions that require a deposit lower', 1)
   .option('--minBalance <eth>', 'Only claim transactions if balance of wallet is higher')
   .option('--minProfitability <eth>', 'Only claim transactions with a bounty higher')
   .option('--ms <number>', 'Sets the scanning frequency of the TimeNode', 4000)

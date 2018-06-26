@@ -1,15 +1,21 @@
 const clear = require('clear');
 const { Config, StatsDB, TimeNode } = require('eac.js-client');
+const fs = require('fs');
 const loki = require('lokijs');
-const Web3 = require('web3');
 
+const initWeb3 = require('../initWeb3');
 const Logger = require('./logger');
 const Repl = require('./repl');
+const { checkOptionsForWalletAndPassword } = require('../Wallet/utils');
 
 const timenode = async (options, program) => {
+  checkOptionsForWalletAndPassword(program);
 
   // We do the set-up first.
-  const web3 = new Web3(program.provider);
+  clear();
+  console.log('Setting Up...')
+
+  const web3 = initWeb3(program.provider);
   const eac = require('eac.js-lib')(web3);
 
   if (!await eac.Util.checkNetworkID()) {
@@ -53,7 +59,9 @@ const timenode = async (options, program) => {
     password: program.password,
     provider: program.provider,
     scanSpread: options.scan,
-    statsDb: new StatsDB(web3, new Loki('stats.json')),
+    statsDb: new StatsDB(web3, new loki('stats.json')),
+    walletStores: encKeystores,
+    web3,
   })
 
   config.chain = chain;
@@ -69,7 +77,7 @@ const timenode = async (options, program) => {
   // Start
 
   clear();
-  console.log(`Welcome to the Ethereum Alarm Clock TimeNode CLI`);
+  console.log('Welcome to the Ethereum Alarm Clock TimeNode CLI\n');
 
   console.log('Executing from accounts:');
   config.wallet.getAddresses().forEach(async (address) => {
@@ -85,7 +93,7 @@ const timenode = async (options, program) => {
   }
 
   // We delay the REPL opening so that the above logic has time to run.
-  console.log('Opening REPL...');
+  console.log('\nOpening REPL...');
 
   setTimeout(() => {
     Repl.start(config, options.ms)

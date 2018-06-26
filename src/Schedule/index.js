@@ -1,8 +1,8 @@
 const BigNumber = require('bignumber.js');
 const clear = require('clear');
 const rls = require('readline-sync');
-const Web3 = require('web3');
 
+const initWeb3 = require('../initWeb3');
 const ReadInput = require('./readInput');
 
 const {
@@ -19,7 +19,7 @@ const MINIMUM_PERIOD_BEFORE_SCHEDULE = (tempUnit) => {
 }
 
 const schedule = async (options, program) => {
-  const web3 = new Web3(program.provider);
+  const web3 = initWeb3(program.provider);
   const eac = require('eac.js-lib')(web3);
   const eacScheduler = await eac.scheduler();
 

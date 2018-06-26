@@ -1,7 +1,8 @@
 const BigNumber = require('bignumber.js');
 const ethUtil = require('ethereumjs-util');
 const ora = require('ora');
-const Web3 = require('web3');
+
+const initWeb3 = require('../initWeb3');
 
 const { 
   checkOptionsForWalletAndPassword,
@@ -10,7 +11,7 @@ const {
 
 const drain = async (target, program) => {
   // Init Web3
-  const web3 = new Web3(program.provider);
+  const web3 = initWeb3(program.provider);
   const eac = require('eac.js-lib')(web3);
 
   checkOptionsForWalletAndPassword(program);
