@@ -96,7 +96,7 @@ const timenode = async (options, program) => {
   console.log('\nOpening REPL...');
 
   setTimeout(() => {
-    Repl.start(config, options.ms)
+    Repl.start(TN)
   }, 2000);
 
   // if (analyticsOn) {
