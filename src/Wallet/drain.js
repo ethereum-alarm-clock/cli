@@ -8,12 +8,12 @@ const {
   loadWalletFromKeystoreFile,
 } = require('./utils');
 
-const drain = async (target, options) => {
+const drain = async (target, program) => {
   // Init Web3
-  const web3 = new Web3(options.provider);
+  const web3 = new Web3(program.provider);
   const eac = require('eac.js-lib')(web3);
 
-  checkOptionsForWalletAndPassword(options);
+  checkOptionsForWalletAndPassword(program);
 
   if (!ethUtil.isValidAddress(target)) {
     throw 'Please provide a valid Ethereum address as the target.';
@@ -28,7 +28,7 @@ const drain = async (target, options) => {
   const gasCost = new BigNumber(gas).times(gasPrice);
 
   try {
-    const wallet = loadWalletFromKeystoreFile(web3, options.wallet, options.password);
+    const wallet = loadWalletFromKeystoreFile(web3, program.wallet, program.password);
     await Promise.all(
       wallet.getAddresses().map((address) => {
         return new Promise(async (resolve, reject) => {

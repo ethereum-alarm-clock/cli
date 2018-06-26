@@ -6,9 +6,9 @@
 
 const program = require('commander');
 
-const createWallet = require('./wallet/create');
-const drainWallet = require('./wallet/drain');
-const fundWallet = require('./wallet/fund');
+const createWallet = require('./Wallet/create');
+const drainWallet = require('./Wallet/drain');
+const fundWallet = require('./Wallet/fund');
 const schedule = require('./Schedule');
 const timenode = require('./TimeNode');
 
@@ -22,7 +22,7 @@ const walletHandle = (path, paths) => {
 /** General Options */
 program
   .version(require('../package.json').version)
-  .options('--password <string>', 'The password for the keystore')
+  .option('--password <string>', 'The password for the keystore')
   .option('--provider <string>', 'Sets the HTTP or WebSockets provider', chronologicQuikNode)
   .option('--wallet <path>', 'Sets the path to the keystore to use', walletHandle, [])
  
@@ -30,19 +30,19 @@ program
 program
   .command('createWallet')
   .description('Guides you through creating a wallet')
-  .action(createWallet)
+  .action(() => createWallet(program))
 
 /** Drain Wallet */
 program
   .command('drainWallet <target>')
   .description('Sends target address all ether in wallet')
-  .action(drainWallet)
+  .action((target) => drainWallet(target, program))
 
 /** Fund Wallet */
 program
   .command('fundWallet <amt>')
   .description('Funds each account in wallet the <amt> in ether')
-  .action(fundWallet)
+  .action((amt) => fundWallet(amt, program))
 
 /** Schedule */
 program
@@ -51,7 +51,7 @@ program
   .option('--block')
   .option('--json <object>', 'Pass a JSON object of the params')
   .option('--timestamp')
-  .action(schedule)
+  .action((options) => schedule(options, program))
 
 /** TimeNode */
 program
@@ -66,7 +66,7 @@ program
   .option('--minProfitability <eth>', 'Only claim transactions with a bounty higher')
   .option('--ms <number>', 'Sets the scanning frequency of the TimeNode', 4000)
   .option('--scan <number>', 'Sets the scanning spread', 75)
-  .action(timenode)
+  .action((options) => timenode(options, program))
 
 
 program.parse(process.argv);

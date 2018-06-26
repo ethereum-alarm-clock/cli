@@ -3,9 +3,11 @@ const rls = require('readline-sync');
 const { Wallet } = require('eac.js-client');
 const Web3 = require('web3');
 
-const create = (options) => {
+const create = (program) => {
+  console.log(program.provider)
+
   // Create web3
-  const web3 = new Web3(options.provider);
+  const web3 = new Web3(program.provider);
 
   let numberOfAccounts = rls.question(
     'How many accounts to create? [1 - 10]\n'
@@ -35,8 +37,9 @@ const create = (options) => {
 
   console.log('Wallet created!');
   console.log('Accounts:');
-  console.log(wallet.getAdresses().join('\n'));
+  console.log(wallet.getAddresses().join('\n'));
 
+  console.log('\nSaving keystore...')
   const encrypted = wallet.encrypt(password);
   fs.writeFileSync(file, JSON.stringify(encrypted));
   console.log(

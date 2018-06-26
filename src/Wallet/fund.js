@@ -5,11 +5,11 @@ const {
   loadWalletFromKeystoreFile,
 } = require('./utils');
 
-const fund = async (amt, options) => {
-  const web3 = new Web3(options.provider);
+const fund = async (amt, program) => {
+  const web3 = new Web3(program.provider);
   const eac = require('eac.js-lib')(web3);
   
-  checkOptionsForWalletAndPassword(options);
+  checkOptionsForWalletAndPassword(program);
 
   if (!await eac.Util.checkForUnlockedAccount()) {
       throw 'Must be running a local node with unlocked account to use this command.';
@@ -17,7 +17,7 @@ const fund = async (amt, options) => {
 
   const spinner = ora('Sending the funding transactions...');
 
-  const wallet = loadWalletFromKeystoreFile(web3, options.wallet, options.password);
+  const wallet = loadWalletFromKeystoreFile(web3, program.wallet, program.password);
 
   const wei = web3.toWei(amt, 'ether');
 

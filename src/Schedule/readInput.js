@@ -2,20 +2,20 @@ const ethUtil = require("ethereumjs-util")
 const rls = require("readline-sync")
 
 class ReadInput {
-  constructor(web3, program, defaultValues) {
+  constructor(web3, options, defaultValues) {
     this.web3 = web3;
     this.eac = require('eac.js-lib')(this.web3);
-    this.program = program;
+    this.options = options;
     this.defaultValues = defaultValues;
   }
 
   readTemporalUnit() {
     let tempUnit;
 
-    if (this.program.block) {
+    if (this.options.block) {
       tempUnit = 1;
     }
-    else if (this.program.timestamp) {
+    else if (this.options.timestamp) {
       tempUnit = 2;
     }
     else {

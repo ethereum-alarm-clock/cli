@@ -15,9 +15,9 @@ const loki = require("lokijs")
 const Reader = require('./reader');
 
 // CLI Imports
-const { Analytics } = require("./analytics")
-const Logger = require("./logger")
-const Repl = require("./repl")
+const { Analytics } = require("./TimeNode/analytics")
+const Logger = require("./TimeNode/logger")
+const Repl = require("./TimeNode/repl")
 
 const {
   Config,

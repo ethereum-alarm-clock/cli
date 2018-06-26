@@ -18,8 +18,8 @@ const MINIMUM_PERIOD_BEFORE_SCHEDULE = (tempUnit) => {
   } else { throw `Invalid temporal unit: ${tempUnit}`; }
 }
 
-const schedule = async (options) => {
-  const web3 = new Web3(options.provider);
+const schedule = async (options, program) => {
+  const web3 = new Web3(program.provider);
   const eac = require('eac.js-lib')(web3);
   const eacScheduler = await eac.scheduler();
 
@@ -31,9 +31,9 @@ const schedule = async (options) => {
     throw 'Must be using the Kovan or Ropsten testnetworks.';
   }
 
-  checkOptionsForWalletAndPassword(options);
+  checkOptionsForWalletAndPassword(program);
   
-  const wallet = loadWalletFromKeystoreFile(web3, options.wallet, options.password);
+  const wallet = loadWalletFromKeystoreFile(web3, program.wallet, program.password);
 
   // Initiate the shedule parameters.
   let scheduleParams = {};

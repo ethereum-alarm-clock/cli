@@ -6,10 +6,10 @@ const Web3 = require('web3');
 const Logger = require('./logger');
 const Repl = require('./repl');
 
-const timenode = async (options) => {
+const timenode = async (options, program) => {
 
   // We do the set-up first.
-  const web3 = new Web3(options.provider);
+  const web3 = new Web3(program.provider);
   const eac = require('eac.js-lib')(web3);
 
   if (!await eac.Util.checkNetworkID()) {
@@ -17,8 +17,8 @@ const timenode = async (options) => {
   }
 
   // Set up default logfile.
-  if (options.logfile === 'default') {
-    options.logfile = `${require('os').homedir()}/.eac.log`;
+  if (options.logFile === 'default') {
+    options.logFile = `${require('os').homedir()}/.eac.log`;
   }
 
   const chain = await eac.Util.getChainName();
@@ -34,7 +34,7 @@ const timenode = async (options) => {
 
   // Process the keystores.
   let encKeystores = [];
-  options.wallet.map((file) => {
+  program.wallet.map((file) => {
     const keystore = fs.readFileSync(file, 'utf8');
     if (typeof JSON.parse(keystore).length !== 'undefined') {
       encKeystores = encKeystores.concat(JSON.parse(keystore));
@@ -48,11 +48,11 @@ const timenode = async (options) => {
     autostart: options.autostart,
     eac,
     factory: requestFactory,
-    logger: new Logger(options.logfile, options.logLevel),
-    ms: options.milliseconds,
-    password: options.password,
-    provider: options.provider,
-    scanSpread: options.scanSpread,
+    logger: new Logger(options.logFile, options.logLevel),
+    ms: options.ms,
+    password: program.password,
+    provider: program.provider,
+    scanSpread: options.scan,
     statsDb: new StatsDB(web3, new Loki('stats.json')),
   })
 
@@ -88,7 +88,7 @@ const timenode = async (options) => {
   console.log('Opening REPL...');
 
   setTimeout(() => {
-    Repl.start(config, options.milliseconds)
+    Repl.start(config, options.ms)
   }, 2000);
 
   // if (analyticsOn) {
