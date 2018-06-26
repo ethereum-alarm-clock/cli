@@ -9,6 +9,7 @@ const program = require('commander');
 const createWallet = require('./wallet/create');
 const drainWallet = require('./wallet/drain');
 const fundWallet = require('./wallet/fund');
+const schedule = require('./Schedule/schedule');
 
 const chronologicQuikNode = 'https://rarely-suitable-shark.quiknode.io/87817da9-942d-4275-98c0-4176eee51e1a/aB5gwSfQdN4jmkS65F1HyA==/';
 
@@ -49,7 +50,7 @@ program
   .option('--block')
   .option('--json <object>', 'Pass a JSON object of the params')
   .option('--timestamp')
-  .action((options) => {})
+  .action(schedule)
 
 /** TimeNode */
 program

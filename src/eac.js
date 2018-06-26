@@ -231,6 +231,9 @@ const main = async (_) => {
     }
 
   } else if (program.schedule) {
+
+
+    
     defaultSchedulingValues = await getDefaultSchedulingValues();
     if (!await eac.Util.checkNetworkID()) {
       console.log("  error: must be running a localnode on the Ropsten or Kovan networks")
