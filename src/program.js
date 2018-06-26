@@ -9,7 +9,8 @@ const program = require('commander');
 const createWallet = require('./wallet/create');
 const drainWallet = require('./wallet/drain');
 const fundWallet = require('./wallet/fund');
-const schedule = require('./Schedule/schedule');
+const schedule = require('./Schedule');
+const timenode = require('./TimeNode');
 
 const chronologicQuikNode = 'https://rarely-suitable-shark.quiknode.io/87817da9-942d-4275-98c0-4176eee51e1a/aB5gwSfQdN4jmkS65F1HyA==/';
 
@@ -65,7 +66,7 @@ program
   .option('--minProfitability <eth>', 'Only claim transactions with a bounty higher')
   .option('--ms <number>', 'Sets the scanning frequency of the TimeNode', 4000)
   .option('--scan <number>', 'Sets the scanning spread', 75)
-  .action((options) => {})
+  .action(timenode)
 
 
 program.parse(process.argv);

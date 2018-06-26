@@ -8,7 +8,7 @@ const checkOptionsForWalletAndPassword = (options) => {
 }
 
 const loadWalletFromKeystoreFile = (web3, filePath, password) => {
-    const file = fs.readFileSync(filePath[0], 'utf-8');
+    const file = fs.readFileSync(filePath[0], 'utf8');
     const keystore = JSON.parse(file);
     
     const wallet = new Wallet(web3);
