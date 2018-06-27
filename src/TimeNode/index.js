@@ -3,6 +3,7 @@ const { Config, StatsDB, TimeNode } = require('eac.js-client');
 const fs = require('fs');
 const loki = require('lokijs');
 
+const Analytics = require('./analytics');
 const initWeb3 = require('../initWeb3');
 const Logger = require('./logger');
 const Repl = require('./repl');
@@ -31,12 +32,16 @@ const timenode = async (options, program) => {
 
   const requestFactory = await eac.requestFactory();
 
-  // const analyticsOn = (options.analytics && options.analytics.toLowerCase() === 'off') ? false : true;
+  const analyticsOn = (options.analytics && options.analytics.toLowerCase() === 'off') ? false : true;
 
-  // let analytics;
-  // if (analyticsOn) {
-  //   analytics = new analytics(web3, )
-  // }
+  let analytics;
+  if (analyticsOn) {
+    analytics = new Analytics(web3, {
+      client: require('eac.js-client').version,
+      contracts: eac.contracts,
+      lib: eac.version,
+    })
+  }
 
   // Process the keystores.
   let encKeystores = [];
@@ -80,9 +85,11 @@ const timenode = async (options, program) => {
   console.log('Welcome to the Ethereum Alarm Clock TimeNode CLI\n');
 
   console.log('Executing from accounts:');
-  config.wallet.getAddresses().forEach(async (address) => {
-    console.log(`${address} | Balance: ${web3.fromWei(await eac.Util.getBalance(address))}`);
-  })
+  await Promise.all(
+    config.wallet.getAddresses().map(async (address) => {
+      console.log(`${address} | Balance: ${web3.fromWei(await eac.Util.getBalance(address))}`);
+    })
+  )
 
   const TN = new TimeNode(config);
 
@@ -99,11 +106,11 @@ const timenode = async (options, program) => {
     Repl.start(TN)
   }, 2000);
 
-  // if (analyticsOn) {
-  //   config.wallet.getAddresses().forEach((address) => {
-  //     analytics.startAnalytics(address);
-  //   })
-  // }
+  if (analyticsOn) {
+    config.wallet.getAddresses().forEach((address) => {
+      analytics.startAnalytics(address);
+    })
+  }
 }
 
 module.exports = timenode;
