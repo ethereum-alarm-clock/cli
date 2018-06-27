@@ -66,9 +66,10 @@ class ReadInput {
     return callValue || this.defaultValues.callValue;
   }
 
-  readWindowSize() {
+  readWindowSize(tempUnit) {
     const windowSize = rls.question('What is the windowSize?\n');
-    return windowSize || this.defaultValues.windowSize;
+    const defaultWindowSize = tempUnit === 1 ? this.defaultValues.windowSize : this.defaultValues.windowSize * 12;
+    return windowSize || defaultWindowSize;
   }
 
   readWindowStart(curBlockNum) {

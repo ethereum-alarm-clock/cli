@@ -2,6 +2,7 @@ const BigNumber = require('bignumber.js');
 const clear = require('clear');
 const rls = require('readline-sync');
 
+const { getDefaultValues } = require('./defaultValues');
 const initWeb3 = require('../initWeb3');
 const ReadInput = require('./readInput');
 
@@ -23,10 +24,8 @@ const schedule = async (options, program) => {
   const eac = require('eac.js-lib')(web3);
   const eacScheduler = await eac.scheduler();
 
-  // TODO
-  const defaultValues = await getDefaultValues();
+  const defaultValues = await getDefaultValues(web3);
 
-  // TODO check network ID
   if (!await eac.Util.checkNetworkId()) {
     throw 'Must be using the Kovan or Ropsten test network.';
   }
@@ -51,26 +50,26 @@ const schedule = async (options, program) => {
   // See if we were provided the parameters in JSON or
   // ask the user for them interactively.
 
-  const temporalUnit = scheduleParams.temporalUnit || readInput.readTemporalUnit()
-  const recipient = scheduleParams.recipient || readInput.readRecipientAddress()
-  const callData = scheduleParams.callData || readInput.readCallData()
-  const callGas = scheduleParams.callGas || readInput.readCallGas()
-  const callValue = scheduleParams.callValue || readInput.readCallValue()
+  const temporalUnit = scheduleParams.temporalUnit || readInput.readTemporalUnit();
+  const recipient = scheduleParams.recipient || readInput.readRecipientAddress();
+  const callData = scheduleParams.callData || readInput.readCallData();
+  const callGas = scheduleParams.callGas || readInput.readCallGas();
+  const callValue = scheduleParams.callValue || readInput.readCallValue();
 
-  const currentBlockNumber = await eac.Util.getBlockNumber()
+  const currentBlockNumber = await eac.Util.getBlockNumber();
 
-  const windowStart = scheduleParams.windowStart || readInput.readWindowStart(currentBlockNumber)
-  const windowSize = scheduleParams.windowSize || readInput.readWindowSize()
+  const windowStart = scheduleParams.windowStart || readInput.readWindowStart(currentBlockNumber);
+  const windowSize = scheduleParams.windowSize || readInput.readWindowSize(temporalUnit);
 
   const soonestScheduleTime = currentBlockNumber + MINIMUM_PERIOD_BEFORE_SCHEDULE(temporalUnit);
   if (windowStart < soonestScheduleTime) {
     throw `Window start of ${windowStart} too soon.\nSoonest Schedule Time: ${soonestScheduleTime}`;
   }
 
-  const gasPrice = scheduleParams.gasPrice || readInput.readGasPrice()
-  const fee = scheduleParams.fee || readInput.readFee()
-  const bounty = scheduleParams.bounty ||  readInput.readBounty()
-  const requiredDeposit = scheduleParams.deposit || readInput.readDeposit()
+  const gasPrice = scheduleParams.gasPrice || readInput.readGasPrice();
+  const fee = scheduleParams.fee || readInput.readFee();
+  const bounty = scheduleParams.bounty ||  readInput.readBounty();
+  const requiredDeposit = scheduleParams.deposit || readInput.readDeposit();
 
   // Calculate the required endowment according to these params.
   const endowment = eac.Util.calcEndowment(
