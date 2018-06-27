@@ -1,5 +1,6 @@
 const BigNumber = require('bignumber.js');
 const clear = require('clear');
+const ora = require('ora');
 const rls = require('readline-sync');
 
 const { getDefaultValues } = require('./defaultValues');
@@ -26,7 +27,7 @@ const schedule = async (options, program) => {
 
   const defaultValues = await getDefaultValues(web3);
 
-  if (!await eac.Util.checkNetworkId()) {
+  if (!await eac.Util.checkNetworkID()) {
     throw 'Must be using the Kovan or Ropsten test network.';
   }
 
@@ -45,7 +46,7 @@ const schedule = async (options, program) => {
 
   // Start the wizard.
   clear();
-  console.log('Welcome to the scheduling wizard!');
+  console.log('Welcome to the scheduling wizard!\n');
 
   // See if we were provided the parameters in JSON or
   // ask the user for them interactively.
@@ -94,16 +95,16 @@ const schedule = async (options, program) => {
   console.log(`Required Deposit: ${requiredDeposit}`);
   console.log('\n');
   console.log(`Sending from: ${wallet.getAddresses()[0]}`);
-  console.log(`Endowment to send: ${web3.toWei(endowment.toString())}`);
+  console.log(`Endowment to send: ${web3.fromWei(endowment.toString())}`);
 
   const confirmed = rls.question('Are the above parameters correct? [Y/n]\n');
-  if (confirmed.toLowerCase() !== 'y' || confirmed !== '') {
+  if (confirmed.toLowerCase() !== 'y' && confirmed !== '') {
     throw `You did not confirm the parameters.`;
   }
 
   // Set up the spinner.
   console.log('\n');
-  const spinner = ora('Sending the scheduling transaction...');
+  const spinner = ora('Sending the scheduling transaction...').start();
 
   // Determine which scheduler to target based on temporal unit.
 

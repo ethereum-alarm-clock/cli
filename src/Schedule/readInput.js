@@ -35,7 +35,7 @@ class ReadInput {
   }
 
   readRecipientAddress() {
-    let toAddress = rls.question('What is the recipeint address?\n');
+    let toAddress = rls.question('What is the recipient address?\n');
     if (!toAddress) {
       toAddress = '0x0010f94b296A852aAac52EA6c5Ac72e03afD032D';
     }
@@ -73,7 +73,7 @@ class ReadInput {
   }
 
   readWindowStart(curBlockNum) {
-    const defaultWindowStart = curBlockNum + this.defaultValues.minimumPeriodBeforeSchedule + 5;
+    const defaultWindowStart = curBlockNum + 15 + 5;
     const windowStart = rls.question(`What is the windowStart: [press enter for ${defaultWindowStart}]\n`);
     return windowStart || defaultWindowStart;
   }

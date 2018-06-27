@@ -19,6 +19,12 @@ const walletHandle = (path, paths) => {
   return paths;
 }
 
+const catchErrors = async (asyncFunction) => {
+  try {
+    await asyncFunction;
+  } catch (e) { console.error(e); }
+}
+
 /** General Options */
 program
   .version(require('../package.json').version)
@@ -34,19 +40,20 @@ program
 program
   .command('createWallet')
   .description('Guides you through creating a wallet')
-  .action(() => createWallet(program))
+  .action(() => catchErrors(createWallet(program)))
+
 
 /** Drain Wallet */
 program
   .command('drainWallet <target>')
   .description('Sends target address all ether in wallet')
-  .action((target) => drainWallet(target, program))
+  .action((target) => catchErrors(drainWallet(target, program)))
 
 /** Fund Wallet */
 program
   .command('fundWallet <amt>')
   .description('Funds each account in wallet the <amt> in ether')
-  .action((amt) => fundWallet(amt, program))
+  .action((amt) => catchErrors(fundWallet(amt, program)))
 
 /** Schedule */
 program
@@ -55,7 +62,7 @@ program
   .option('--block')
   .option('--json <object>', 'Pass a JSON object of the params')
   .option('--timestamp')
-  .action((options) => schedule(options, program))
+  .action((options) => catchErrors(schedule(options, program)))
 
 /** TimeNode */
 program
@@ -70,7 +77,7 @@ program
   .option('--minProfitability <eth>', 'Only claim transactions with a bounty higher')
   .option('--ms <number>', 'Sets the scanning frequency of the TimeNode', 4000)
   .option('--scan <number>', 'Sets the scanning spread', 75)
-  .action((options) => timenode(options, program))
+  .action((options) => catchErrors(timenode(options, program)))
 
 
 program.parse(process.argv);

@@ -1,3 +1,5 @@
+const ora = require('ora');
+
 const initWeb3 = require('../initWeb3');
 
 const { 

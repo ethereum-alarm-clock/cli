@@ -7,12 +7,12 @@ const getDefaultValues = async (web3) => {
   });
 
   return {
-    bounty: gasPrice * 100000,
+    bounty: networkGasPrice * 100000,
     callGas: 100000,
     callValue: web3.toWei('15', 'gwei'),
     deposit: web3.toWei('20', 'gwei'),
     fee: web3.toWei('12', 'gwei'),
-    gasPrice,
+    gasPrice: networkGasPrice,
     windowSize: 255,
   }
 }
