@@ -19,7 +19,7 @@ const timenode = async (options, program) => {
   const eac = require('eac.js-lib')(web3);
 
   if (!await eac.Util.checkNetworkID()) {
-    throw 'Must be on the Ropsten or Kovan testnetworks.';
+    throw 'Must be on the Ropsten or Kovan test network.';
   }
 
   // Set up default logfile.

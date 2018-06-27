@@ -28,7 +28,7 @@ const schedule = async (options, program) => {
 
   // TODO check network ID
   if (!await eac.Util.checkNetworkId()) {
-    throw 'Must be using the Kovan or Ropsten testnetworks.';
+    throw 'Must be using the Kovan or Ropsten test network.';
   }
 
   checkOptionsForWalletAndPassword(program);
