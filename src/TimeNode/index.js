@@ -1,3 +1,4 @@
+const BigNumber = require('bignumber.js');
 const clear = require('clear');
 const { Config, StatsDB, TimeNode } = require('eac.js-client');
 const fs = require('fs');
@@ -74,9 +75,9 @@ const timenode = async (options, program) => {
 
   // Economic Strategy
   config.economicStrategy = {
-    maxDeposit: options.maxDeposit ? web3.toWei(options.maxDeposit) : web3.toWei('0'),
-    minBalance: options.minBalance ? web3.toWei(options.minBalance) : web3.toWei('0'),
-    minProfitability: options.minProfitability ? web3.toWei(options.minProfitability) : web3.toWei('0'),
+    maxDeposit: options.maxDeposit ? new BigNumber(web3.toWei(options.maxDeposit)) : new BigNumber(web3.toWei('0')),
+    minBalance: options.minBalance ? new BigNumber(web3.toWei(options.minBalance)) : new BigNumber(web3.toWei('0')),
+    minProfitability: options.minProfitability ? new BigNumber(web3.toWei(options.minProfitability)) : new BigNumber(web3.toWei('0')),
   }
 
   // Start
