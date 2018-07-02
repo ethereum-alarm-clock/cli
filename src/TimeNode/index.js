@@ -12,11 +12,9 @@ const { checkOptionsForWalletAndPassword } = require('../Wallet/utils');
 
 const timenode = async (options, program) => {
   if (program.config) {
-    // console.log(program.config)
     const config = JSON.parse(fs.readFileSync(program.config));
     program.password = fs.readFileSync(config.password).toString();
     program.wallet = config.wallet;
-    // console.log(program.password)
   }
   checkOptionsForWalletAndPassword(program);
 
