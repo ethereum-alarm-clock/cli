@@ -1,5 +1,12 @@
 {
+    "autostart": false,
+    "logFile": "default",
+    "logLevel": 2,
+    "maxDeposit": 1,
+    "minBalance": 0,
+    "minProfitability": 0,
     "password": "password",
+    "provider": "http://localhost:8545",
     "wallet": [
         "test_wallet_3"
     ]

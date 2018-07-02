@@ -28,7 +28,7 @@ const catchErrors = async (asyncFunction) => {
 /** General Options */
 program
   .version(require('../package.json').version)
-  .option('--config <path>', 'Turn on read from config file.', '')
+  .option('--config <path>', 'Load parameters from config file.', '')
   .option('--password <string>', 'The password for the keystore')
   .option('--provider <string>', 'Sets the HTTP or WebSockets provider', chronologicQuikNode)
   .option('--wallet <path>', 'Sets the path to the keystore to use', walletHandle, [])

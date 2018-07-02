@@ -14,7 +14,16 @@ const timenode = async (options, program) => {
   if (program.config) {
     const config = JSON.parse(fs.readFileSync(program.config));
     program.password = fs.readFileSync(config.password).toString();
+    program.provider = config.provider || program.provider;
     program.wallet = config.wallet;
+
+    // TimeNode specific configurations
+    options.autostart = config.autostart || options.autostart;
+    options.logFile = config.logFile || options.logFile;
+    options.logLevel = config.logLevel || options.logLevel;
+    options.maxDeposit = config.maxDeposit || options.maxDeposit;
+    options.minBalance = config.minBalance || options.minBalance;
+    options.minProfitability = config.minProfitability || options.minProfitability;
   }
   checkOptionsForWalletAndPassword(program);
 
