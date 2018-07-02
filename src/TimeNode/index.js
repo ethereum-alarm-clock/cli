@@ -13,9 +13,9 @@ const { checkOptionsForWalletAndPassword } = require('../Wallet/utils');
 const timenode = async (options, program) => {
   if (program.config) {
     const config = JSON.parse(fs.readFileSync(program.config));
-    program.password = fs.readFileSync(config.password).toString();
+    program.password = fs.readFileSync(config.password).toString() || program.password;
     program.provider = config.provider || program.provider;
-    program.wallet = config.wallet;
+    program.wallet = config.wallet || program.wallet;
 
     // TimeNode specific configurations
     options.autostart = config.autostart || options.autostart;
