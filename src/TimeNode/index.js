@@ -70,8 +70,6 @@ const timenode = async (options, program) => {
     }
   });
 
-  console.log(program.claiming);
-
   // Load the config.
   let config = new Config({
     autostart: options.autostart,
