@@ -50,7 +50,7 @@ const provider = (() => {
 const web3 = new Web3(provider)
 const eac = require('eac.js-lib')(web3)
 const dependencyVersions = {
-  client: require('eac.js-client').version,
+  client: require('@ethereum-alarm-clock/timenode-core').version,
   contracts: eac.contracts,
   lib: eac.version
 }

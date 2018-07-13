@@ -1,5 +1,5 @@
 const fs = require('fs')
-const { Wallet } = require('eac.js-client')
+const { Wallet } = require('@ethereum-alarm-clock/timenode-core')
 const { Util } = require('eac.js-lib')()
 
 // TODO before mainnet - change the default gas / gasPrice

@@ -71,6 +71,7 @@ program
   .description('Run a TimeNode')
   .option('--analytics <boolean>', 'Sets the analytics on or off')
   .option('--autostart', 'Sets autostart')
+  .option('--claiming', 'Claiming mode')
   .option('--logFile <path>', 'Sets the file to output logs', 'default')
   .option('--logLevel <number>', 'Sets the logging level', 2)
   .option('--maxDeposit <eth>', 'Only claim transactions that require a deposit lower', 1)

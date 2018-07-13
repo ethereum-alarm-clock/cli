@@ -12,7 +12,7 @@
 
 const BigNumber = require('bignumber.js');
 const Bb = require('bluebird');
-const { Wallet } = require('eac.js-client');
+const { Wallet } = require('@ethereum-alarm-clock/timenode-core');
 const fs = require('fs');
 const initWeb3 = require('./initWeb3');
 const program = require('./program');

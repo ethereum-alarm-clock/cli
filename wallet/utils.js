@@ -1,4 +1,4 @@
-const { Wallet } = require('eac.js-client')
+const { Wallet } = require('@ethereum-alarm-clock/timenode-core')
 const fs = require('fs');
 
 const loadWalletFromKeystoreFile = function(web3, fileName, password) {

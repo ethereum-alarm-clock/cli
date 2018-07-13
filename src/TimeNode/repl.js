@@ -55,6 +55,7 @@ const start = (timenode) => {
     help: "Get some interesting stats on your executing accounts.",
     action() {
       const stats = config.statsDb.getStats()
+      const claiming = config.claiming ? 'ON' : 'OFF';
       stats.forEach((accountStats) => {
         const bounties = web3.fromWei(accountStats.bounties, 'ether')
         const costs = web3.fromWei(accountStats.costs, 'ether')
@@ -62,9 +63,9 @@ const start = (timenode) => {
 
         const stringToFixed = (string) => parseFloat(string).toFixed(6)
 
-        console.log(`${accountStats.account} | Claimed: ${
-          accountStats.claimed
-        } | Executed: ${accountStats.executed} | Ether gain: ${
+        console.log(`${accountStats.account} | Executed: ${
+          accountStats.executed
+          } | Claimed: ${accountStats.claimed} (${claiming}) | Ether gain: ${
           stringToFixed(profit)
         } (${stringToFixed(bounties)} - ${stringToFixed(costs)})`)
       })
