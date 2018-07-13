@@ -14,16 +14,18 @@ If you would like to hack on `@ethereum-alarm-clock/cli` or notice a bug, please
 
 ## How to use
 
+Install the binary from NPM by typing `npm i -g @ethereum-alarm-clock/cli` and hitting enter.
+
 To run a TimeNode or schedule a transaction you will need to create a keystore. `eac` contains some utilities to help out with this.
 
 ```
-node bin/eac createWallet
+eac createWallet
 ```
 
 will guide you through the steps of creating a keystore.
 
 ```
-node bin/eac fundWallet <amt> --wallet <wallet_path> --password <string> --provider <path>
+eac fundWallet <amt> --wallet <wallet_path> --password <string> --provider <path>
 ```
 
 will send `<amt>` ether to each account in the passed in wallet from a **local unlocked account**. Notice, you must be running a local node with a **local unlocked account** to use this utility. Otherwise you can send ether to your wallet accounts in any other way.
@@ -31,13 +33,13 @@ will send `<amt>` ether to each account in the passed in wallet from a **local u
 If you ever get tired of running a TimeNode, you can drain the funds held in the wallet to an external account like so:
 
 ```
-node bin/eac drainWallet <target_address> --wallet <wallet_path> --password <string>
+eac drainWallet <target_address> --wallet <wallet_path> --password <string>
 ```
 
 Once you have your wallet set up and funded, run a TimeNode with some default params like so: (`provider` is the path to the Ethereum node you are using)
 
 ```
-node bin/eac timenode --wallet <wallet_path> --password <string> --provider <path> --maxDeposit 1
+eac timenode --wallet <wallet_path> --password <string> --provider <path> --maxDeposit 1
 ```
 
 Open up `~/.eac.log` for the output, I prefer to follow the output in a new screen:
