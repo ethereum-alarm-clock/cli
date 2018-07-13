@@ -1,6 +1,6 @@
 const BigNumber = require('bignumber.js');
 const clear = require('clear');
-const { Config, StatsDB, TimeNode } = require('eac.js-client');
+const { Config, StatsDB, TimeNode } = require('@ethereum-alarm-clock/timenode-core');
 const fs = require('fs');
 const loki = require('lokijs');
 
@@ -19,6 +19,7 @@ const timenode = async (options, program) => {
 
     // TimeNode specific configurations
     options.autostart = config.autostart || options.autostart;
+    options.claiming = config.claiming || options.claiming;
     options.logFile = config.logFile || options.logFile;
     options.logLevel = config.logLevel || options.logLevel;
     options.maxDeposit = config.maxDeposit || options.maxDeposit;
@@ -52,7 +53,7 @@ const timenode = async (options, program) => {
   let analytics;
   if (analyticsOn) {
     analytics = new Analytics(web3, {
-      client: require('eac.js-client').version,
+      client: require('@ethereum-alarm-clock/timenode-core').version,
       contracts: eac.contracts,
       lib: eac.version,
     })
@@ -69,9 +70,12 @@ const timenode = async (options, program) => {
     }
   });
 
+  console.log(program.claiming);
+
   // Load the config.
   let config = new Config({
     autostart: options.autostart,
+    claiming: options.claiming,
     eac,
     factory: requestFactory,
     logger: new Logger(options.logFile, options.logLevel),

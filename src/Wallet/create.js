@@ -1,6 +1,6 @@
 const fs = require('fs');
 const rls = require('readline-sync');
-const { Wallet } = require('eac.js-client');
+const { Wallet } = require('@ethereum-alarm-clock/timenode-core');
 
 const initWeb3 = require('../initWeb3');
 
