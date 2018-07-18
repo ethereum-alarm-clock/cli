@@ -1,6 +1,6 @@
 const ora = require('ora');
 
-const initWeb3 = require('../initWeb3');
+const initWeb3 = require('../../tools/initWeb3');
 
 const { 
   checkOptionsForWalletAndPassword,
