@@ -9,12 +9,20 @@ const checkOptionsForWalletAndPassword = (options) => {
 
 const loadWalletFromKeystoreFile = (web3, filePath, password) => {
     const file = fs.readFileSync(filePath[0], 'utf8');
-    const keystore = JSON.parse(file);
+    let keystore = allPropertiesToLowerCase(JSON.parse(file));
     
     const wallet = new Wallet(web3);
-    wallet.decrypt(keystore, password);
+    wallet.decrypt([keystore], password);
 
     return wallet;
+}
+
+const allPropertiesToLowerCase = (object) => {
+    let newObject = {};
+    Object.keys(object).forEach(key => {
+        newObject[key.toLowerCase()] = object[key];
+    });
+    return newObject;
 }
 
 module.exports = {

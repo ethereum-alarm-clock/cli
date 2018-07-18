@@ -4,7 +4,7 @@ const ora = require('ora');
 const rls = require('readline-sync');
 
 const { getDefaultValues } = require('./defaultValues');
-const initWeb3 = require('../initWeb3');
+const initWeb3 = require('../../tools/initWeb3');
 const ReadInput = require('./readInput');
 
 const {
@@ -148,7 +148,7 @@ const schedule = async (options, program) => {
   // Send the scheduling transaction.
 
   try {
-    const { receipt } = await wallet.sendFromNext({
+    const result = await wallet.sendFromNext({
       to: target,
       value: endowment,
       gas: 3000000,
@@ -156,14 +156,20 @@ const schedule = async (options, program) => {
       data,
     })
 
-    const successValues = [1, '0x1', '0x01', true];
-    if (successValues.indexOf(receipt.status) === -1) {
+    if (result.receipt && !result.hasOwnProperty('error')) {
+      const successValues = [1, '0x1', '0x01', true];
+      if (successValues.indexOf(result.receipt.status) === -1) {
+        spinner.fail(`Transaction failed.`);
+        throw `Receipt: ${JSON.stringify(result.receipt)}`;
+      }
+  
+      spinner.succeed(`Transaction successful. Transaction Hash: ${result.receipt.transactionHash}\n`);
+      console.log(`Address of scheduled transaction: ${eac.Util.getTxRequestFromReceipt(result.receipt)}`);
+    } else {
       spinner.fail(`Transaction failed.`);
-      throw `Receipt: ${JSON.stringify(receipt)}`;
+      throw `Error: ${JSON.stringify(result.error)}`;
     }
 
-    spinner.succeed(`Transaction successful. Transaction Hash: ${receipt.transactionHash}\n`);
-    console.log(`Address of scheduled transaction: ${eac.Util.getTxRequestFromReceipt(receipt)}`);
   } catch (e) { spinner.fail(e); }
 }
 

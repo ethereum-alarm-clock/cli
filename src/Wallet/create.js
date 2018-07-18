@@ -2,7 +2,7 @@ const fs = require('fs');
 const rls = require('readline-sync');
 const { Wallet } = require('@ethereum-alarm-clock/timenode-core');
 
-const initWeb3 = require('../initWeb3');
+const initWeb3 = require('../../tools/initWeb3');
 
 const create = (program) => {
   // Create web3
