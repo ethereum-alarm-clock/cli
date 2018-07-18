@@ -31,7 +31,6 @@ const create = (program) => {
     'What is the password? Remember to write this down.\n'
   );
 
-  console.log(web3);
   const wallet = new Wallet(web3);
   wallet.create(numberOfAccounts);
 
