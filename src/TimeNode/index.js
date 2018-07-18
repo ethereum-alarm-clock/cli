@@ -15,7 +15,7 @@ const timenode = async (options, program) => {
     program.provider = config.provider || program.provider;
     program.password = fs.readFileSync(config.password).toString() || program.password;
     program.wallet = config.wallet || program.wallet;
-    
+
     // TimeNode specific configurations
     options.autostart = config.autostart || options.autostart;
     options.claiming = config.claiming || options.claiming;
@@ -26,7 +26,7 @@ const timenode = async (options, program) => {
     options.minProfitability = config.minProfitability || options.minProfitability;
   }
   checkOptionsForWalletAndPassword(program);
-  
+
   // We do the set-up first.
   // clear();
   console.log('Setting Up...')
