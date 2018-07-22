@@ -3,4 +3,4 @@ node_modules/*
 scheduled.txt
 test_wallet*
 password
-.vscode/
+.vscode/.eac.log
