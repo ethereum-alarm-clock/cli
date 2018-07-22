@@ -36,7 +36,7 @@ const start = (timenode) => {
         console.log('\nCACHE EMPTY')
       } else {
         config.cache.stored().forEach((entry) => {
-          console.log(`${entry} | ${config.cache.get(entry)}`)
+          console.log(`${entry} | ${config.cache.get(entry).windowStart}`)
         })
       }
     },

@@ -13,6 +13,7 @@ const schedule = require('./Schedule');
 const timenode = require('./TimeNode');
 
 const chronologicQuikNode = 'https://rarely-suitable-shark.quiknode.io/87817da9-942d-4275-98c0-4176eee51e1a/aB5gwSfQdN4jmkS65F1HyA==/';
+const chronologicQuikNodeWss = 'wss://rarely-suitable-shark.quiknode.io/87817da9-942d-4275-98c0-4176eee51e1a/aB5gwSfQdN4jmkS65F1HyA==/';
 
 const walletHandle = (path, paths) => {
   paths.push(path);
@@ -30,7 +31,7 @@ program
   .version(require('../package.json').version)
   .option('--config <path>', 'Load parameters from config file.', '')
   .option('--password <string>', 'The password for the keystore')
-  .option('--provider <string>', 'Sets the HTTP or WebSockets provider', chronologicQuikNode)
+  .option('--provider <string>', 'Sets the HTTP or WebSockets provider', chronologicQuikNodeWss)
   .option('--wallet <path>', 'Sets the path to the keystore to use', walletHandle, [])
  
 program
@@ -42,7 +43,6 @@ program
   .command('createWallet')
   .description('Guides you through creating a wallet')
   .action(() => catchErrors(createWallet(program)))
-
 
 /** Drain Wallet */
 program
@@ -72,7 +72,7 @@ program
   .option('--analytics <boolean>', 'Sets the analytics on or off')
   .option('--autostart', 'Sets autostart')
   .option('--claiming', 'Claiming mode')
-  .option('--logFile <path>', 'Sets the file to output logs', 'default')
+  .option('--logFile <path>', 'Sets the file to output logs', '.eac.log')
   .option('--logLevel <number>', 'Sets the logging level', 2)
   .option('--maxDeposit <eth>', 'Only claim transactions that require a deposit lower', 1)
   .option('--minBalance <eth>', 'Only claim transactions if balance of wallet is higher')
