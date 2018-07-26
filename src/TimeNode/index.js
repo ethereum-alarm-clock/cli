@@ -107,18 +107,19 @@ const timenode = async (options, program) => {
     } catch (e) { throw e; }
   }
 
+  if (analyticsOn) {
+    config.logger.info('Analytics ON');
+    config.wallet.getAddresses().forEach((address) => {
+      analytics.startAnalytics(address);
+    })
+  }
+
   // We delay the REPL opening so that the above logic has time to run.
   console.log('\nOpening REPL...');
 
   setTimeout(() => {
     Repl.start(TN)
   }, 2000);
-
-  if (analyticsOn) {
-    config.wallet.getAddresses().forEach((address) => {
-      analytics.startAnalytics(address);
-    })
-  }
 }
 
 module.exports = timenode;

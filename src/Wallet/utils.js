@@ -2,8 +2,13 @@ const fs = require('fs');
 const { Wallet } = require('@ethereum-alarm-clock/timenode-core');
 
 const checkOptionsForWalletAndPassword = (options) => {
-    if (!options.wallet || !options.password) {
-        throw 'Please provide --wallet and --password flags!';
+    const hasWallet = options.wallet && typeof options.wallet === 'object' && options.wallet.length;
+    if (!hasWallet || !options.password) {
+        const msg = 'Please provide --wallet and --password flags!';
+        if (options.logger) {
+            return options.logger.error(msg);
+        }
+        throw msg;
       }    
 }
 

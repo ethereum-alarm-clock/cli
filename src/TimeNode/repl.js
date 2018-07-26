@@ -3,7 +3,7 @@ const repl = require("repl")
 
 const start = (timenode) => {
   const config = timenode.config;
-  const { eac, web3 } = config;
+  const { eac, web3, util } = config;
 
   console.log(" ") // blank space
   const replServer = repl.start({ prompt: ">> " })
@@ -25,7 +25,7 @@ const start = (timenode) => {
   replServer.defineCommand("getNow", {
     help: "Get the latest blockNum and timestamp",
     async action() {
-      const block = await web3.eth.getBlock("latest")
+      const block = await util.getBlock("latest")
       console.log(`BlockNum: ${block.number} | Timestamp: ${block.timestamp}`)
     },
   })
@@ -95,12 +95,14 @@ const start = (timenode) => {
       timenode.stopClaiming();
     },
   })
-  replServer.defineCommand("sweepCache", {
-    help: "Sweeps your cache of expired txRequests.",
-    action() {
-      conf.cache.sweepExpired()
-    },
-  })
+  // No longer supported
+  // replServer.defineCommand("sweepCache", {
+  //   help: "Sweeps your cache of expired txRequests.",
+  //   action() {
+  //     console.log(config.cache)
+  //     config.cache.sweepExpired()
+  //   },
+  // })
   replServer.defineCommand("testTx", {
     help:
       "Send a test transaction to the network (requires unlocked local account).",
@@ -110,7 +112,7 @@ const start = (timenode) => {
       const scheduler = await eac.scheduler()
 
       // Set some meaningless defaults
-      const windowStart = web3.eth.blockNumber + 30
+      const windowStart = new BigNumber(await eac.Util.getBlockNumber()) + 30
       const gasPrice = web3.toWei("100", "gwei")
       const requiredDeposit = 1
       const callGas = 1212121
@@ -133,7 +135,7 @@ const start = (timenode) => {
       })
 
       // we're using a wallet.
-      if (conf.wallet) {
+      if (config.wallet) {
         spinner.fail('Currently unavailable feature.')
       }
 
