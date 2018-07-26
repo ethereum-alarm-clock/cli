@@ -1,5 +1,5 @@
 const fs = require('fs')
-const { Wallet } = require('eac.js-client')
+const { Wallet } = require('@ethereum-alarm-clock/timenode-core')
 
 const createWallet = async (web3, num, file, password) => {
   const wallet = new Wallet(web3)

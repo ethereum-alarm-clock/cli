@@ -1,8 +1,9 @@
 const BigNumber = require("bignumber.js")
 const repl = require("repl")
 
-const start = (conf, ms) => {
-  const { eac, web3 } = conf
+const start = (timenode) => {
+  const config = timenode.config;
+  const { eac, web3 } = config;
 
   console.log(" ") // blank space
   const replServer = repl.start({ prompt: ">> " })
@@ -10,8 +11,8 @@ const start = (conf, ms) => {
   replServer.defineCommand("getBalance", {
     help: "Get the balance of your accounts.",
     async action() {
-      if (conf.wallet) {
-        conf.wallet.getAccounts().forEach(async (account) => {
+      if (config.wallet) {
+        config.wallet.getAccounts().forEach(async (account) => {
           const address = account.getAddressString();
           console.log(`${address} | Balance: ${web3.fromWei(await eac.Util.getBalance(address))}`)
         })
@@ -31,11 +32,11 @@ const start = (conf, ms) => {
   replServer.defineCommand("dumpCache", {
     help: "Dumps your cache storage.",
     action() {
-      if (conf.cache.isEmpty()) {
-        console.log("Cache empty")
+      if (config.cache.isEmpty()) {
+        console.log('\nCACHE EMPTY')
       } else {
-        conf.cache.stored().forEach((entry) => {
-          console.log(`${entry} | ${conf.cache.get(entry)}`)
+        config.cache.stored().forEach((entry) => {
+          console.log(`${entry} | ${config.cache.get(entry).windowStart}`)
         })
       }
     },
@@ -47,19 +48,51 @@ const start = (conf, ms) => {
         console.log("Please define 1 for debug, 2 for info, 3 for error.")
         return
       }
-      conf.logger.logLevel = level
+      config.logger.logLevel = level
+    },
+  })
+  replServer.defineCommand("getStats", {
+    help: "Get some interesting stats on your executing accounts.",
+    action() {
+      const stats = config.statsDb.getStats()
+      const claiming = config.claiming ? 'ON' : 'OFF';
+      stats.forEach((accountStats) => {
+        const bounties = web3.fromWei(accountStats.bounties, 'ether')
+        const costs = web3.fromWei(accountStats.costs, 'ether')
+        const profit = bounties - costs
+
+        const stringToFixed = (string) => parseFloat(string).toFixed(6)
+
+        console.log(`${accountStats.account} | Executed: ${
+          accountStats.executed
+          } | Claimed: ${accountStats.claimed} (${claiming}) | Ether gain: ${
+          stringToFixed(profit)
+        } (${stringToFixed(bounties)} - ${stringToFixed(costs)})`)
+      })
     },
   })
   replServer.defineCommand("start", {
-    help: "Starts the execution client.",
+    help: "Starts the TimeNode.",
     action() {
-      conf.scanning = true
+      timenode.startScanning();
     },
   })
   replServer.defineCommand("stop", {
-    help: "Stops the execution client.",
+    help: "Stops the TimeNode.",
     action() {
-      conf.scanning = false
+      timenode.stopScanning();
+    },
+  })
+  replServer.defineCommand("startClaiming", {
+    help: "Starts the TimeNode claiming.",
+    action() {
+      timenode.startClaiming();
+    },
+  })
+  replServer.defineCommand("stopClaiming", {
+    help: "Stops the TimeNode claiming.",
+    action() {
+      timenode.stopClaiming();
     },
   })
   replServer.defineCommand("sweepCache", {
@@ -123,25 +156,6 @@ const start = (conf, ms) => {
           spinner.succeed(`Transaction mined! Hash - ${receipt.transactionHash}`)
         }
       }).catch(err => spinner.fail(err))
-    },
-  })
-  replServer.defineCommand("getStats", {
-    help: "Get some interesting stats on your executing accounts.",
-    action() {
-      const stats = conf.statsdb.getStats()
-      stats.forEach((accountStats) => {
-        const bounties = web3.fromWei(accountStats.bounties, 'ether')
-        const costs = web3.fromWei(accountStats.costs, 'ether')
-        const profit = bounties - costs
-
-        const stringToFixed = (string) => parseFloat(string).toFixed(6)
-
-        console.log(`${accountStats.account} | Claimed: ${
-          accountStats.claimed
-        } | Executed: ${accountStats.executed} | Ether gain: ${
-          stringToFixed(profit)
-        } (${stringToFixed(bounties)} - ${stringToFixed(costs)})`)
-      })
     },
   })
   replServer.defineCommand("requestInfo", {

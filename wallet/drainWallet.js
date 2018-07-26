@@ -1,5 +1,4 @@
 const BigNumber = require('bignumber.js')
-const fs = require('fs')
 const { Util } = require('eac.js-lib')()
 
 // @returns Promise<[txObjs]>

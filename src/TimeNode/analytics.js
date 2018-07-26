@@ -81,4 +81,4 @@ class Analytics {
     }
 }
 
-module.exports = { Analytics };
+module.exports = Analytics;
