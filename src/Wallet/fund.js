@@ -14,7 +14,7 @@ const fund = async (amt, program) => {
   checkOptionsForWalletAndPassword(program);
 
   if (!await eac.Util.checkForUnlockedAccount()) {
-      throw 'Must be running a local node with unlocked account to use this command.';
+    throw 'Must be running a local node with unlocked account to use this command.';
   }
 
   const spinner = ora('Sending the funding transactions...');

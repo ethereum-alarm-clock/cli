@@ -23,7 +23,9 @@ const walletHandle = (path, paths) => {
 const catchErrors = async (asyncFunction) => {
   try {
     await asyncFunction;
-  } catch (e) { console.error(e); }
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 /** General Options */
