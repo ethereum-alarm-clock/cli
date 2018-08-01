@@ -79,7 +79,6 @@ const timenode = async (options, program) => {
   }
 
   config.chain = chain;
-  config.client = 'parity';
 
   // Economic Strategy
   config.economicStrategy = {
