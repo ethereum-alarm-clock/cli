@@ -12,7 +12,7 @@
 
 const BigNumber = require('bignumber.js');
 const Bb = require('bluebird');
-const { Wallet } = require('@ethereum-alarm-clock/timenode-core');
+const { checkOptionsForWalletAndPassword, loadWalletFromKeystoreFile } = require('../src/Wallet/utils');
 const fs = require('fs');
 const initWeb3 = require('./initWeb3');
 const program = require('./program');
@@ -38,17 +38,14 @@ const getDefaultValues = async (web3) => {
  */
 const main = async () => {
   // First checks,
-  if (!program.wallet || !program.password) {
-    throw new Error('Must pass a keystore and password arguments.');
-  }
+  checkOptionsForWalletAndPassword(program);
 
   // Second inits,
   const web3 = initWeb3(program.provider); 
   const eac = require('eac.js-lib')(web3);
 
   // Third wallet,
-  const wallet = new Wallet(web3);
-  wallet.decrypt(JSON.parse(fs.readFileSync(program.wallet[0])), program.password);
+  const wallet = loadWalletFromKeystoreFile( web3, program.wallet, program.password);
 
   // Fourth logic,
   const defaultValues = await getDefaultValues(web3);
