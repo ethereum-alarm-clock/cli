@@ -61,14 +61,32 @@ const start = (timenode) => {
         const costs = web3.fromWei(accountStats.costs, 'ether')
         const profit = bounties - costs
 
+        const claimedPendingExecution = timenode.getClaimedNotExecutedTransactions()
+
         const stringToFixed = (string) => parseFloat(string).toFixed(6)
 
         console.log(`${accountStats.account} | Executed: ${
           accountStats.executed
-          } | Claimed: ${accountStats.claimed} (${claiming}) | Ether gain: ${
+          } | Total Claimed: ${accountStats.claimed} (${claiming}) | Claimed Pending Execution: ${claimedPendingExecution.length} | Ether gain: ${
           stringToFixed(profit)
         } (${stringToFixed(bounties)} - ${stringToFixed(costs)})`)
       })
+    },
+  })
+  replServer.defineCommand("getClaimed", {
+    help: "Get claimed transactions pending execution.",
+    action() {
+      const claimedPendingExecution = timenode.getClaimedNotExecutedTransactions()
+
+      let print = `Claimed transactions pending execution (${claimedPendingExecution.length}): \n`;
+
+      let i = 1;
+      for (const address of claimedPendingExecution) {
+        print += `${i}. ${address}\n`;
+        i++;
+      }
+
+      console.log(print);
     },
   })
   replServer.defineCommand("start", {
@@ -98,7 +116,7 @@ const start = (timenode) => {
   replServer.defineCommand("sweepCache", {
     help: "Sweeps your cache of expired txRequests.",
     action() {
-      conf.cache.sweepExpired()
+      config.cache.sweepExpired()
     },
   })
   replServer.defineCommand("testTx", {
@@ -125,7 +143,7 @@ const start = (timenode) => {
         new BigNumber(fee),
         new BigNumber(bounty)
       )
-    
+
       scheduler.initSender({
         from: web3.eth.defaultAccount,
         gas: 3000000,
@@ -133,7 +151,7 @@ const start = (timenode) => {
       })
 
       // we're using a wallet.
-      if (conf.wallet) {
+      if (config.wallet) {
         spinner.fail('Currently unavailable feature.')
       }
 
