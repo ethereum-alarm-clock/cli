@@ -112,7 +112,7 @@ const start = (timenode) => {
       const scheduler = await eac.scheduler()
 
       // Set some meaningless defaults
-      const windowStart = new BigNumber(await eac.Util.getBlockNumber()) + 30
+      const windowStart = new BigNumber(await eac.Util.getBlockNumber()).add(30)
       const gasPrice = web3.toWei("100", "gwei")
       const requiredDeposit = 1
       const callGas = 1212121

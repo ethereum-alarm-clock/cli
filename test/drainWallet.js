@@ -29,8 +29,7 @@ describe('drainWallet', () => {
             provider: 'http://localhost:8545',
         }
 
-        await drainWallet(EXAMPLE_ADDRESS, program)
-
+        await drainWallet({}, 1, 1, wallet);
         assert.ok(getAddressesCalled)
     })
 
