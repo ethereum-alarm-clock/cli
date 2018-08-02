@@ -1,6 +1,6 @@
 [<img src="https://s3.amazonaws.com/chronologic.network/ChronoLogic_logo.svg" width="128px">](https://github.com/chronologic)
 
-[![npm version](https://badge.fury.io/js/eac.js-cli.svg)](https://badge.fury.io/js/eac.js-client)
+[![npm version](https://badge.fury.io/js/%40ethereum-alarm-clock%2Fcli.svg)](https://badge.fury.io/js/%40ethereum-alarm-clock%2Fcli)
 [![Greenkeeper badge](https://badges.greenkeeper.io/ethereum-alarm-clock/cli.svg)](https://greenkeeper.io/)
 
 # @ethereum-alarm-clock/cli

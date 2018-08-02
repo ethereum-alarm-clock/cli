@@ -14,10 +14,14 @@ const checkOptionsForWalletAndPassword = (options) => {
 
 const loadWalletFromKeystoreFile = (web3, filePath, password) => {
     const file = fs.readFileSync(filePath[0], 'utf8');
-    let keystore = allPropertiesToLowerCase(JSON.parse(file));
-    
+    let keystore = JSON.parse(file);
+
+    if (!Array.isArray(keystore)) {
+        keystore = [keystore];
+    }
+
     const wallet = new Wallet(web3);
-    wallet.decrypt([keystore], password);
+    wallet.decrypt(keystore, password);
 
     return wallet;
 }

@@ -2,6 +2,8 @@ const BigNumber = require("bignumber.js")
 const drainWallet = require('./wallet/drainWallet')
 const { assert, expect }  = require("chai")
 
+const EXAMPLE_ADDRESS = '0xe87529A6123a74320e13A6Dabf3606630683C029';
+
 describe('drainWallet', () => {
     it('returns promise', () => {
         expect(drainWallet({}, 1, 1, {
@@ -11,7 +13,7 @@ describe('drainWallet', () => {
         })).to.be.a('Promise')
     })
 
-    it('calls wallet.getAddresses', () => {
+    it('calls wallet.getAddresses', async () => {
         let getAddressesCalled = false
         const wallet = {
             getAddresses() {
@@ -21,7 +23,13 @@ describe('drainWallet', () => {
             }
         };
 
-        drainWallet({}, 1, 1, wallet)
+        const program = {
+            password: 'lol',
+            wallet,
+            provider: 'http://localhost:8545',
+        }
+
+        await drainWallet(EXAMPLE_ADDRESS, program)
 
         assert.ok(getAddressesCalled)
     })
@@ -31,7 +39,6 @@ describe('drainWallet', () => {
         let getBalanceCalled = false
         let waitForTransactionToBeMinedCalled = false
 
-        const EXAMPLE_ADDRESS = '0xe87529A6123a74320e13A6Dabf3606630683C029';
         const EXAMPLE_ADDRESSES = [EXAMPLE_ADDRESS]
         const EXAMPLE_BALANCE = 100000000
         const EXAMPLE_TX_HASH = '0xf24cea9a5270e8df3cbe693209621690b5753cd207dda8b59013f6911ab469fb'
