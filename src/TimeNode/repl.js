@@ -62,10 +62,11 @@ const start = (timenode) => {
         const profit = bounties - costs
 
         const claimedPendingExecution = timenode.getClaimedNotExecutedTransactions()
+        const failedClaims = timenode.getUnsucessfullyClaimedTransactions()
 
         const stringToFixed = (string) => parseFloat(string).toFixed(6)
 
-        console.log(`${accountStats.account} | Executed: ${
+        console.log(`${accountStats.account} | Failed Claims: ${failedClaims.length} | Executed: ${
           accountStats.executed
           } | Total Claimed: ${accountStats.claimed} (${claiming}) | Claimed Pending Execution: ${claimedPendingExecution.length} | Ether gain: ${
           stringToFixed(profit)
@@ -82,6 +83,22 @@ const start = (timenode) => {
 
       let i = 1;
       for (const address of claimedPendingExecution) {
+        print += `${i}. ${address}\n`;
+        i++;
+      }
+
+      console.log(print);
+    },
+  })
+  replServer.defineCommand("getFailedClaims", {
+    help: "Get unsuccessfully claimed transactions.",
+    action() {
+      const transactions = timenode.getUnsucessfullyClaimedTransactions();
+
+      let print = `Unsuccessfully claimed transactions (${transactions.length}): \n`;
+
+      let i = 1;
+      for (const address of transactions) {
         print += `${i}. ${address}\n`;
         i++;
       }
