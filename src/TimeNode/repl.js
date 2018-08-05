@@ -146,8 +146,10 @@ const start = (timenode) => {
       const spinner = ora("Sending test transaction to network...").start()
       const scheduler = await eac.scheduler()
 
+      const blockNumber = await eac.Util.getBlockNumber()
+
       // Set some meaningless defaults
-      const windowStart = new BigNumber(await eac.Util.getBlockNumber()).add(30)
+      const windowStart = (new BigNumber(blockNumber)).plus(30)
       const gasPrice = web3.toWei("100", "gwei")
       const requiredDeposit = 1
       const callGas = 1212121
