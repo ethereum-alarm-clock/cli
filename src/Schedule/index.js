@@ -12,6 +12,8 @@ const {
   loadWalletFromKeystoreFile,
 } = require('../Wallet/utils');
 
+const { scheduleUsingWallet } = require('./helpers');
+
 const MINIMUM_PERIOD_BEFORE_SCHEDULE = (tempUnit) => {
   if (tempUnit === 1) {
     return 15;
@@ -23,7 +25,6 @@ const MINIMUM_PERIOD_BEFORE_SCHEDULE = (tempUnit) => {
 const schedule = async (options, program) => {
   const web3 = initWeb3(program.provider);
   const eac = require('eac.js-lib')(web3);
-  const eacScheduler = await eac.scheduler();
 
   const defaultValues = await getDefaultValues(web3);
 
@@ -32,7 +33,7 @@ const schedule = async (options, program) => {
   }
 
   checkOptionsForWalletAndPassword(program);
-  
+
   const wallet = loadWalletFromKeystoreFile(web3, program.wallet, program.password);
 
   // Initiate the shedule parameters.
@@ -106,71 +107,30 @@ const schedule = async (options, program) => {
   console.log('\n');
   const spinner = ora('Sending the scheduling transaction...').start();
 
-  // Determine which scheduler to target based on temporal unit.
-
-  let data; // Encoded transaction data.
-  let target; // The scheduler address.
-
-  if (temporalUnit === 1) {
-    target = eacScheduler.blockScheduler.address;
-    data = eacScheduler.blockScheduler.schedule.getData(
-      recipient,
-      callData,
-      [
-        callGas,
-        callValue,
-        windowSize,
-        windowStart,
-        gasPrice,
-        fee,
-        bounty,
-        requiredDeposit,
-      ]
-    );
-  } else if (temporalUnit === 2) {
-    target = eacScheduler.timestampScheduler.address;
-    data = eacScheduler.timestampScheduler.schedule.getData(
-      recipient,
-      callData,
-      [
-        callGas,
-        callValue,
-        windowSize,
-        windowStart,
-        gasPrice,
-        fee,
-        bounty,
-        requiredDeposit,
-      ]
-    );
-  } else { throw `Invalid temporal unit.`; }
-
-  // Send the scheduling transaction.
-
   try {
-    const result = await wallet.sendFromNext({
-      to: target,
-      value: endowment,
-      gas: 3000000,
-      gasPrice: web3.toWei('8', 'gwei'),
-      data,
-    })
+    const { receipt, success } = await scheduleUsingWallet({
+      recipient,
+      callData,
+      callGas,
+      callValue,
+      windowSize,
+      windowStart,
+      gasPrice,
+      fee,
+      bounty,
+      requiredDeposit,
+      temporalUnit
+    }, web3, eac, wallet);
 
-    if (result.receipt && !result.hasOwnProperty('error')) {
-      const successValues = [1, '0x1', '0x01', true];
-      if (successValues.indexOf(result.receipt.status) === -1) {
-        spinner.fail(`Transaction failed.`);
-        throw `Receipt: ${JSON.stringify(result.receipt)}`;
-      }
-  
-      spinner.succeed(`Transaction successful. Transaction Hash: ${result.receipt.transactionHash}\n`);
-      console.log(`Address of scheduled transaction: ${eac.Util.getTxRequestFromReceipt(result.receipt)}`);
+    if (success) {
+      spinner.succeed(`Transaction successful. Transaction Hash: ${receipt.transactionHash}\n`);
+      console.log(`Address of scheduled transaction: ${eac.Util.getTxRequestFromReceipt(receipt)}`);
     } else {
       spinner.fail(`Transaction failed.`);
-      throw `Error: ${JSON.stringify(result.error)}`;
     }
-
-  } catch (e) { spinner.fail(e); }
+  } catch (e) {
+    spinner.fail(`Transaction failed.\n\nError: ${e}`);
+  }
 }
 
 module.exports = schedule;
