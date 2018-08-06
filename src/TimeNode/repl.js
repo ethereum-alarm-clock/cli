@@ -1,5 +1,6 @@
 const BigNumber = require("bignumber.js")
 const repl = require("repl")
+const { scheduleUsingWallet } = require('../Schedule/helpers');
 
 const start = (timenode) => {
   const config = timenode.config;
@@ -149,15 +150,48 @@ const start = (timenode) => {
       const blockNumber = await eac.Util.getBlockNumber()
 
       // Set some meaningless defaults
+      const recipient = '0x009f7EfeD908c05df5101DA1557b7CaaB38EE4Ce';
+      const callData = web3.fromAscii("s0x".repeat(Math.floor(Math.random() * 10)));
       const windowStart = (new BigNumber(blockNumber)).plus(30)
-      const gasPrice = web3.toWei("100", "gwei")
+      const windowSize  = 255
+      const gasPrice = web3.toWei("5", "gwei")
       const requiredDeposit = 1
-      const callGas = 1212121
-      const callValue = 123454321
+      const callGas = 100000
+      const callValue = 321
       const fee = 50
-      const bounty = web3.toWei("500", "finney")
+      const bounty = web3.toWei("1", "finney")
+      const temporalUnit = 1;
 
-      const endowment = scheduler.calcEndowment(
+      if (config.wallet) {
+        try {
+          const { receipt, success } = await scheduleUsingWallet({
+            recipient,
+            callData,
+            callGas,
+            callValue,
+            windowSize,
+            windowStart,
+            gasPrice,
+            fee,
+            bounty,
+            requiredDeposit,
+            temporalUnit
+          }, web3, eac, config.wallet);
+
+          if (success) {
+            spinner.succeed(`Transaction successful. Transaction Hash: ${receipt.transactionHash}\n`);
+            console.log(`Address of scheduled transaction: ${eac.Util.getTxRequestFromReceipt(receipt)}`);
+          } else {
+            spinner.fail(`Transaction failed.`);
+          }
+        } catch (e) {
+          spinner.fail(`Transaction failed.\n\nError: ${e}`);
+        }
+
+        return;
+      }
+
+      const endowment = eac.Util.calcEndowment(
         new BigNumber(callGas),
         new BigNumber(callValue),
         new BigNumber(gasPrice),
@@ -171,17 +205,12 @@ const start = (timenode) => {
         value: endowment,
       })
 
-      // we're using a wallet.
-      if (config.wallet) {
-        spinner.fail('Currently unavailable feature.')
-      }
-
       scheduler.blockSchedule(
-        "0x009f7EfeD908c05df5101DA1557b7CaaB38EE4Ce",
-        web3.fromAscii("s0x".repeat(Math.floor(Math.random() * 10))),
+        recipient,
+        callData,
         callGas,
         callValue,
-        255, // windowSize
+        windowSize,
         windowStart,
         gasPrice,
         fee, // fee
