@@ -31,7 +31,7 @@ const timenode = async (options, program) => {
   // clear();
   console.log('Setting Up...')
   console.log(`Using the provider: ${program.provider}`);
-  
+
   // Process the keystores.
   let encKeystores = [];
   program.wallet.map((file) => {
@@ -55,7 +55,7 @@ const timenode = async (options, program) => {
     statsDb: new loki('stats.json'),
     walletStores: encKeystores,
   });
-  
+
   if (!await config.eac.Util.checkNetworkID()) {
     throw 'Must be on the Ropsten or Kovan test network.';
   }
@@ -66,7 +66,7 @@ const timenode = async (options, program) => {
   }
 
   const chain = await config.eac.Util.getChainName();
-  
+
   const analyticsOn = (options.analytics && options.analytics.toLowerCase() === 'off') ? false : true;
 
   let analytics;
@@ -99,6 +99,19 @@ const timenode = async (options, program) => {
   )
 
   const TN = new TimeNode(config);
+
+  function warnBeforeTerminating() {
+    const claimedPendingExecution = TN.getClaimedNotExecutedTransactions();
+
+    if (claimedPendingExecution.length > 0) {
+      console.log(`\nKill signal received. You have ${claimedPendingExecution.length} claimed transactions pending execution. Are you sure you want to stop the TimeNode?\n\nHINT: Use .getClaimed to find out which transactions are pending execution.`);
+    } else {
+      process.exit(0);
+    }
+  }
+
+  process.once('SIGINT', warnBeforeTerminating);
+  process.once('SIGTERM', warnBeforeTerminating);
 
   if (options.autostart) {
     try {
