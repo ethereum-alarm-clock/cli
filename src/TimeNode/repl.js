@@ -67,9 +67,9 @@ const start = (timenode) => {
 
         const stringToFixed = (string) => parseFloat(string).toFixed(6)
 
-        console.log(`${accountStats.account} | Failed Claims: ${failedClaims.length} | Executed: ${
+        console.log(`${accountStats.account}\nFailed Claims: ${failedClaims.length}\nExecuted: ${
           accountStats.executed
-          } | Total Claimed: ${accountStats.claimed} (${claiming}) | Claimed Pending Execution: ${claimedPendingExecution.length} | Ether gain: ${
+          }\nTotal Claimed: ${accountStats.claimed} (${claiming})\nClaimed Pending Execution: ${claimedPendingExecution.length}\nEther gain: ${
           stringToFixed(profit)
         } (${stringToFixed(bounties)} - ${stringToFixed(costs)})`)
       })
