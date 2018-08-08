@@ -67,7 +67,7 @@ const start = (timenode) => {
 
         const stringToFixed = (string) => parseFloat(string).toFixed(6)
 
-        console.log(`${accountStats.account}\nFailed Claims: ${failedClaims.length}\nExecuted: ${
+        console.log(`${accountStats.account}\nDiscovered: ${accountStats.discovered}\nFailed Claims: ${failedClaims.length}\nExecuted: ${
           accountStats.executed
           }\nTotal Claimed: ${accountStats.claimed} (${claiming})\nClaimed Pending Execution: ${claimedPendingExecution.length}\nEther gain: ${
           stringToFixed(profit)
