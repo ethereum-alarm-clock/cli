@@ -5,7 +5,7 @@ const fs = require('fs');
 const loki = require('lokijs');
 
 const Analytics = require('./analytics');
-const Logger = require('./logger');
+const FileLogger = require('./logger');
 const Repl = require('./repl');
 const { checkOptionsForWalletAndPassword } = require('../Wallet/utils');
 
@@ -47,7 +47,7 @@ const timenode = async (options, program) => {
   let config = new Config({
     autostart: options.autostart,
     claiming: options.claiming,
-    logger: new Logger(options.logFile, options.logLevel),
+    logger: new FileLogger(options.logFile, options.logLevel),
     ms: options.ms,
     password: program.password,
     providerUrl: program.provider,

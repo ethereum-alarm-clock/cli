@@ -1,61 +1,49 @@
 const fs = require("fs")
 
-class Logger {
-  // 1 - debug / cache
-  // 2 - info
-  // 3 - error
+class FileLogger {
 
-  constructor(logfile, logLevel) {
-    if (logfile === "console") {
-      this.logToFile = false
+  constructor(logFile, logLevel) {
+    if (logFile === "console") {
+      this.logToFile = false;
     } else {
-      this.logToFile = true
-      this.logfile = logfile
-      fs.writeFileSync(this.logfile, "\n")
+      this.logToFile = true;
+      this.logFile = logFile;
+      fs.writeFileSync(this.logFile, "\n");
     }
-    this.logLevel = logLevel
+    this.logLevel = logLevel;
   }
 
-  debug(msg) {
+  debug(msg, address = '') {
     if (this.logLevel > 1) {
-      return
+      return;
     }
-    if (this.logToFile) {
-      fs.appendFileSync(this.logfile, `[debug] ${msg}\n`)
-    } else {
-      console.log(`[debug] ${msg}`)
-    }
+    this.formatPrint('DEBUG', msg, address);
   }
 
-  cache(msg) {
-    if (this.logLevel > 1) {
-      return
-    }
-    if (this.logToFile) {
-      fs.appendFileSync(this.logfile, `[cache] ${msg}\n`)
-    } else {
-      console.log(`[cache] ${msg}`)
-    }
+  error(msg, address = '') {
+    this.formatPrint('ERROR', msg, address);
   }
 
-  info(msg) {
+  info(msg, address = '') {
     if (this.logLevel > 2) {
-      return
+      return;
     }
+    this.formatPrint('INFO', msg, address);
+  }
+
+  formatPrint(kind, msg, address = '') {
+    const txRequest = address ? ` [${address}]` : '';
+    const stringToLog = `${this.now()} [${kind}]${txRequest} ${msg}`;
     if (this.logToFile) {
-      fs.appendFileSync(this.logfile, `[info] ${msg}\n`)
+      fs.appendFileSync(this.logFile, stringToLog + "\n");
     } else {
-      console.log(`[info] ${msg}`)
+      console.log(stringToLog);
     }
   }
 
-  error(msg) {
-    if (this.logToFile) {
-      fs.appendFileSync(this.logfile, `[error] ${msg}\n`)
-    } else {
-      console.log(`[error] ${msg}`)
-    }
+  now() {
+    return new Date().toISOString();
   }
 }
 
-module.exports = Logger
+module.exports = FileLogger;
