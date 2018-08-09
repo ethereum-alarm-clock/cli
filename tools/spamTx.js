@@ -10,6 +10,7 @@
  * place in a short while.
  */
 
+const { Config } = require('@ethereum-alarm-clock/timenode-core');
 const BigNumber = require('bignumber.js');
 const Bb = require('bluebird');
 const { checkOptionsForWalletAndPassword, loadWalletFromKeystoreFile } = require('../src/Wallet/utils');
@@ -43,9 +44,11 @@ const main = async () => {
   // Second inits,
   const web3 = initWeb3(program.provider); 
   const eac = require('eac.js-lib')(web3);
+  const logger = new Config({providerUrl: program.provider}).logger;
 
   // Third wallet,
   const wallet = loadWalletFromKeystoreFile( web3, program.wallet, program.password);
+  wallet.logger = logger;
 
   // Fourth logic,
   const defaultValues = await getDefaultValues(web3);
