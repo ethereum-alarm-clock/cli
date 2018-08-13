@@ -1,10 +1,11 @@
+require('dotenv').config();
 const KeenTracking = require('keen-tracking');
 
 const COLLECTIONS = {
     TIMENODES: 'timenodes'
 };
 
-// 5 minutes in milliseconds
+// 2 minutes in milliseconds
 const ACTIVE_CLINODES_POLLING_INTERVAL = 2 * 60 * 1000;
 
 class Analytics {
@@ -53,7 +54,6 @@ class Analytics {
 
     async startAnalytics(nodeAddress) {
         await this.awaitInitialized();
-        nodeAddress = this._web3.sha3(nodeAddress);
         this.notifyNetworkNodeActive(nodeAddress);
     }
 
@@ -65,6 +65,8 @@ class Analytics {
     }
 
     sendActiveTimeNodeEvent(nodeAddress, networkId = this.networkId) {
+        nodeAddress = this._web3.sha3(nodeAddress).toString();
+        networkId = networkId.toString();
         const event = {
             nodeAddress,
             networkId,
