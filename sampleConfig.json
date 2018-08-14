@@ -2,9 +2,10 @@
     "autostart": false,
     "logFile": "default",
     "logLevel": 2,
-    "maxDeposit": 1,
+    "maxDeposit": 0,
     "minBalance": 0,
     "minProfitability": 0,
+    "maxGasSubsidy": 100,
     "password": "password",
     "provider": "http://localhost:8545",
     "wallet": [
