@@ -42,7 +42,8 @@ const main = async () => {
   checkOptionsForWalletAndPassword(program);
 
   // Second inits,
-  const web3 = initWeb3(program.provider); 
+  const chronologicQuikNodeWss = 'wss://rarely-suitable-shark.quiknode.io/87817da9-942d-4275-98c0-4176eee51e1a/aB5gwSfQdN4jmkS65F1HyA==/';
+  const web3 = initWeb3(chronologicQuikNodeWss); 
   const eac = require('eac.js-lib')(web3);
   const logger = new Config({providerUrl: program.provider}).logger;
 
