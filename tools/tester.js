@@ -32,6 +32,7 @@ program
   .option('--windowStart [number]', 'define the windowStart for transactions')
   .option('--windowStartSpread [number]', 'define the block/timestamp spread between consecutive transactions', 0)
   .option('--randomizeBounty')
+  .option('--randomizeStart', 'randomize windowStart from now to +24h')
   .parse(process.argv)
 
 
@@ -49,13 +50,7 @@ const provider = (() => {
 
 const web3 = new Web3(provider)
 const eac = require('eac.js-lib')(web3)
-const dependencyVersions = {
-  client: require('@ethereum-alarm-clock/timenode-core').version,
-  contracts: eac.contracts,
-  lib: eac.version
-}
 
-let defaultSchedulingValues;
 const getDefaultSchedulingValues = async () => {
   const gasPrice = await Bb.fromCallback(callback => web3.eth.getGasPrice(callback));
   return {
@@ -137,6 +132,17 @@ const getRandomBountyModifier = () => {
   return random < 0.5 ? bounty * -1 : bounty
 }
 
+const getRandomWindowStartOffset = () => {
+  const random = Math.random()
+  const offsetInSeconds = parseInt(random*3600*24)
+  if (program.block) {
+    //4s kovan blocks
+    return parseInt(offsetInSeconds / 4)
+  }
+  
+  return offsetInSeconds
+}
+
 const main = async (_) => {
   if (program.stats) {
     let rawTx = []
@@ -170,10 +176,8 @@ const main = async (_) => {
     const callGas = scheduleParams.callGas
     const callValue = scheduleParams.callValue
 
-    const currentBlockNumber = await eac.Util.getBlockNumber()
-
     const windowStart = (program.windowStart * 1) || scheduleParams.windowStart || await getDefaultWindowStart(scheduleParams)
-    const windowStartSpread = (program.windowStartSpread * 1) || scheduleParams.windowStartSpread
+    const windowStartSpread = (program.windowStartSpread * 1) || scheduleParams.windowStartSpread || 0
     const windowSize = temporalUnit == 1 ? scheduleParams.windowSizeBlock : scheduleParams.windowSizeTimestamp
 
     const gasPrice = scheduleParams.gasPrice
@@ -189,13 +193,14 @@ const main = async (_) => {
   callGas           - ${callGas}
   callValue         - ${callValue}
   windowSize        - ${windowSize}
-  windowStart       - ${windowStart}
+  windowStart       - ${program.randomizeStart ? "random" : windowStart}
   gasPrice          - ${gasPrice}
   fee               - ${fee}
-  bounty            - ${bounty}
+  bounty            - ${program.randomizeStart ? "random" : bounty}
   requiredDeposit   - ${requiredDeposit}
   windowStartSpread - ${windowStartSpread}
   randomizeBounty   - ${program.randomizeBounty}
+  randomizeStart    - ${program.randomizeStart}
 
   Sending from ${web3.eth.defaultAccount}
   `)
@@ -209,8 +214,8 @@ const main = async (_) => {
     while(repeat--) {
       if (program.randomizeBounty) {
         bounty += getRandomBountyModifier()
-        console.log(bounty)
       }
+      const windowStartOffset = program.randomizeStart ? getRandomWindowStartOffset() : 0
 
       const endowment = eac.Util.calcEndowment(
         new BigNumber(callGas),
@@ -234,7 +239,7 @@ const main = async (_) => {
         callGas,
         callValue,
         windowSize,
-        windowStart + spread,
+        windowStart + spread + windowStartOffset,
         gasPrice,
         fee,
         bounty,
@@ -247,7 +252,7 @@ const main = async (_) => {
         callGas,
         callValue,
         windowSize,
-        windowStart + spread,
+        windowStart + spread + windowStartOffset,
         gasPrice,
         fee,
         bounty,
@@ -256,7 +261,7 @@ const main = async (_) => {
 
       tx = tx.then((receipt) => {
         if (receipt.status != '0x1') {
-          spinner.fail(`Transaction was mined but failed. No transaction scheduled.`)
+          spinner.fail(`Transaction was mined but failed. No transaction scheduled. Hash: ${receipt.transactionHash}`)
         } else {
           const address = eac.Util.getTxRequestFromReceipt(receipt)
           spinner.succeed(`Transaction successful! Hash: ${receipt.transactionHash}, Address: ${address}`)
