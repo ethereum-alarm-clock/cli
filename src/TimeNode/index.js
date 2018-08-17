@@ -83,10 +83,10 @@ const timenode = async (options, program) => {
 
   // Economic Strategy
   config.economicStrategy = {
-    maxDeposit: options.maxDeposit ? new BigNumber(config.web3.toWei(options.maxDeposit)) : new BigNumber(Config.DEFAULT_ECONOMIC_STRATEGY.maxDeposit),
-    minBalance: options.minBalance ? new BigNumber(config.web3.toWei(options.minBalance)) : new BigNumber(Config.DEFAULT_ECONOMIC_STRATEGY.minBalance),
-    minProfitability: options.minProfitability ? new BigNumber(config.web3.toWei(options.minProfitability)) : new BigNumber(Config.DEFAULT_ECONOMIC_STRATEGY.minProfitability),
-    maxGasSubsidy: options.maxGasSubsidy ? config.web3.toWei(options.maxGasSubsidy) : Config.DEFAULT_ECONOMIC_STRATEGY.maxGasSubsidy
+    maxDeposit: options.maxDeposit ? new BigNumber(config.web3.toWei(options.maxDeposit)) : Config.DEFAULT_ECONOMIC_STRATEGY.maxDeposit,
+    minBalance: options.minBalance ? new BigNumber(config.web3.toWei(options.minBalance)) : Config.DEFAULT_ECONOMIC_STRATEGY.minBalance,
+    minProfitability: options.minProfitability ? new BigNumber(config.web3.toWei(options.minProfitability)) : Config.DEFAULT_ECONOMIC_STRATEGY.minProfitability,
+    maxGasSubsidy: options.maxGasSubsidy ? options.maxGasSubsidy : Config.DEFAULT_ECONOMIC_STRATEGY.maxGasSubsidy
   }
 
   // Start
