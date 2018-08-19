@@ -12,6 +12,7 @@ program
   .option('--save', '', false)
   .option('--wallet [path]', '', walletHandle, [])
   .option('--password [string]', '')
+  .option('--lengthMod [num]', '', 1)
   .parse(process.argv)
 
 module.exports = program;

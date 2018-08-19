@@ -80,10 +80,10 @@ const main = async () => {
       })
       const rand = Math.floor(Math.random() * 30);
       if (temporalUnit === 1) {
-        return curBlock.number + 25 + rand;
+        return program.lengthMod * (curBlock.number + 25 + rand);
       }
       if (temporalUnit === 2) {
-        return curBlock.timestamp + (25 * 12) + (rand * 12);
+        return program.lengthMod * (curBlock.timestamp + (25 * 12) + (rand * 12));
       }
     }
 
