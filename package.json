@@ -4,7 +4,8 @@
   "description": "Command-line tool written in JavaScript to interact with the Ethereum Alarm Clock",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "cleanup": "node tools/cleanup.js"
   },
   "repository": {
     "type": "git",

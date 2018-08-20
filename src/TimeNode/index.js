@@ -3,6 +3,7 @@ const clear = require('clear');
 const { Config, TimeNode } = require('@ethereum-alarm-clock/timenode-core');
 const fs = require('fs');
 const loki = require('lokijs');
+const lfsa = require('lokijs/src/loki-fs-structured-adapter.js');
 
 const Analytics = require('./analytics');
 const FileLogger = require('./logger');
@@ -44,6 +45,8 @@ const timenode = async (options, program) => {
     }
   });
 
+  const persistenceAdapter = new lfsa();
+
   // Load the config.
   let config = new Config({
     autostart: options.autostart,
@@ -53,7 +56,12 @@ const timenode = async (options, program) => {
     password: program.password,
     providerUrl: program.provider,
     scanSpread: options.scan,
-    statsDb: new loki('stats.json'),
+    statsDb: new loki('stats.json', {
+      adapter: persistenceAdapter,
+      autoload: true,
+      autosave: true,
+      autosaveInterval: 5000
+    }),
     walletStores: encKeystores,
   });
 
