@@ -134,6 +134,9 @@ const timenode = async (options, program) => {
   setTimeout(() => {
     Repl.start(TN)
   }, 2000);
+
+  // Hacky way to keep the process open so we can use the REPL.
+  return new Promise((resolve) => {});
 }
 
 module.exports = timenode;

@@ -140,6 +140,7 @@ const main = async () => {
       fs.appendFileSync('scheduled.txt', `${addressOf}\n`);
     } catch (e) { console.error(e); }
   }
+  process.exit(0);
 }
 
 try { main(); } catch (e) { console.error(e); }

@@ -27,6 +27,8 @@ const catchErrors = async (asyncFunction) => {
   } catch (e) {
     console.error(e);
   }
+  // Explicitly exit on completion.
+  process.exit(0);
 }
 
 /** General Options */
