@@ -249,6 +249,13 @@ Now: ${await txRequest.now()}`)
       }
     },
   })
+  replServer.defineCommand("resetStats", {
+    help: "Reset your TimeNode statistics.",
+    action() {
+      const addresses = config.wallet ? config.wallet.getAddresses() : [ web3.eth.defaultAccount ];
+      config.statsDb.resetStats(addresses);
+    },
+  })
 }
 
 module.exports = {
