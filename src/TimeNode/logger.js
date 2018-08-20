@@ -8,6 +8,11 @@ class FileLogger {
     } else {
       this.logToFile = true;
       this.logFile = logFile;
+      let i = 1;
+      while (fs.existsSync(this.logFile)) {
+        this.logFile = logFile + '.' + i.toString();
+        i++;
+      }
       fs.writeFileSync(this.logFile, "\n");
     }
     this.logLevel = logLevel;
