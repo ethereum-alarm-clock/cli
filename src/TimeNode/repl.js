@@ -71,7 +71,7 @@ const start = (timenode) => {
           accountStats.executed
           }\nTotal Claimed: ${accountStats.claimed} (${claiming})\nClaimed Pending Execution: ${claimedPendingExecution.length}\nEther gain: ${
           stringToFixed(profit)
-        } (${stringToFixed(bounties)} - ${stringToFixed(costs)})`)
+        } (${stringToFixed(bounties)} - ${stringToFixed(costs)})\n`)
       })
     },
   })
