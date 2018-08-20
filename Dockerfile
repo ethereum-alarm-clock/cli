@@ -12,4 +12,4 @@ RUN npm install -g npm@latest
 RUN npm cache verify
 RUN npm install
 
-RUN node tools/spamTx.js --wallet eacc301fee591a459d572cf1c5daa423f4433785 --password chronologic --repeat 3 --recurrent 300 --provider wss://rarely-suitable-shark.quiknode.io/87817da9-942d-4275-98c0-4176eee51e1a/aB5gwSfQdN4jmkS65F1HyA==/
+CMD ["node", "tools/spamTx.js", "--wallet", "eacc301fee591a459d572cf1c5daa423f4433785", "--password", "chronologic", "--repeat", "3", "--recurrent", "300", "--provider", "wss://rarely-suitable-shark.quiknode.io/87817da9-942d-4275-98c0-4176eee51e1a/aB5gwSfQdN4jmkS65F1HyA==/"]
