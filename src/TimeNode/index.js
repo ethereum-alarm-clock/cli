@@ -45,8 +45,6 @@ const timenode = async (options, program) => {
     }
   });
 
-  const persistenceAdapter = new lfsa();
-
   // Load the config.
   let config = new Config({
     autostart: options.autostart,
@@ -57,7 +55,7 @@ const timenode = async (options, program) => {
     providerUrl: program.provider,
     scanSpread: options.scan,
     statsDb: new loki('stats.json', {
-      adapter: persistenceAdapter,
+      adapter: new lfsa(),
       autoload: true,
       autosave: true,
       autosaveInterval: 5000
@@ -142,6 +140,9 @@ const timenode = async (options, program) => {
   setTimeout(() => {
     Repl.start(TN)
   }, 2000);
+
+  // Hacky way to keep the process open so we can use the REPL.
+  return new Promise((resolve) => {});
 }
 
 module.exports = timenode;

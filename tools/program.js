@@ -13,6 +13,7 @@ program
   .option('--wallet [path]', '', walletHandle, [])
   .option('--password [string]', '')
   .option('--lengthMod [num]', '', 1)
+  .option('--recurrent [secs]', '', 0)
   .parse(process.argv)
 
 module.exports = program;
