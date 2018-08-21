@@ -45,6 +45,23 @@ const timenode = async (options, program) => {
     }
   });
 
+  const statsDb = new loki('stats.json', {
+    adapter: new lfsa(),
+    autoload: true,
+    autoloadCallback: () => {
+      // LokiJS stores BN objects as a string.
+      // This causes problems when loading from persistent storage.
+      // Convert any stored non-BN into BN.
+      const stats = statsDb.getCollection('timenode-stats').data;
+      stats.forEach(stat => {
+        stat.bounty = new BigNumber(stat.bounty);
+        stat.cost = new BigNumber(stat.cost);
+      });
+    },
+    autosave: true,
+    autosaveInterval: 5000
+  });
+
   // Load the config.
   let config = new Config({
     autostart: options.autostart,
@@ -54,12 +71,7 @@ const timenode = async (options, program) => {
     password: program.password,
     providerUrl: program.provider,
     scanSpread: options.scan,
-    statsDb: new loki('stats.json', {
-      adapter: new lfsa(),
-      autoload: true,
-      autosave: true,
-      autosaveInterval: 5000
-    }),
+    statsDb,
     walletStores: encKeystores,
   });
 

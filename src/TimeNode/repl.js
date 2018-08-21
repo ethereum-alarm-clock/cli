@@ -60,12 +60,12 @@ const start = (timenode) => {
       addresses.forEach(address => {
         const bounties = config.statsDb.totalBounty(address);
         const costs = config.statsDb.totalCost(address);
-        const profit = bounties - costs;
+        const profit = bounties.minus(costs);
 
-        const stringToFixed = (string) => parseFloat(string).toFixed(6);
+        const formatWeiToEther = (wei) => web3.fromWei(wei, 'ether').toFixed(6);
 
         console.log(`TimeNode address: ${address}
-Ether gain: ${stringToFixed(profit)} (${stringToFixed(bounties)} bounties - ${stringToFixed(costs)} costs)
+Ether gain: ${formatWeiToEther(profit)} (${formatWeiToEther(bounties)} bounties - ${formatWeiToEther(costs)} costs)
 
 Discovered: ${config.statsDb.getDiscovered(address).length}
 Executions: ${config.statsDb.getSuccessfulExecutions(address).length} successful, ${config.statsDb.getFailedExecutions(address).length} failed
