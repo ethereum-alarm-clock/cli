@@ -3,8 +3,8 @@ const fs = require('fs');
 
 const delFile = file => {
   fs.unlink(file, (err) => {
-    if (err) throw err;
-    console.log(`${file} was deleted.`);
+    const msg = err ? ` - ${err.message}.` : ' - deleted.';
+    console.log(file + msg);
   });
 };
 
