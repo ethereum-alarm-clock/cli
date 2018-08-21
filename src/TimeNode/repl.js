@@ -60,7 +60,7 @@ const start = (timenode) => {
       addresses.forEach(address => {
         const bounties = config.statsDb.totalBounty(address);
         const costs = config.statsDb.totalCost(address);
-        const profit = bounties - costs;
+        const profit = bounties.minus(costs);
 
         const stringToFixed = (string) => parseFloat(string).toFixed(6);
 
