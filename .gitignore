@@ -7,4 +7,5 @@ password
 .eac.log*
 wallet2
 sample-keystore
+stats.json*
 keystore

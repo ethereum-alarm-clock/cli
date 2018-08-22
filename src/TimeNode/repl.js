@@ -55,30 +55,28 @@ const start = (timenode) => {
   replServer.defineCommand("getStats", {
     help: "Get some interesting stats on your executing accounts.",
     action() {
-      const stats = config.statsDb.getStats()
+      const addresses = config.wallet.getAddresses();
       const claiming = config.claiming ? 'ON' : 'OFF';
-      stats.forEach((accountStats) => {
-        const bounties = web3.fromWei(accountStats.bounties, 'ether')
-        const costs = web3.fromWei(accountStats.costs, 'ether')
-        const profit = bounties - costs
+      addresses.forEach(address => {
+        const bounties = config.statsDb.totalBounty(address);
+        const costs = config.statsDb.totalCost(address);
+        const profit = bounties.minus(costs);
 
-        const claimedPendingExecution = timenode.getClaimedNotExecutedTransactions()
-        const failedClaims = timenode.getUnsucessfullyClaimedTransactions()
+        const formatWeiToEther = (wei) => web3.fromWei(wei, 'ether').toFixed(6);
 
-        const stringToFixed = (string) => parseFloat(string).toFixed(6)
+        console.log(`TimeNode address: ${address}
+Ether gain: ${formatWeiToEther(profit)} (${formatWeiToEther(bounties)} bounties - ${formatWeiToEther(costs)} costs)
 
-        console.log(`${accountStats.account}\nDiscovered: ${accountStats.discovered}\nFailed Claims: ${failedClaims.length}\nExecuted: ${
-          accountStats.executed
-          }\nTotal Claimed: ${accountStats.claimed} (${claiming})\nClaimed Pending Execution: ${claimedPendingExecution.length}\nEther gain: ${
-          stringToFixed(profit)
-        } (${stringToFixed(bounties)} - ${stringToFixed(costs)})\n`)
+Discovered: ${config.statsDb.getDiscovered(address).length}
+Executions: ${config.statsDb.getSuccessfulExecutions(address).length} successful, ${config.statsDb.getFailedExecutions(address).length} failed
+Claiming: ${claiming}, ${config.statsDb.getSuccessfulClaims(address).length} claimed, ${config.statsDb.getFailedClaims(address).length} failed, ${timenode.getClaimedNotExecutedTransactions()[address].length} pending execution`);
       })
     },
   })
   replServer.defineCommand("getClaimed", {
     help: "Get claimed transactions pending execution.",
     action() {
-      const claimedPendingExecution = timenode.getClaimedNotExecutedTransactions()
+      const claimedPendingExecution = timenode.getClaimedNotExecutedTransactions();
 
       let print = `Claimed transactions pending execution (${claimedPendingExecution.length}): \n`;
 
@@ -247,6 +245,12 @@ Now: ${await txRequest.now()}`)
       } catch (err) {
         console.error(err)
       }
+    },
+  })
+  replServer.defineCommand("resetStats", {
+    help: "Reset your TimeNode statistics.",
+    action() {
+      config.statsDb.clearAll();
     },
   })
 }
