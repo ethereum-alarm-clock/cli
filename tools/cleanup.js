@@ -15,4 +15,9 @@ glob("stats.json*", (err, files) => {
 });
 
 delFile('scheduled.txt');
-delFile('.eac.log');
+
+glob(".eac.log*", (err, files) => {
+  for (let file of files) {
+    delFile(file);
+  }
+});
