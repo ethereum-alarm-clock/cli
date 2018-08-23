@@ -35,7 +35,7 @@ const timenode = async (options, program) => {
   console.log(`Using the provider: ${program.provider}\n`);
   if (!options.claiming) {
       console.log(`You are not using the CLAIMING functionality. This might make your TimeNode unprofitable. Please use the '.startClaiming' command to enable CLAIMING.`)
-      console.log(`For more info on claiming check: https://blog.chronologic.network/how-to-mitigate-timenode-risks-b8551bb28f9d.\n`)
+      console.log(`For more info on claiming check: https://blog.chronologic.network/how-to-mitigate-timenode-risks-b8551bb28f9d\n`)
   }
 
   // Process the keystores.
