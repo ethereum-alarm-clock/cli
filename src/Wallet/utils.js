@@ -10,6 +10,7 @@ const checkOptionsForWalletAndPassword = (options) => {
     }
     throw new Error(msg);
   }
+  return true;
 };
 
 const loadWalletFromKeystoreFile = (web3, filePath, password) => {

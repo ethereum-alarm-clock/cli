@@ -1,11 +1,4 @@
-const BigNumber = require('bignumber.js');
-const clear = require('clear');
 const Table = require('cli-table2');
-
-const Web3 = require('web3');
-
-const chronologicQuikNodeHttpKovan = 'https://rarely-suitable-shark.quiknode.io/87817da9-942d-4275-98c0-4176eee51e1a/aB5gwSfQdN4jmkS65F1HyA==/';
-const web3 = new Web3(new Web3.providers.HttpProvider(chronologicQuikNodeHttpKovan));
 
 const makeDashboard = (config, timenode) => {
   const claiming = config.claiming ? 'ON' : 'OFF';
@@ -30,7 +23,7 @@ const makeDashboard = (config, timenode) => {
 
     const formatWeiToEther = wei => config.web3.fromWei(wei, 'ether').toFixed(6);
 
-    const shortenAddr = addr => addr.slice(0, 8) + '...' + addr.slice(-4);
+    const shortenAddr = addr => `${addr.slice(0, 8)}...${addr.slice(-4)}`;
 
     return [
       { hAlign: 'center', content: shortenAddr(address) },
