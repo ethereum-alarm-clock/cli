@@ -15,6 +15,7 @@ const { Config } = require('@ethereum-alarm-clock/timenode-core');
 
 const chronologicQuikNode = 'https://rarely-suitable-shark.quiknode.io/87817da9-942d-4275-98c0-4176eee51e1a/aB5gwSfQdN4jmkS65F1HyA==/';
 const chronologicQuikNodeWss = 'wss://rarely-suitable-shark.quiknode.io/87817da9-942d-4275-98c0-4176eee51e1a/aB5gwSfQdN4jmkS65F1HyA==/';
+const chronologicQuikNodeWssRopsten = 'wss://abnormally-just-wombat.quiknode.io/286cd134-837e-44ce-bfd7-d6d7d01632dc/dFQbkQcp3ZCfgUjXghtXLA==/';
 
 const walletHandle = (path, paths) => {
   paths.push(path);
@@ -36,7 +37,7 @@ program
   .version(require('../package.json').version)
   .option('--config <path>', 'Load parameters from config file.', '')
   .option('--password <string>', 'The password for the keystore')
-  .option('--provider <string>', 'Sets the HTTP or WebSockets provider', chronologicQuikNodeWss)
+  .option('--provider <string>', 'Sets the HTTP or WebSockets provider', chronologicQuikNodeWssRopsten)
   .option('--wallet <path>', 'Sets the path to the keystore to use', walletHandle, [])
  
 program
