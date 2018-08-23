@@ -47,17 +47,6 @@ const timenode = async (options, program) => {
 
   const statsDb = new loki('stats.json', {
     adapter: new lfsa(),
-    autoload: true,
-    autoloadCallback: () => {
-      // LokiJS stores BN objects as a string.
-      // This causes problems when loading from persistent storage.
-      // Convert any stored non-BN into BN.
-      const stats = statsDb.getCollection('timenode-stats').data;
-      stats.forEach(stat => {
-        stat.bounty = new BigNumber(stat.bounty);
-        stat.cost = new BigNumber(stat.cost);
-      });
-    },
     autosave: true,
     autosaveInterval: 5000
   });
@@ -74,6 +63,8 @@ const timenode = async (options, program) => {
     statsDb,
     walletStores: encKeystores,
   });
+
+  await config.statsDbLoaded;
 
   if (!await config.eac.Util.checkNetworkID()) {
     throw 'Must be on the Ropsten or Kovan test network.';
