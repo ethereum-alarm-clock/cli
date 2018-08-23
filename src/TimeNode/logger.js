@@ -1,19 +1,18 @@
-const fs = require("fs")
+const fs = require('fs');
 
 class FileLogger {
-
   constructor(logFile, logLevel) {
-    if (logFile === "console") {
+    if (logFile === 'console') {
       this.logToFile = false;
     } else {
       this.logToFile = true;
       this.logFile = logFile;
       let i = 1;
       while (fs.existsSync(this.logFile)) {
-        this.logFile = logFile + '.' + i.toString();
-        i++;
+        this.logFile = `${logFile}.${i.toString()}`;
+        i += 1;
       }
-      fs.writeFileSync(this.logFile, "\n");
+      fs.writeFileSync(this.logFile, '\n');
     }
     this.logLevel = logLevel;
   }
@@ -40,13 +39,13 @@ class FileLogger {
     const txRequest = address ? ` [${address}]` : '';
     const stringToLog = `${this.now()} [${kind}]${txRequest} ${msg}`;
     if (this.logToFile) {
-      fs.appendFileSync(this.logFile, stringToLog + "\n");
+      fs.appendFileSync(this.logFile, `${stringToLog}\n`);
     } else {
       console.log(stringToLog);
     }
   }
 
-  now() {
+  static now() {
     return new Date().toISOString();
   }
 }

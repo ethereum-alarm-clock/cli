@@ -4,7 +4,7 @@ const ora = require('ora');
 
 const initWeb3 = require('../../tools/initWeb3');
 
-const { 
+const {
   checkOptionsForWalletAndPassword,
   loadWalletFromKeystoreFile,
 } = require('./utils');
@@ -21,7 +21,7 @@ const drain = async (target, program) => {
   }
 
   const spinner = ora(
-    'Sending the funding transactions...'
+    'Sending the funding transactions...',
   ).start();
 
   const gas = '21000';
@@ -31,29 +31,27 @@ const drain = async (target, program) => {
   try {
     const wallet = loadWalletFromKeystoreFile(web3, program.wallet, program.password);
     await Promise.all(
-      wallet.getAddresses().map((address) => {
-        return new Promise(async (resolve, reject) => {
-          const balance = new BigNumber(await eac.Util.getBalance(address));
-          const amount = balance.minus(gasCost);
-          try {
-            const { receipt } = await wallet.sendFromIndex(
-              wallet.getAddresses().indexOf(address),
-              {
-                to: target,
-                value: amount.toString(),
-                gas,
-                gasPrice,
-                data: '',
-              }
-            );
+      wallet.getAddresses().map(address => new Promise(async (resolve, reject) => {
+        const balance = new BigNumber(await eac.Util.getBalance(address));
+        const amount = balance.minus(gasCost);
+        try {
+          const { receipt } = await wallet.sendFromIndex(
+            wallet.getAddresses().indexOf(address),
+            {
+              to: target,
+              value: amount.toString(),
+              gas,
+              gasPrice,
+              data: '',
+            },
+          );
 
-            resolve(receipt);
-          } catch (e) { reject(e); }
-        });
-      })
-    )
+          resolve(receipt);
+        } catch (e) { reject(e); }
+      })),
+    );
     spinner.succeed('Wallet drained.');
   } catch (e) { spinner.fail(e); }
-}
+};
 
 module.exports = drain;

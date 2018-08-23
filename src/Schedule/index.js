@@ -17,19 +17,20 @@ const { scheduleUsingWallet } = require('./helpers');
 const MINIMUM_PERIOD_BEFORE_SCHEDULE = (tempUnit) => {
   if (tempUnit === 1) {
     return 15;
-  } else if (tempUnit === 2) {
+  } if (tempUnit === 2) {
     return 15 * 12;
-  } else { throw `Invalid temporal unit: ${tempUnit}`; }
-}
+  } throw new Error(`Invalid temporal unit: ${tempUnit}`);
+};
 
 const schedule = async (options, program) => {
   const web3 = initWeb3(program.provider);
+  // eslint-disable-next-line global-require
   const eac = require('eac.js-lib')(web3);
 
   const defaultValues = await getDefaultValues(web3);
 
   if (!await eac.Util.checkNetworkID()) {
-    throw 'Must be using the Kovan or Ropsten test network.';
+    throw new Error('Must be using the Kovan or Ropsten test network.');
   }
 
   checkOptionsForWalletAndPassword(program);
@@ -65,12 +66,12 @@ const schedule = async (options, program) => {
 
   const soonestScheduleTime = currentBlockNumber + MINIMUM_PERIOD_BEFORE_SCHEDULE(temporalUnit);
   if (windowStart < soonestScheduleTime) {
-    throw `Window start of ${windowStart} too soon.\nSoonest Schedule Time: ${soonestScheduleTime}`;
+    throw new Error(`Window start of ${windowStart} too soon.\nSoonest Schedule Time: ${soonestScheduleTime}`);
   }
 
   const gasPrice = scheduleParams.gasPrice || readInput.readGasPrice();
   const fee = scheduleParams.fee || readInput.readFee();
-  const bounty = scheduleParams.bounty ||  readInput.readBounty();
+  const bounty = scheduleParams.bounty || readInput.readBounty();
   const requiredDeposit = scheduleParams.deposit || readInput.readDeposit();
 
   // Calculate the required endowment according to these params.
@@ -80,7 +81,7 @@ const schedule = async (options, program) => {
     new BigNumber(gasPrice),
     new BigNumber(fee),
     new BigNumber(bounty),
-  )
+  );
 
   // We have all the input we need, now we confirm with the user.
   clear();
@@ -100,7 +101,7 @@ const schedule = async (options, program) => {
 
   const confirmed = rls.question('Are the above parameters correct? [Y/n]\n');
   if (confirmed.toLowerCase() !== 'y' && confirmed !== '') {
-    throw `You did not confirm the parameters.`;
+    throw new Error('You did not confirm the parameters.');
   }
 
   // Set up the spinner.
@@ -119,18 +120,18 @@ const schedule = async (options, program) => {
       fee,
       bounty,
       requiredDeposit,
-      temporalUnit
+      temporalUnit,
     }, web3, eac, wallet);
 
     if (success) {
       spinner.succeed(`Transaction successful. Transaction Hash: ${receipt.transactionHash}\n`);
       console.log(`Address of scheduled transaction: ${eac.Util.getTxRequestFromReceipt(receipt)}`);
     } else {
-      spinner.fail(`Transaction failed.`);
+      spinner.fail('Transaction failed.');
     }
   } catch (e) {
     spinner.fail(`Transaction failed.\n\nError: ${e}`);
   }
-}
+};
 
 module.exports = schedule;

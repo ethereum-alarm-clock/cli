@@ -31,7 +31,7 @@ const timenode = async (options, program) => {
 
   // We do the set-up first.
   // clear();
-  console.log('Setting Up...')
+  console.log('Setting Up...');
   console.log(`Using the provider: ${program.provider}`);
 
   // Process the keystores.
@@ -48,11 +48,11 @@ const timenode = async (options, program) => {
   const statsDb = new loki('stats.json', {
     adapter: new lfsa(),
     autosave: true,
-    autosaveInterval: 5000
+    autosaveInterval: 5000,
   });
 
   // Load the config.
-  let config = new Config({
+  const config = new Config({
     autostart: options.autostart,
     claiming: options.claiming,
     logger: new FileLogger(options.logFile, options.logLevel),
@@ -67,25 +67,27 @@ const timenode = async (options, program) => {
   await config.statsDbLoaded;
 
   if (!await config.eac.Util.checkNetworkID()) {
-    throw 'Must be on the Ropsten or Kovan test network.';
+    throw new Error('Must be on the Ropsten or Kovan test network.');
   }
 
   // Set up default logfile.
   if (options.logFile === 'default') {
+    // eslint-disable-next-line global-require
     options.logFile = `${require('os').homedir()}/.eac.log`;
   }
 
   const chain = await config.eac.Util.getChainName();
 
-  const analyticsOn = (options.analytics && options.analytics.toLowerCase() === 'off') ? false : true;
+  const analyticsOn = !((options.analytics && options.analytics.toLowerCase() === 'off'));
 
   let analytics;
   if (analyticsOn) {
     analytics = new Analytics(config.web3, {
+      // eslint-disable-next-line global-require
       client: require('@ethereum-alarm-clock/timenode-core').version,
       contracts: config.eac.contracts,
       lib: config.eac.version,
-    })
+    });
   }
 
   config.chain = chain;
@@ -95,8 +97,8 @@ const timenode = async (options, program) => {
     maxDeposit: options.maxDeposit ? new BigNumber(config.web3.toWei(options.maxDeposit)) : Config.DEFAULT_ECONOMIC_STRATEGY.maxDeposit,
     minBalance: options.minBalance ? new BigNumber(config.web3.toWei(options.minBalance)) : Config.DEFAULT_ECONOMIC_STRATEGY.minBalance,
     minProfitability: options.minProfitability ? new BigNumber(config.web3.toWei(options.minProfitability)) : Config.DEFAULT_ECONOMIC_STRATEGY.minProfitability,
-    maxGasSubsidy: options.maxGasSubsidy ? options.maxGasSubsidy : Config.DEFAULT_ECONOMIC_STRATEGY.maxGasSubsidy
-  }
+    maxGasSubsidy: options.maxGasSubsidy ? options.maxGasSubsidy : Config.DEFAULT_ECONOMIC_STRATEGY.maxGasSubsidy,
+  };
 
   // Start
   clear();
@@ -106,8 +108,8 @@ const timenode = async (options, program) => {
   await Promise.all(
     config.wallet.getAddresses().map(async (address) => {
       console.log(`${address} | Balance: ${config.web3.fromWei(await config.eac.Util.getBalance(address))}`);
-    })
-  )
+    }),
+  );
 
   const TN = new TimeNode(config);
 
@@ -134,18 +136,18 @@ const timenode = async (options, program) => {
     config.logger.info('Analytics ON');
     config.wallet.getAddresses().forEach((address) => {
       analytics.startAnalytics(address);
-    })
+    });
   }
 
   // We delay the REPL opening so that the above logic has time to run.
   console.log('\nOpening REPL...');
 
   setTimeout(() => {
-    Repl.start(TN)
+    Repl.start(TN);
   }, 2000);
 
   // Hacky way to keep the process open so we can use the REPL.
-  return new Promise((resolve) => {});
-}
+  return new Promise(() => {});
+};
 
 module.exports = timenode;
