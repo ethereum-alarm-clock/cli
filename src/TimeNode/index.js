@@ -30,9 +30,13 @@ const timenode = async (options, program) => {
   checkOptionsForWalletAndPassword(program);
 
   // We do the set-up first.
-  // clear();
-  console.log('Setting Up...')
-  console.log(`Using the provider: ${program.provider}`);
+  clear();
+  console.log('Setting Up...');
+  console.log(`Using the provider: ${program.provider}\n`);
+  if (!options.claiming) {
+    console.log(`\x1b[33mYou are not using the CLAIMING functionality. This might make your TimeNode unprofitable. Please use the '.startClaiming' command to enable CLAIMING.
+For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate-timenode-risks-b8551bb28f9d\n\x1b[0m`);
+  }
 
   // Process the keystores.
   let encKeystores = [];
@@ -98,8 +102,6 @@ const timenode = async (options, program) => {
     maxGasSubsidy: options.maxGasSubsidy ? options.maxGasSubsidy : Config.DEFAULT_ECONOMIC_STRATEGY.maxGasSubsidy
   }
 
-  // Start
-  clear();
   console.log('Welcome to the Ethereum Alarm Clock TimeNode CLI\n');
 
   console.log('Executing from accounts:');
