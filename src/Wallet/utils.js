@@ -8,8 +8,9 @@ const checkOptionsForWalletAndPassword = (options) => {
     if (options.logger) {
       return options.logger.error(msg);
     }
-    throw msg;
+    throw new Error(msg);
   }
+  throw new Error('Do not have a wallet~');
 };
 
 const loadWalletFromKeystoreFile = (web3, filePath, password) => {
@@ -24,14 +25,6 @@ const loadWalletFromKeystoreFile = (web3, filePath, password) => {
   wallet.decrypt(keystore, password);
 
   return wallet;
-};
-
-const allPropertiesToLowerCase = (object) => {
-  const newObject = {};
-  Object.keys(object).forEach((key) => {
-    newObject[key.toLowerCase()] = object[key];
-  });
-  return newObject;
 };
 
 module.exports = {

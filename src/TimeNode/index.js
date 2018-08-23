@@ -2,8 +2,8 @@ const BigNumber = require('bignumber.js');
 const clear = require('clear');
 const { Config, TimeNode } = require('@ethereum-alarm-clock/timenode-core');
 const fs = require('fs');
-const loki = require('lokijs');
-const lfsa = require('lokijs/src/loki-fs-structured-adapter.js');
+const Loki = require('lokijs');
+const Lfsa = require('lokijs/src/loki-fs-structured-adapter.js');
 
 const Analytics = require('./analytics');
 const FileLogger = require('./logger');
@@ -13,6 +13,7 @@ const { checkOptionsForWalletAndPassword } = require('../Wallet/utils');
 const timenode = async (options, program) => {
   if (program.config) {
     const config = JSON.parse(fs.readFileSync(program.config));
+    /* eslint-disable */
     program.provider = config.provider || program.provider;
     program.password = fs.readFileSync(config.password).toString() || program.password;
     program.wallet = config.wallet || program.wallet;
@@ -26,6 +27,7 @@ const timenode = async (options, program) => {
     options.minBalance = config.minBalance || options.minBalance;
     options.minProfitability = config.minProfitability || options.minProfitability;
     options.maxGasSubsidy = config.maxGasSubsidy || options.maxGasSubsidy;
+    /* eslint-enable */
   }
   checkOptionsForWalletAndPassword(program);
 
@@ -37,9 +39,10 @@ const timenode = async (options, program) => {
     console.log(`\x1b[33mYou are not using the CLAIMING functionality. This might make your TimeNode unprofitable. Please use the '.startClaiming' command to enable CLAIMING.
 For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate-timenode-risks-b8551bb28f9d\n\x1b[0m`);
   }
-  
+
   // Process the keystores.
   let encKeystores = [];
+  // eslint-disable-next-line
   program.wallet.map((file) => {
     const keystore = fs.readFileSync(file, 'utf8');
     if (typeof JSON.parse(keystore).length !== 'undefined') {
@@ -49,8 +52,8 @@ For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate
     }
   });
 
-  const statsDb = new loki('stats.json', {
-    adapter: new lfsa(),
+  const statsDb = new Loki('stats.json', {
+    adapter: new Lfsa(),
     autosave: true,
     autosaveInterval: 5000,
   });
@@ -77,6 +80,7 @@ For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate
   // Set up default logfile.
   if (options.logFile === 'default') {
     // eslint-disable-next-line global-require
+    // eslint-disable-next-line
     options.logFile = `${require('os').homedir()}/.eac.log`;
   }
 
@@ -98,10 +102,18 @@ For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate
 
   // Economic Strategy
   config.economicStrategy = {
-    maxDeposit: options.maxDeposit ? new BigNumber(config.web3.toWei(options.maxDeposit)) : Config.DEFAULT_ECONOMIC_STRATEGY.maxDeposit,
-    minBalance: options.minBalance ? new BigNumber(config.web3.toWei(options.minBalance)) : Config.DEFAULT_ECONOMIC_STRATEGY.minBalance,
-    minProfitability: options.minProfitability ? new BigNumber(config.web3.toWei(options.minProfitability)) : Config.DEFAULT_ECONOMIC_STRATEGY.minProfitability,
-    maxGasSubsidy: options.maxGasSubsidy ? options.maxGasSubsidy : Config.DEFAULT_ECONOMIC_STRATEGY.maxGasSubsidy,
+    maxDeposit: options.maxDeposit
+      ? new BigNumber(config.web3.toWei(options.maxDeposit))
+      : Config.DEFAULT_ECONOMIC_STRATEGY.maxDeposit,
+    minBalance: options.minBalance
+      ? new BigNumber(config.web3.toWei(options.minBalance))
+      : Config.DEFAULT_ECONOMIC_STRATEGY.minBalance,
+    minProfitability: options.minProfitability
+      ? new BigNumber(config.web3.toWei(options.minProfitability))
+      : Config.DEFAULT_ECONOMIC_STRATEGY.minProfitability,
+    maxGasSubsidy: options.maxGasSubsidy
+      ? options.maxGasSubsidy
+      : Config.DEFAULT_ECONOMIC_STRATEGY.maxGasSubsidy,
   };
 
   console.log('Welcome to the Ethereum Alarm Clock TimeNode CLI\n');

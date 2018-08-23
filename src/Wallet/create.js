@@ -12,7 +12,7 @@ const create = (program) => {
     'How many accounts to create? [1 - 10]\n',
   );
 
-  numberOfAccounts = parseInt(numberOfAccounts);
+  numberOfAccounts = parseInt(numberOfAccounts, 10);
 
   // Create array [0, ... 10]
   const acceptedValues = Array.from(Array(10).keys());
@@ -20,7 +20,7 @@ const create = (program) => {
   acceptedValues.shift();
 
   if (acceptedValues.indexOf(numberOfAccounts) === -1) {
-    throw `Incorrect input - ${numberOfAccounts}`;
+    throw new Error(`Incorrect input - ${numberOfAccounts}`);
   }
 
   const file = rls.question(

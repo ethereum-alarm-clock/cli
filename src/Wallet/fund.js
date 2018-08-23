@@ -9,12 +9,13 @@ const {
 
 const fund = async (amt, program) => {
   const web3 = initWeb3(program.provider);
+  // eslint-disable-next-line global-require
   const eac = require('eac.js-lib')(web3);
 
   checkOptionsForWalletAndPassword(program);
 
   if (!await eac.Util.checkForUnlockedAccount()) {
-    throw 'Must be running a local node with unlocked account to use this command.';
+    throw new Error('Must be running a local node with unlocked account to use this command.');
   }
 
   const spinner = ora('Sending the funding transactions...');
@@ -48,7 +49,7 @@ const fund = async (amt, program) => {
     res.forEach((receipt) => {
       if (successValues.indexOf(receipt.status) === -1) {
         spinner.fail(`Funding to ${receipt.to} failed.`);
-        throw 'Error!';
+        throw new Error('Error!');
       }
     });
     spinner.succeed('Accounts funded!');

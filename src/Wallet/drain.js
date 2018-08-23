@@ -12,12 +12,13 @@ const {
 const drain = async (target, program) => {
   // Init Web3
   const web3 = initWeb3(program.provider);
+  // eslint-disable-next-line global-require
   const eac = require('eac.js-lib')(web3);
 
   checkOptionsForWalletAndPassword(program);
 
   if (!ethUtil.isValidAddress(target)) {
-    throw 'Please provide a valid Ethereum address as the target.';
+    throw new Error('Please provide a valid Ethereum address as the target.');
   }
 
   const spinner = ora(
