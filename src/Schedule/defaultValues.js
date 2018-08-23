@@ -1,9 +1,9 @@
 
 const getDefaultValues = async (web3) => {
   const networkGasPrice = await new Promise((resolve) => {
-    web3.eth.getGasPrice((err,res) => {
+    web3.eth.getGasPrice((err, res) => {
       resolve(res);
-    })
+    });
   });
 
   return {
@@ -14,9 +14,9 @@ const getDefaultValues = async (web3) => {
     fee: web3.toWei('12', 'gwei'),
     gasPrice: networkGasPrice,
     windowSize: 255,
-  }
-}
+  };
+};
 
 module.exports = {
   getDefaultValues,
-}
+};

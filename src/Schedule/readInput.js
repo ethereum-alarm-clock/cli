@@ -1,9 +1,10 @@
-const ethUtil = require("ethereumjs-util")
-const rls = require("readline-sync")
+const ethUtil = require('ethereumjs-util');
+const rls = require('readline-sync');
 
 class ReadInput {
   constructor(web3, options, defaultValues) {
     this.web3 = web3;
+    // eslint-disable-next-line global-require
     this.eac = require('eac.js-lib')(this.web3);
     this.options = options;
     this.defaultValues = defaultValues;
@@ -14,20 +15,16 @@ class ReadInput {
 
     if (this.options.block) {
       tempUnit = 1;
-    }
-    else if (this.options.timestamp) {
+    } else if (this.options.timestamp) {
       tempUnit = 2;
-    }
-    else {
+    } else {
       let response = rls.question('Would you like to schedule using blocks or timestamps as the unit?\n');
       response = response.toLocaleLowerCase();
       if (response === 'block' || response === 'blocks') {
         tempUnit = 1;
-      }
-      else if (response === 'timestamp' || response === 'timestamps') {
+      } else if (response === 'timestamp' || response === 'timestamps') {
         tempUnit = 2;
-      }
-      else {
+      } else {
         throw new Error('Invalid response to question! Please response "block" or "timestamp"');
       }
     }
@@ -39,7 +36,7 @@ class ReadInput {
     if (!toAddress) {
       toAddress = '0x0010f94b296A852aAac52EA6c5Ac72e03afD032D';
     }
-    //Validate the address.
+    // Validate the address.
     toAddress = ethUtil.addHexPrefix(toAddress);
     if (!this.eac.Util.checkValidAddress(toAddress)) {
       throw new Error('Invalid recipient address.');
@@ -68,11 +65,12 @@ class ReadInput {
 
   readWindowSize(tempUnit) {
     const windowSize = rls.question('What is the windowSize?\n');
-    const defaultWindowSize = tempUnit === 1 ? this.defaultValues.windowSize : this.defaultValues.windowSize * 12;
+    const defaultWindowSize = tempUnit === 1
+      ? this.defaultValues.windowSize : this.defaultValues.windowSize * 12;
     return windowSize || defaultWindowSize;
   }
 
-  readWindowStart(curBlockNum) {
+  static readWindowStart(curBlockNum) {
     const defaultWindowStart = curBlockNum + 15 + 5;
     const windowStart = rls.question(`What is the windowStart: [press enter for ${defaultWindowStart}]\n`);
     return windowStart || defaultWindowStart;
