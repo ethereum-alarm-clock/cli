@@ -31,11 +31,11 @@ const timenode = async (options, program) => {
 
   // We do the set-up first.
   clear();
-  console.log('Setting Up...')
+  console.log('Setting Up...');
   console.log(`Using the provider: ${program.provider}\n`);
   if (!options.claiming) {
-      console.log(`You are not using the CLAIMING functionality. This might make your TimeNode unprofitable. Please use the '.startClaiming' command to enable CLAIMING.`)
-      console.log(`For more info on claiming check: https://blog.chronologic.network/how-to-mitigate-timenode-risks-b8551bb28f9d\n`)
+    console.log('\x1b[33m', `You are not using the CLAIMING functionality. This might make your TimeNode unprofitable. Please use the '.startClaiming' command to enable CLAIMING.
+    For more info on claiming check: https://blog.chronologic.network/how-to-mitigate-timenode-risks-b8551bb28f9d\n`, '\x1b[0m');
   }
 
   // Process the keystores.
