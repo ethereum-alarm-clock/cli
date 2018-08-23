@@ -1,8 +1,6 @@
 const BigNumber = require('bignumber.js');
 const ora = require('ora');
 const repl = require('repl');
-// eslint-disable-next-line
-const Table = require('cli-table2');
 const { scheduleUsingWallet } = require('../Schedule/helpers');
 
 const start = (timenode) => {
