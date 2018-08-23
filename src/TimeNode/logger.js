@@ -37,7 +37,7 @@ class FileLogger {
 
   formatPrint(kind, msg, address = '') {
     const txRequest = address ? ` [${address}]` : '';
-    const stringToLog = `${this.now()} [${kind}]${txRequest} ${msg}`;
+    const stringToLog = `${FileLogger.now()} [${kind}]${txRequest} ${msg}`;
     if (this.logToFile) {
       fs.appendFileSync(this.logFile, `${stringToLog}\n`);
     } else {

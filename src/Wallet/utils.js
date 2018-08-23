@@ -10,7 +10,6 @@ const checkOptionsForWalletAndPassword = (options) => {
     }
     throw new Error(msg);
   }
-  throw new Error('Do not have a wallet~');
 };
 
 const loadWalletFromKeystoreFile = (web3, filePath, password) => {

@@ -3,6 +3,8 @@ const ora = require('ora');
 const repl = require('repl');
 const { scheduleUsingWallet } = require('../Schedule/helpers');
 
+const makeDashboard = require('./dashboard');
+
 const start = (timenode) => {
   const { config } = timenode;
   const { eac, web3, util } = config;
@@ -56,22 +58,7 @@ const start = (timenode) => {
   replServer.defineCommand('getStats', {
     help: 'Get some interesting stats on your executing accounts.',
     action() {
-      const addresses = config.wallet.getAddresses();
-      const claiming = config.claiming ? 'ON' : 'OFF';
-      addresses.forEach((address) => {
-        const bounties = config.statsDb.totalBounty(address);
-        const costs = config.statsDb.totalCost(address);
-        const profit = bounties.minus(costs);
-
-        const formatWeiToEther = wei => web3.fromWei(wei, 'ether').toFixed(6);
-
-        console.log(`TimeNode address: ${address}
-Ether gain: ${formatWeiToEther(profit)} (${formatWeiToEther(bounties)} bounties - ${formatWeiToEther(costs)} costs)
-
-Discovered: ${config.statsDb.getDiscovered(address).length}
-Executions: ${config.statsDb.getSuccessfulExecutions(address).length} successful, ${config.statsDb.getFailedExecutions(address).length} failed
-Claiming: ${claiming}, ${config.statsDb.getSuccessfulClaims(address).length} claimed, ${config.statsDb.getFailedClaims(address).length} failed, ${timenode.getClaimedNotExecutedTransactions()[address].length} pending execution`);
-      });
+      console.log(makeDashboard(config, timenode).toString());
     },
   });
   replServer.defineCommand('getClaimed', {
