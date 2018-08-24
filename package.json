@@ -40,7 +40,7 @@
     "commander": "2.17.1",
     "console.table": "0.10.0",
     "dotenv": "5.0.1",
-    "eac.js-lib": "2.3.8",
+    "eac.js-lib": "2.4.0",
     "ethereumjs-util": "5.2.0",
     "keen-tracking": "4.0.2",
     "lokijs": "1.5.3",
