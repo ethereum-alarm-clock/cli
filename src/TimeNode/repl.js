@@ -226,6 +226,8 @@ const start = (timenode) => {
         await txRequest.fillData();
         const now = await txRequest.now();
         const networkGasPrice = await util.networkGasPrice();
+        const paymentModifier = await txRequest.claimPaymentModifier();
+
         console.log(`
 Owner: ${txRequest.owner}
 Claimed By: ${txRequest.isClaimed ? txRequest.claimedBy : 'not claimed'}
@@ -236,6 +238,7 @@ Freeze Period Begins: ${txRequest.freezePeriodStart} (t=${now - txRequest.freeze
 Execution Window Begins: ${txRequest.windowStart} (t=${now - txRequest.windowStart})
 ---
 Bounty: ${txRequest.bounty} (${web3.fromWei(txRequest.bounty, 'gwei')} Gwei)
+Bounty with modifier: ${txRequest.bounty} * ${paymentModifier} = ${txRequest.bounty * paymentModifier} (${web3.fromWei(txRequest.bounty * paymentModifier, 'gwei')} Gwei)
 Deposit: ${txRequest.requiredDeposit} (${web3.fromWei(txRequest.requiredDeposit, 'gwei')} Gwei)
 ---
 GasPrice: ${txRequest.gasPrice} (${web3.fromWei(txRequest.gasPrice, 'gwei')} Gwei) | Network: ${web3.fromWei(networkGasPrice, 'gwei')} Gwei
