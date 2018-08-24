@@ -26,11 +26,14 @@ const start = (timenode) => {
       }
     },
   });
-  replServer.defineCommand('getNow', {
-    help: 'Get the latest blockNum and timestamp',
+  replServer.defineCommand('network', {
+    help: 'Get the current network stats',
     async action() {
       const block = await util.getBlock('latest');
-      console.log(`BlockNum: ${block.number} | Timestamp: ${block.timestamp}`);
+      const gasPrice = await util.networkGasPrice();
+      const gweiGasPrice = web3.fromWei(gasPrice, 'gwei');
+
+      console.log(`BlockNum: ${block.number} | Timestamp: ${block.timestamp} | GasPrice: ${gweiGasPrice} Gwei`);
     },
   });
   replServer.defineCommand('dumpCache', {
@@ -221,13 +224,24 @@ const start = (timenode) => {
       const txRequest = await eac.transactionRequest(txRequestAddr);
       try {
         await txRequest.fillData();
+        const now = await txRequest.now();
+        const networkGasPrice = await util.networkGasPrice();
         console.log(`
 Owner: ${txRequest.owner}
 Claimed By: ${txRequest.isClaimed ? txRequest.claimedBy : 'not claimed'}
-Claim Window Begins: ${txRequest.claimWindowStart}
-Freeze Period Begins: ${txRequest.freezePeriodStart}
-Execution Window Begins: ${txRequest.windowStart}
-Now: ${await txRequest.now()}`);
+---
+Unit: ${txRequest.temporalUnit == 1 ? 'block' : 'time'}
+Claim Window Begins: ${txRequest.claimWindowStart} (t=${now - txRequest.claimWindowStart})
+Freeze Period Begins: ${txRequest.freezePeriodStart} (t=${now - txRequest.freezePeriodStart})
+Execution Window Begins: ${txRequest.windowStart} (t=${now - txRequest.windowStart})
+---
+Bounty: ${txRequest.bounty} (${web3.fromWei(txRequest.bounty, 'gwei')} Gwei)
+Deposit: ${txRequest.requiredDeposit} (${web3.fromWei(txRequest.requiredDeposit, 'gwei')} Gwei)
+---
+GasPrice: ${txRequest.gasPrice} (${web3.fromWei(txRequest.gasPrice, 'gwei')} Gwei) | Network: ${web3.fromWei(networkGasPrice, 'gwei')} Gwei
+Gas: ${txRequest.callGas}
+---
+Now: ${now}`);
       } catch (err) {
         console.error(err);
       }
