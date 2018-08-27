@@ -47,7 +47,7 @@
     "ora": "3.0.0",
     "readline-sync": "1.4.9",
     "web3": "0.20.6",
-    "web3-providers-ws": "1.0.0-beta.33",
+    "web3-providers-ws": "1.0.0-beta.36",
     "websocket": "1.0.26"
   },
   "engines": {
