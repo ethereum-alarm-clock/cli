@@ -21,6 +21,8 @@ const timenode = async (options, program) => {
     // TimeNode specific configurations
     options.autostart = config.autostart || options.autostart;
     options.claiming = config.claiming || options.claiming;
+    options.analyticsOff = config.analyticsOff || options.analyticsOff;
+
     options.logFile = config.logFile || options.logFile;
     options.logLevel = config.logLevel || options.logLevel;
     options.maxDeposit = config.maxDeposit || options.maxDeposit;
@@ -86,10 +88,8 @@ For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate
 
   const chain = await config.eac.Util.getChainName();
 
-  const analyticsOn = !((options.analytics && options.analytics.toLowerCase() === 'off'));
-
   let analytics;
-  if (analyticsOn) {
+  if (!options.analyticsOff) {
     analytics = new Analytics(config.web3, {
       // eslint-disable-next-line global-require
       client: require('@ethereum-alarm-clock/timenode-core').version,
@@ -146,7 +146,7 @@ For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate
     } catch (e) { throw e; }
   }
 
-  if (analyticsOn) {
+  if (!options.analyticsOff) {
     config.logger.info('Analytics ON');
     config.wallet.getAddresses().forEach((address) => {
       analytics.startAnalytics(address);
