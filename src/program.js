@@ -79,6 +79,7 @@ program
   .option('--analytics <boolean>', 'Sets the analytics on or off')
   .option('--autostart', 'Sets autostart')
   .option('--claiming', 'Claiming mode')
+  .option('--dashboard', 'Use the experimental dashboard', false)
   .option('--logFile <path>', 'Sets the file to output logs', '.eac.log')
   .option('--logLevel <number>', 'Sets the logging level', 2)
   .option('--maxDeposit <eth>', 'Only claim transactions that require a deposit lower than', Config.DEFAULT_ECONOMIC_STRATEGY.maxDeposit.div(Math.pow(10, 18)))

@@ -10,6 +10,8 @@ const FileLogger = require('./logger');
 const Repl = require('./repl');
 const { checkOptionsForWalletAndPassword } = require('../Wallet/utils');
 
+const Dashboard = require('../Dashboard/index.js');
+
 const timenode = async (options, program) => {
   if (program.config) {
     const config = JSON.parse(fs.readFileSync(program.config));
@@ -154,13 +156,76 @@ For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate
   }
 
   // We delay the REPL opening so that the above logic has time to run.
-  console.log('\nOpening REPL...');
+  if (options.dashboard) {
+    console.log('\nOpening DASHBOARD...');
+
 
   setTimeout(() => {
-    Repl.start(TN);
+    const dashboard = new Dashboard(TN);
+    class DashboardLogger {
+      constructor(logLevel=2, hidden=false) {
+        this.logLevel = logLevel;
+        this.hidden = hidden;
+      }
+
+      debug(msg, address='') {
+        if (this.logLevel > 1) {
+          return;
+        }
+        this.formatLog('DEBUG', msg, address);
+      }
+      error(msg, address='') {
+        this.formatLog('ERROR', msg, address);
+      }
+      info(msg, address='') {
+        if (this.logLevel > 3) {
+          return;
+        }
+        this.formatLog('INFO', msg, address);
+      }
+      formatLog(kind, msg, address='') {
+        if (this.hidden) {
+          return;
+        }
+        const txRequest = address ? ` [${address}]` : '';
+        let colorTag;
+        switch(kind) {
+          case 'INFO':
+            colorTag = '{blue-fg}';
+            break;
+          case 'DEBUG':
+            colorTag = '{green-fg}';
+            break;
+          case 'ERROR':
+            colorTag = '{red-fg}';
+            break;
+          default:
+            colorTag = '';
+            break;
+        }
+        const stringToLog = `${this.now()} ${colorTag}[${kind}]${colorTag?'{/}':''}${txRequest} ${msg}`;
+        dashboard.logText.pushLine(stringToLog);
+        // dashboard.logText.pushLine('scrolledTo: ' + dashboard.logText.getScrollPerc());
+        // const scrollPerc = parseInt(dashboard.logText.getScrollPerc(), 10);
+        if (dashboard.scrolling) {
+          dashboard.logText.setScrollPerc(100);
+        }
+        dashboard.screen.render();
+      }
+      now() {
+        return Math.floor(Date.now() / 1000);
+      }
+    }
+    const dashboardLogger = new DashboardLogger();
+    config.logger = dashboardLogger;
   }, 2000);
 
-  // Hacky way to keep the process open so we can use the REPL.
+  } else {
+    console.log('\nOpening REPL');
+    Repl.start(TN);
+  }
+
+  // Hacky way to keep the process open so we can use the REPL/ Dashboard.
   return new Promise(() => {});
 };
 
