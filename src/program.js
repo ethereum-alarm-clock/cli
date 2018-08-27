@@ -76,7 +76,7 @@ program
 program
   .command('timenode')
   .description('Run a TimeNode')
-  .option('--analytics <boolean>', 'Sets the analytics on or off')
+  .option('--analyticsOff', 'Turns the analytics off (TimeNode counter, state of the network, etc.)')
   .option('--autostart', 'Sets autostart')
   .option('--claiming', 'Claiming mode')
   .option('--logFile <path>', 'Sets the file to output logs', '.eac.log')
