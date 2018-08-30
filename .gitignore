@@ -6,6 +6,9 @@ password
 .vscode/.eac.log
 .eac.log
 wallet2
-.eac.log
+.eac.log*
 sample-keystore
 keystore
+keystore*
+stats.json
+stats.json*
