@@ -88,9 +88,6 @@ const main = async () => {
         }
       }
 
-      const trueGasPrice = defaultValues.gasPrice * program.gasPrice;
-      console.log(trueGasPrice);
-  
       if (tempUnit === 1) {
         target = bScheduler.address;
         data = bScheduler.schedule.getData(
@@ -101,7 +98,7 @@ const main = async () => {
             defaultValues.callValue,
             defaultValues.windowSizeBlock,
             await getRandWindowStart(tempUnit),
-            trueGasPrice,
+            defaultValues.gasPrice,
             defaultValues.fee,
             defaultValues.bounty,
             defaultValues.deposit,
@@ -117,7 +114,7 @@ const main = async () => {
             defaultValues.callValue,
             defaultValues.windowSizeTs,
             await getRandWindowStart(tempUnit),
-            trueGasPrice,
+            defaultValues.gasPrice,
             defaultValues.fee,
             defaultValues.bounty,
             defaultValues.deposit,
@@ -130,7 +127,7 @@ const main = async () => {
           to: target,
           value: endowment,
           gas: 3000000,
-          gasPrice: web3.toWei('6', 'gwei'),
+          gasPrice: web3.toWei('6', 'gwei') * program.gasPrice,
           data,
         });
   
