@@ -123,11 +123,12 @@ const main = async () => {
       } else { throw 'Invalid temporal unit.'; }
   
       try {
+        const price = Math.floor(web3.toWei('6', 'gwei') * program.gasPrice);
         const { receipt } = await wallet.sendFromNext({
           to: target,
-          value: endowment,
+          value: endowment.toNumber(),
           gas: 3000000,
-          gasPrice: web3.toWei('6', 'gwei') * program.gasPrice,
+          gasPrice: price,
           data,
         });
   
