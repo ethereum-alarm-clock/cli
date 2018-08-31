@@ -87,6 +87,9 @@ const main = async () => {
           return program.lengthMod * (curBlock.timestamp + (25 * 12) + (rand * 12));
         }
       }
+
+      const trueGasPrice = defaultValues.gasPrice * program.gasPrice;
+      console.log(trueGasPrice);
   
       if (tempUnit === 1) {
         target = bScheduler.address;
@@ -98,7 +101,7 @@ const main = async () => {
             defaultValues.callValue,
             defaultValues.windowSizeBlock,
             await getRandWindowStart(tempUnit),
-            defaultValues.gasPrice,
+            trueGasPrice,
             defaultValues.fee,
             defaultValues.bounty,
             defaultValues.deposit,
@@ -114,7 +117,7 @@ const main = async () => {
             defaultValues.callValue,
             defaultValues.windowSizeTs,
             await getRandWindowStart(tempUnit),
-            defaultValues.gasPrice,
+            trueGasPrice,
             defaultValues.fee,
             defaultValues.bounty,
             defaultValues.deposit,

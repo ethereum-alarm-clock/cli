@@ -14,6 +14,7 @@ program
   .option('--password [string]', '')
   .option('--lengthMod [num]', '', 1)
   .option('--recurrent [secs]', '', 0)
+  .option('--gasPrice <multiple>', '', 1)
   .parse(process.argv)
 
 module.exports = program;
