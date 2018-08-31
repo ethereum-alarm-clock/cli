@@ -12,4 +12,4 @@ RUN npm install -g npm@latest
 RUN npm cache verify
 RUN npm install
 
-CMD ["node", "tools/spamTx.js", "--wallet", "eacc301fee591a459d572cf1c5daa423f4433785", "--password", "chronologic", "--repeat", "3", "--recurrent", "300", "--provider", "wss://ropsten.infura.io/ws", "--gasPrice", "1.40"]
+CMD ["node", "tools/spamTx.js", "--wallet", "eacc301fee591a459d572cf1c5daa423f4433785", "--password", "chronologic", "--repeat", "3", "--recurrent", "300", "--provider", "wss://ropsten.infura.io/ws", "--gasPrice", ".5"]
