@@ -66,10 +66,21 @@ program
 /** Schedule */
 program
   .command('schedule')
-  .description('Scheduled a transaction')  
-  .option('--block')
+  .description('Schedule a transaction')  
   .option('--json <object>', 'Pass a JSON object of the params')
-  .option('--timestamp')
+
+  .option('--bounty', 'Sets the bounty for the scheduled transaction', '')
+  .option('--callData', 'Sets the call data for the scheduled transaction', '')
+  .option('--callGas', 'Sets the gas for the scheduled transaction', 0)
+  .option('--callValue', 'Sets the value for the scheduled transaction', 0)
+  .option('--fee', 'Sets the fee for the scheduled transaction')
+  .option('--gasPrice', 'Sets the minimum gas price for the scheduled transaction', 0)
+  .option('--requiredDeposit', 'Sets the required deposit', 0)
+  .option('--temporalUnit', 'Sets the parameters to use unit blocks or timestamps', 0)
+  .option('--to', 'Sets the recipient of the scheduled transactions', '')
+  .option('--windowSize', 'Sets the size of the execution window', 0)
+  .option('--windowStart', 'Sets the start of the execution window', 0)
+
   .action((options) => catchErrors(schedule(options, program)))
 
 /** TimeNode */

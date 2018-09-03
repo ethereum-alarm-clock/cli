@@ -30,7 +30,7 @@ const schedule = async (options, program) => {
   const defaultValues = await getDefaultValues(web3);
 
   if (!await eac.Util.checkNetworkID()) {
-    throw new Error('Must be using the Kovan or Ropsten test network.');
+    throw new Error('You are not using a supported network. Please use Ethereum mainnet, ropsten, kovan or rinkeby.');
   }
 
   checkOptionsForWalletAndPassword(program);
@@ -38,41 +38,30 @@ const schedule = async (options, program) => {
   const wallet = loadWalletFromKeystoreFile(web3, program.wallet, program.password);
 
   // Initiate the shedule parameters.
-  let scheduleParams = {};
+  let jsonParams = {};
   if (options.json) {
-    scheduleParams = JSON.parse(options.json);
+    jsonParams = JSON.parse(options.json);
   }
 
-  // Initiate the input reader.
-  const readInput = new ReadInput(web3, options, defaultValues);
+  const temporalUnit = program.temporalUnit ? program.temporalUnit : jsonParams.temporalUnit;
+  const to = program.to ? program.to : jsonParams.to;
+  const callData = program.callData ? program.callData : jsonParams.callData;
+  const callGas = program.callGas ? program.callGas : jsonParams.callGas;
+  const callValue = program.callValue ? program.callValue : jsonParams.callValue;
 
-  // Start the wizard.
-  clear();
-  console.log('Welcome to the scheduling wizard!\n');
+  const windowStart = program.windowStart ? program.windowStart : jsonParams.windowStart;
+  const windowSize = program.windowSize ? program.windowSize : jsonParams.windowSize;
 
-  // See if we were provided the parameters in JSON or
-  // ask the user for them interactively.
+  const gasPrice = program.gasPrice ? program.gasPrice : jsonParams.gasPrice;
+  const fee = program.fee ? program.fee : jsonParams.fee;
+  const bounty = program.bounty ? program.bounty : jsonParams.bounty;
+  const requiredDeposit = program.requiredDeposit ? program.requiredDeposit : jsonParams.requiredDeposit;
 
-  const temporalUnit = scheduleParams.temporalUnit || readInput.readTemporalUnit();
-  const recipient = scheduleParams.recipient || readInput.readRecipientAddress();
-  const callData = scheduleParams.callData || readInput.readCallData();
-  const callGas = scheduleParams.callGas || readInput.readCallGas();
-  const callValue = scheduleParams.callValue || readInput.readCallValue();
-
-  const currentBlockNumber = await eac.Util.getBlockNumber();
-
-  const windowStart = scheduleParams.windowStart || readInput.readWindowStart(currentBlockNumber);
-  const windowSize = scheduleParams.windowSize || readInput.readWindowSize(temporalUnit);
-
+  // Validation
   const soonestScheduleTime = currentBlockNumber + MINIMUM_PERIOD_BEFORE_SCHEDULE(temporalUnit);
   if (windowStart < soonestScheduleTime) {
     throw new Error(`Window start of ${windowStart} too soon.\nSoonest Schedule Time: ${soonestScheduleTime}`);
   }
-
-  const gasPrice = scheduleParams.gasPrice || readInput.readGasPrice();
-  const fee = scheduleParams.fee || readInput.readFee();
-  const bounty = scheduleParams.bounty || readInput.readBounty();
-  const requiredDeposit = scheduleParams.deposit || readInput.readDeposit();
 
   // Calculate the required endowment according to these params.
   const endowment = eac.Util.calcEndowment(
@@ -83,10 +72,8 @@ const schedule = async (options, program) => {
     new BigNumber(bounty),
   );
 
-  // We have all the input we need, now we confirm with the user.
-  clear();
-
-  console.log(`Recipient: ${recipient}`);
+  console.log('You have inputted the following parameters: ')
+  console.log(`To: ${to}`);
   console.log(`Call Data: ${callData}`);
   console.log(`Call Gas: ${callGas}`);
   console.log(`Window Size: ${windowSize}`);
@@ -97,7 +84,7 @@ const schedule = async (options, program) => {
   console.log(`Required Deposit: ${requiredDeposit}`);
   console.log('\n');
   console.log(`Sending from: ${wallet.getAddresses()[0]}`);
-  console.log(`Endowment to send: ${web3.fromWei(endowment.toString())}`);
+  console.log(`Transaction will send: ${web3.fromWei(endowment.toString())} ether`);
 
   const confirmed = rls.question('Are the above parameters correct? [Y/n]\n');
   if (confirmed.toLowerCase() !== 'y' && confirmed !== '') {
@@ -110,7 +97,7 @@ const schedule = async (options, program) => {
 
   try {
     const { receipt, success } = await scheduleUsingWallet({
-      recipient,
+      to,
       callData,
       callGas,
       callValue,
