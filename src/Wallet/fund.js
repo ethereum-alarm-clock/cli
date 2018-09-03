@@ -1,6 +1,6 @@
 const ora = require('ora');
 
-const { W3Util } = require('timenode-core');
+const { W3Util } = require('@ethereum-alarm-clock/timenode-core');
 const w3Util = new W3Util();
 
 const {

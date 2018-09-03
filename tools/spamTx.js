@@ -15,7 +15,7 @@ const BigNumber = require('bignumber.js');
 const Bb = require('bluebird');
 const { checkOptionsForWalletAndPassword, loadWalletFromKeystoreFile } = require('../src/Wallet/utils');
 const fs = require('fs');
-const { W3Util } = require('timenode-core');
+const { W3Util } = require('@ethereum-alarm-clock/timenode-core');
 const w3Util = new W3Util();
 const program = require('./program');
 
