@@ -3,8 +3,8 @@
 /**
  * To run
  *  ./tools/spamTx.js --wallet <wallet_file> --password <string> --repeat <num_txs>
- * 
- * Will alternate between transactions using block number and timestamps as the 
+ *
+ * Will alternate between transactions using block number and timestamps as the
  * temporal unit. Creates transactions so that they will immediately be in the claim
  * window and that a TimeNode with `--maxDeposit 1` set will claim. Executions take
  * place in a short while.
@@ -15,7 +15,8 @@ const BigNumber = require('bignumber.js');
 const Bb = require('bluebird');
 const { checkOptionsForWalletAndPassword, loadWalletFromKeystoreFile } = require('../src/Wallet/utils');
 const fs = require('fs');
-const initWeb3 = require('./initWeb3');
+const { W3Util } = require('@ethereum-alarm-clock/timenode-core');
+const w3Util = new W3Util();
 const program = require('./program');
 
 const getDefaultValues = async (web3) => {
@@ -42,7 +43,7 @@ const main = async () => {
   checkOptionsForWalletAndPassword(program);
 
   // Second inits,
-  const web3 = initWeb3(program.provider); 
+  const web3 = w3Util.getWeb3FromProviderUrl(program.provider);
   const eac = require('eac.js-lib')(web3);
   const logger = new Config({providerUrl: program.provider}).logger;
 
@@ -72,9 +73,9 @@ const main = async () => {
         );
       }
       const endowment = getEndowmentFromValues(defaultValues);
-  
+
       let tempUnit = ((repeat % 2) === 0)? 2 : 1;
-  
+
       const getRandWindowStart = async (temporalUnit) => {
         const curBlock = await Bb.fromCallback((cb) => {
           return web3.eth.getBlock('latest', cb);
@@ -121,7 +122,7 @@ const main = async () => {
           ]
         );
       } else { throw 'Invalid temporal unit.'; }
-  
+
       try {
         const price = Math.floor(web3.toWei('6', 'gwei') * program.gasPrice);
         const { receipt } = await wallet.sendFromNext({
@@ -131,7 +132,7 @@ const main = async () => {
           gasPrice: price,
           data,
         });
-  
+
         if (!receipt.status) {
           throw 'Sending transaction failed.';
         }
