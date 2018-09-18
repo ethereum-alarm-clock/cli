@@ -1,8 +1,7 @@
 const fs = require('fs');
 const rls = require('readline-sync');
-const { Wallet } = require('@ethereum-alarm-clock/timenode-core');
+const { Wallet, W3Util } = require('@ethereum-alarm-clock/timenode-core');
 
-const { W3Util } = require('@ethereum-alarm-clock/timenode-core');
 const w3Util = new W3Util();
 
 const create = (program) => {
