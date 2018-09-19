@@ -11,6 +11,8 @@ const program = require('commander');
 const createWallet = require('./Wallet/create');
 const drainWallet = require('./Wallet/drain');
 const fundWallet = require('./Wallet/fund');
+const splitWallet = require('./Wallet/split');
+
 const schedule = require('./Schedule');
 const timenode = require('./TimeNode');
 
@@ -62,6 +64,12 @@ program
   .command('fundWallet <amt>')
   .description('Funds each account in wallet the <amt> in ether')
   .action((amt) => catchErrors(fundWallet(amt, program)))
+
+/** Split Wallet */
+program
+  .command('splitWallet <target>')
+  .description('Splits a wallet file created using the createWallet command into separate files.')
+  .action((target) => catchErrors(splitWallet(target)))
 
 /** Schedule */
 program
