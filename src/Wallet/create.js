@@ -6,7 +6,7 @@ const w3Util = new W3Util();
 
 const create = (program) => {
   // Create web3
-  const web3 = w3Util.getWeb3FromProviderUrl(program.provider);
+  const web3 = W3Util.getWeb3FromProviderUrl(program.provider);
 
   let numberOfAccounts = rls.question(
     'How many accounts to create? [1 - 10]\n',
