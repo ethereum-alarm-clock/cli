@@ -87,6 +87,7 @@ program
   .option('--analyticsOff', 'Turns the analytics off (TimeNode counter, state of the network, etc.)')
   .option('--autostart', 'Sets autostart')
   .option('--claiming', 'Claiming mode')
+  .option('--docker', 'Docker mode')
   .option('--logFile <path>', 'Sets the file to output logs', '.eac.log')
   .option('--logLevel <number>', 'Sets the logging level', 2)
   .option('--maxDeposit <eth>', 'Only claim transactions that require a deposit lower than', Config.DEFAULT_ECONOMIC_STRATEGY.maxDeposit.div(Math.pow(10, 18)))
