@@ -10,4 +10,4 @@ COPY wallet--79a92e6fe6baecf1e0a895d2d960e2321331697c /app
 RUN cd /app
 RUN npm install
 
-CMD ["sh", "-c", "node src/program.js timenode --claiming --autostart --logFile console --logLevel 1 --wallet wallet--79a92e6fe6baecf1e0a895d2d960e2321331697c --password ${PASSWORD} --provider ${PROVIDER}"]
+CMD ["sh", "-c", "node src/program.js timenode --docker --claiming --autostart --logFile console --logLevel 1 --wallet wallet--79a92e6fe6baecf1e0a895d2d960e2321331697c --password ${PASSWORD} --provider ${PROVIDER}"]
