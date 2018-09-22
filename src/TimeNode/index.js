@@ -157,7 +157,7 @@ For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate
   console.log('\nOpening REPL...');
 
   setTimeout(() => {
-    Repl.start(TN);
+    Repl.start(TN, options.docker);
   }, 2000);
 
   // Hacky way to keep the process open so we can use the REPL.

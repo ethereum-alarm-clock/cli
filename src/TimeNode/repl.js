@@ -5,7 +5,7 @@ const { scheduleUsingWallet } = require('../Schedule/helpers');
 
 const makeDashboard = require('./dashboard');
 
-const start = (timenode) => {
+const start = (timenode, docker) => {
   const { config } = timenode;
   const { eac, web3, util } = config;
 
@@ -262,10 +262,12 @@ Now: ${now}`);
     },
   });
 
-  replServer.on('exit', () => {
-    console.log('Exiting! Goodbye :]');
-    process.exit();
-  })
+  if (!docker) {
+    replServer.on('exit', () => {
+      console.log('Exiting! Goodbye :]');
+      process.exit();
+    })
+  }
 };
 
 module.exports = {
