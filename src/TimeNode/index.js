@@ -60,6 +60,8 @@ For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate
     autosaveInterval: 5000,
   });
 
+  const providerUrls = options.providers || [program.provider];
+
   // Load the config.
   const config = new Config({
     autostart: options.autostart,
@@ -67,7 +69,7 @@ For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate
     logger: new FileLogger(options.logFile, options.logLevel),
     ms: options.ms,
     password: program.password,
-    providerUrl: program.provider,
+    providerUrls,
     scanSpread: options.scan,
     statsDb,
     walletStores: encKeystores,
