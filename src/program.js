@@ -86,7 +86,7 @@ program
   .option('--minProfitability <eth>', 'Only claim transactions with a bounty higher', Config.DEFAULT_ECONOMIC_STRATEGY.minProfitability.div(Math.pow(10, 18)))
   .option('--maxGasSubsidy <eth>', 'Subsidize a percentage of gas costs on gas spikes', Config.DEFAULT_ECONOMIC_STRATEGY.maxGasSubsidy)
   .option('--ms <number>', 'Sets the scanning frequency of the TimeNode', 4000)
-  .option('--providers <list_of_providers>', '')
+  .option('--providers <list_of_providers>', 'List of providers separated by commas without spaces', '')
   .option('--scan <number>', 'Sets the scanning spread', 75)
   .action((options) => catchErrors(timenode(options, program)))
 

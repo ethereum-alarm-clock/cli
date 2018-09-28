@@ -60,7 +60,7 @@ For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate
     autosaveInterval: 5000,
   });
 
-  const providerUrls = options.providers || [program.provider];
+  const providerUrls = options.providers ? options.providers.split(',') : [program.provider];
 
   // Load the config.
   const config = new Config({
