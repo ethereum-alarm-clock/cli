@@ -8,6 +8,9 @@
     "maxGasSubsidy": 100,
     "password": "password",
     "provider": "http://localhost:8545",
+    "providers": [
+
+    ],
     "wallet": [
         "test_wallet_3"
     ]
