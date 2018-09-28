@@ -24,7 +24,7 @@ const MINIMUM_PERIOD_BEFORE_SCHEDULE = (tempUnit) => {
 };
 
 const schedule = async (options, program) => {
-  const web3 = w3Util.getWeb3FromProviderUrl(program.provider);
+  const web3 = W3Util.getWeb3FromProviderUrl(program.provider);
   // eslint-disable-next-line global-require
   const eac = require('eac.js-lib')(web3);
 

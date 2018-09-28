@@ -5,13 +5,14 @@ const { scheduleUsingWallet } = require('../Schedule/helpers');
 
 const makeDashboard = require('./dashboard');
 
-const start = (timenode) => {
+const start = (timenode, docker) => {
   const { config } = timenode;
   const { eac, web3, util } = config;
 
   console.log(' '); // blank space
   const replServer = repl.start({ prompt: '>> ' });
   replServer.context.web3 = web3;
+
   replServer.defineCommand('getBalance', {
     help: 'Get the balance of your accounts.',
     async action() {
@@ -26,6 +27,7 @@ const start = (timenode) => {
       }
     },
   });
+
   replServer.defineCommand('network', {
     help: 'Get the current network stats',
     async action() {
@@ -36,6 +38,7 @@ const start = (timenode) => {
       console.log(`BlockNum: ${block.number} | Timestamp: ${block.timestamp} | GasPrice: ${gweiGasPrice} Gwei`);
     },
   });
+
   replServer.defineCommand('dumpCache', {
     help: 'Dumps your cache storage.',
     action() {
@@ -48,6 +51,7 @@ const start = (timenode) => {
       }
     },
   });
+
   replServer.defineCommand('logLevel', {
     help: 'Defines the level to log, 1 - debug/cache, 2 - info, 3- error.',
     action(level) {
@@ -58,12 +62,14 @@ const start = (timenode) => {
       config.logger.logLevel = level;
     },
   });
+
   replServer.defineCommand('getStats', {
     help: 'Get some interesting stats on your executing accounts.',
     action() {
       console.log(makeDashboard(config, timenode).toString());
     },
   });
+
   replServer.defineCommand('getClaimed', {
     help: 'Get claimed transactions pending execution.',
     action() {
@@ -80,6 +86,7 @@ const start = (timenode) => {
       console.log(print);
     },
   });
+
   replServer.defineCommand('getFailedClaims', {
     help: 'Get unsuccessfully claimed transactions.',
     action() {
@@ -96,38 +103,35 @@ const start = (timenode) => {
       console.log(print);
     },
   });
+
   replServer.defineCommand('start', {
     help: 'Starts the TimeNode.',
     action() {
       timenode.startScanning();
     },
   });
+
   replServer.defineCommand('stop', {
     help: 'Stops the TimeNode.',
     action() {
       timenode.stopScanning();
     },
   });
+
   replServer.defineCommand('startClaiming', {
     help: 'Starts the TimeNode claiming.',
     action() {
       timenode.startClaiming();
     },
   });
+
   replServer.defineCommand('stopClaiming', {
     help: 'Stops the TimeNode claiming.',
     action() {
       timenode.stopClaiming();
     },
   });
-  // No longer supported
-  // replServer.defineCommand("sweepCache", {
-  //   help: "Sweeps your cache of expired txRequests.",
-  //   action() {
-  //     console.log(config.cache)
-  //     config.cache.sweepExpired()
-  //   },
-  // })
+
   replServer.defineCommand('testTx', {
     help:
       'Send a test transaction to the network (requires unlocked local account).',
@@ -250,12 +254,20 @@ Now: ${now}`);
       }
     },
   });
+
   replServer.defineCommand('resetStats', {
     help: 'Reset your TimeNode statistics.',
     action() {
       config.statsDb.clearAll();
     },
   });
+
+  if (!docker) {
+    replServer.on('exit', () => {
+      console.log('Exiting! Goodbye :]');
+      process.exit();
+    })
+  }
 };
 
 module.exports = {
