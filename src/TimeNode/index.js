@@ -29,6 +29,7 @@ const timenode = async (options, program) => {
     options.minBalance = config.minBalance || options.minBalance;
     options.minProfitability = config.minProfitability || options.minProfitability;
     options.maxGasSubsidy = config.maxGasSubsidy || options.maxGasSubsidy;
+    options.providers = config.providers || options.providers.split(',');
     /* eslint-enable */
   }
   checkOptionsForWalletAndPassword(program);
@@ -60,6 +61,8 @@ For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate
     autosaveInterval: 5000,
   });
 
+  const providerUrls = options.providers || [program.provider];
+
   // Load the config.
   const config = new Config({
     autostart: options.autostart,
@@ -67,7 +70,7 @@ For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate
     logger: new FileLogger(options.logFile, options.logLevel),
     ms: options.ms,
     password: program.password,
-    providerUrl: program.provider,
+    providerUrls,
     scanSpread: options.scan,
     statsDb,
     walletStores: encKeystores,
@@ -157,7 +160,7 @@ For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate
   console.log('\nOpening REPL...');
 
   setTimeout(() => {
-    Repl.start(TN, options.docker);
+    Repl.start(TN);
   }, 2000);
 
   // Hacky way to keep the process open so we can use the REPL.
