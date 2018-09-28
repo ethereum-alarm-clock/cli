@@ -43,7 +43,7 @@ const main = async () => {
   checkOptionsForWalletAndPassword(program);
 
   // Second inits,
-  const web3 = w3Util.getWeb3FromProviderUrl(program.provider);
+  const web3 = W3Util.getWeb3FromProviderUrl(program.provider);
   const eac = require('eac.js-lib')(web3);
   const logger = new Config({providerUrl: program.provider}).logger;
 
