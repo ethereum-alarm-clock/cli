@@ -2,11 +2,10 @@ const BigNumber = require('bignumber.js');
 const clear = require('clear');
 const ora = require('ora');
 const rls = require('readline-sync');
+const { W3Util } = require('@ethereum-alarm-clock/timenode-core');
 
 const { getDefaultValues } = require('./defaultValues');
 const ReadInput = require('./readInput');
-const { W3Util } = require('@ethereum-alarm-clock/timenode-core');
-const w3Util = new W3Util();
 
 const {
   checkOptionsForWalletAndPassword,

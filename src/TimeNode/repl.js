@@ -236,7 +236,7 @@ const start = (timenode, docker) => {
 Owner: ${txRequest.owner}
 Claimed By: ${txRequest.isClaimed ? txRequest.claimedBy : 'not claimed'}
 ---
-Unit: ${txRequest.temporalUnit == 1 ? 'block' : 'time'}
+Unit: ${Number(txRequest.temporalUnit) === 1 ? 'block' : 'time'}
 Claim Window Begins: ${txRequest.claimWindowStart} (t=${now - txRequest.claimWindowStart})
 Freeze Period Begins: ${txRequest.freezePeriodStart} (t=${now - txRequest.freezePeriodStart})
 Execution Window Begins: ${txRequest.windowStart} (t=${now - txRequest.windowStart})
@@ -266,7 +266,7 @@ Now: ${now}`);
     replServer.on('exit', () => {
       console.log('Exiting! Goodbye :]');
       process.exit();
-    })
+    });
   }
 };
 
