@@ -3,7 +3,6 @@ const ethUtil = require('ethereumjs-util');
 const ora = require('ora');
 
 const { W3Util } = require('@ethereum-alarm-clock/timenode-core');
-const w3Util = new W3Util();
 
 const {
   checkOptionsForWalletAndPassword,
