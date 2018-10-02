@@ -11,10 +11,11 @@ const Repl = require('./repl');
 const { checkOptionsForWalletAndPassword } = require('../Wallet/utils');
 
 const timenode = async (options, program) => {
+  let providerUrls = program.providers;
+
   if (program.config) {
     const config = JSON.parse(fs.readFileSync(program.config));
     /* eslint-disable */
-    program.provider = config.provider || program.provider;
     program.password = fs.readFileSync(config.password).toString() || program.password;
     program.wallet = config.wallet || program.wallet;
 
@@ -29,15 +30,18 @@ const timenode = async (options, program) => {
     options.minBalance = config.minBalance || options.minBalance;
     options.minProfitability = config.minProfitability || options.minProfitability;
     options.maxGasSubsidy = config.maxGasSubsidy || options.maxGasSubsidy;
-    options.providers = config.providers || options.providers.split(',');
+    providerUrls = config.providers || providerUrls
     /* eslint-enable */
   }
   checkOptionsForWalletAndPassword(program);
 
   // We do the set-up first.
   clear();
+  if (program.provider) {
+    console.log('Use of --provider flag is depreciated. Use --providers instead.');
+  }
   console.log('Setting Up...');
-  console.log(`Using provider: ${program.provider}\n`);
+  console.log(`Using provider: ${providerUrls[0]}\n`);
   if (!options.claiming) {
     console.log(`\x1b[33mYou are not using the CLAIMING functionality. This might make your TimeNode unprofitable. Please use the '.startClaiming' command to enable CLAIMING.
 For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate-timenode-risks-b8551bb28f9d\n\x1b[0m`);
@@ -61,8 +65,6 @@ For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate
     autosaveInterval: 5000,
   });
 
-  const providerUrls = options.providers || [program.provider];
-
   // Load the config.
   const config = new Config({
     autostart: options.autostart,
@@ -79,7 +81,7 @@ For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate
   await config.statsDbLoaded;
 
   if (!await config.eac.Util.checkNetworkID()) {
-    throw new Error('Must be on the Ropsten or Kovan test network.');
+    throw new Error('Unsupported network');
   }
 
   // Set up default logfile.
@@ -160,7 +162,7 @@ For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate
   console.log('\nOpening REPL...');
 
   setTimeout(() => {
-    Repl.start(TN);
+    Repl.start(TN, options.docker);
   }, 2000);
 
   // Hacky way to keep the process open so we can use the REPL.

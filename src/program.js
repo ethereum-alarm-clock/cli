@@ -15,14 +15,15 @@ const splitWallet = require('./Wallet/split');
 
 const schedule = require('./Schedule');
 const timenode = require('./TimeNode');
-
-// const chronologicQuikNodeHttpKovan = 'https://rarely-suitable-shark.quiknode.io/87817da9-942d-4275-98c0-4176eee51e1a/aB5gwSfQdN4jmkS65F1HyA==/';
-// const chronologicQuikNodeWssKovan = 'wss://rarely-suitable-shark.quiknode.io/87817da9-942d-4275-98c0-4176eee51e1a/aB5gwSfQdN4jmkS65F1HyA==/';
-const chronologicQuikNodeWssRopsten = 'wss://abnormally-just-wombat.quiknode.io/286cd134-837e-44ce-bfd7-d6d7d01632dc/dFQbkQcp3ZCfgUjXghtXLA==/';
+const roptenNode = 'wss://abnormally-just-wombat.quiknode.io/286cd134-837e-44ce-bfd7-d6d7d01632dc/dFQbkQcp3ZCfgUjXghtXLA==/';
 
 const walletHandle = (path, paths) => {
   paths.push(path);
   return paths;
+}
+
+const formatProviders = (providers) => {
+  return providers.indexOf(',') > 0 ? providers.split(',') : [providers];
 }
 
 const catchErrors = async (asyncFunction) => {
@@ -40,12 +41,13 @@ program
   .version(require('../package.json').version)
   .option('--config <path>', 'Load parameters from config file.', '')
   .option('--password <string>', 'The password for the keystore')
-  .option('--provider <string>', 'Sets the HTTP or WebSockets provider', chronologicQuikNodeWssRopsten)
+  .option('--provider <string>', '[DEPRECATED. Use --providersUrl instead] Sets the HTTP or WebSockets provider')
+  .option('--providers <providers>', 'List of providers separated by commas without spaces', formatProviders, [roptenNode])
   .option('--wallet <path>', 'Sets the path to the keystore to use', walletHandle, [])
 
 program
   .command('test')
-  .action(() => console.log(program.provider))
+  .action(() => console.log(program.providers[0]))
 
 /** Create Wallet */
 program
@@ -95,7 +97,6 @@ program
   .option('--minProfitability <eth>', 'Only claim transactions with a bounty higher', Config.DEFAULT_ECONOMIC_STRATEGY.minProfitability.div(Math.pow(10, 18)))
   .option('--maxGasSubsidy <eth>', 'Subsidize a percentage of gas costs on gas spikes', Config.DEFAULT_ECONOMIC_STRATEGY.maxGasSubsidy)
   .option('--ms <number>', 'Sets the scanning frequency of the TimeNode', 4000)
-  .option('--providers <list_of_providers>', 'List of providers separated by commas without spaces', '')
   .option('--scan <number>', 'Sets the scanning spread', 75)
   .action((options) => catchErrors(timenode(options, program)))
 
