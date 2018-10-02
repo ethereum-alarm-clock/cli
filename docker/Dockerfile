@@ -14,10 +14,9 @@ ENV NPM_CONFIG_PREFIX=/home/app/.npm-global
 
 RUN npm i -g -s @ethereum-alarm-clock/cli
 ARG WALLET
-ENV wallet = $WALLET
-
 COPY ${WALLET} /app
+ENV WALLET $WALLET
 
 RUN cd /app
 
-CMD ["sh", "-c", "eac timenode --docker --claiming --autostart --logFile console --logLevel 1 --wallet ${wallet} --password ${PASSWORD} --providers ${PROVIDER}"]
+CMD ["sh", "-c", "eac timenode --docker --claiming --autostart --logFile console --logLevel 1 --wallet ${WALLET} --password ${PASSWORD} --providers ${PROVIDER}"]
