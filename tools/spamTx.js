@@ -16,7 +16,6 @@ const Bb = require('bluebird');
 const { checkOptionsForWalletAndPassword, loadWalletFromKeystoreFile } = require('../src/Wallet/utils');
 const fs = require('fs');
 const { W3Util } = require('@ethereum-alarm-clock/timenode-core');
-const w3Util = new W3Util();
 const program = require('./program');
 
 const getDefaultValues = async (web3) => {
@@ -43,9 +42,9 @@ const main = async () => {
   checkOptionsForWalletAndPassword(program);
 
   // Second inits,
-  const web3 = W3Util.getWeb3FromProviderUrl(program.provider);
+  const web3 = W3Util.getWeb3FromProviderUrl(program.providers[0]);
   const eac = require('eac.js-lib')(web3);
-  const logger = new Config({providerUrl: program.provider}).logger;
+  const logger = new Config({providerUrls: program.providers}).logger;
 
   // Third wallet,
   const wallet = loadWalletFromKeystoreFile( web3, program.wallet, program.password);

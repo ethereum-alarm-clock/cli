@@ -7,7 +7,6 @@
     "minProfitability": 0,
     "maxGasSubsidy": 100,
     "password": "password",
-    "provider": "http://localhost:8545",
     "providers": [
         "ws://localhost:8546",
         "ws://kovan.infura.io/ws",

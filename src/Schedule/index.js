@@ -6,7 +6,6 @@ const rls = require('readline-sync');
 const { getDefaultValues } = require('./defaultValues');
 const ReadInput = require('./readInput');
 const { W3Util } = require('@ethereum-alarm-clock/timenode-core');
-const w3Util = new W3Util();
 
 const {
   checkOptionsForWalletAndPassword,
@@ -24,7 +23,7 @@ const MINIMUM_PERIOD_BEFORE_SCHEDULE = (tempUnit) => {
 };
 
 const schedule = async (options, program) => {
-  const web3 = W3Util.getWeb3FromProviderUrl(program.provider);
+  const web3 = W3Util.getWeb3FromProviderUrl(program.providers[0]);
   // eslint-disable-next-line global-require
   const eac = require('eac.js-lib')(web3);
 
