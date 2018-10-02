@@ -47,6 +47,33 @@ Open up `~/.eac.log` for the output, I prefer to follow the output in a new scre
 tail -f ~/.eac.log
 ```
 
+## Docker
+
+Sample `Dockerfile` for running the `eac.js-cli` node with remote web3 provider
+
+### Instructions
+
+To create a docker image from the Dockerfile you need copy your wallet encrypted keystore `json` file to the root directory.
+
+update the wallet file name in the `Dockerfile`on `L#8` and `L#13`
+  
+Next step is to run docker build command
+
+`docker build . -t eac.js-cli --build-arg WALLET={WALLET_NAME}`
+
+where
+
++ `{WALLET_NAME}` filename of the wallet file, has to be located in same dir as Dockerfile
+
+Next running docker image
+
+`docker run -it -e PASSWORD={PASSWORD} -e PROVIDER={PROVIDER} eac.js-cli`
+
+where
+
++ `{PASSWORD}` is a password used to encrypt wallet keystore file
++ `{PROVIDER}` is an comma-separated list of urls of web3 provider
+
 ## Want more?
 
 This package is a part of EAC.JS family ~
