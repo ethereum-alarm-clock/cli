@@ -2,11 +2,15 @@ const fs = require('fs');
 
 const split = (target) => {
   const keystores = JSON.parse(fs.readFileSync(target));
-  for (const keystore of keystores) {
+  const keys = Object.keys(keystores);
+  keys.forEach((key) => {
+    const keystore = keystores[key];
     const { address } = keystore;
-    const fileName = 'UTC--' + new Date().toISOString() + '--' + address;
-    fs.writeFileSync(fileName, JSON.stringify(keystore));
-  }
-}
+    if (address) {
+      const fileName = `UTC--${new Date().toISOString()}--${address}`;
+      fs.writeFileSync(fileName, JSON.stringify(keystore));
+    }
+  });
+};
 
 module.exports = split;
