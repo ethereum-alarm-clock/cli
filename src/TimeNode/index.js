@@ -12,7 +12,7 @@ const { checkOptionsForWalletAndPassword } = require('../Wallet/utils');
 
 const timenode = async (options, program) => {
   let providerUrls = program.providers;
-  
+
   if (program.config) {
     const config = JSON.parse(fs.readFileSync(program.config));
     /* eslint-disable */
