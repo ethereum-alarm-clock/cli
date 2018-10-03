@@ -42,7 +42,7 @@
     "dotenv": "5.0.1",
     "eac.js-lib": "2.4.4",
     "ethereumjs-util": "5.2.0",
-    "keen-tracking": "4.0.5",
+    "keen-tracking": "4.0.6",
     "lokijs": "1.5.3",
     "ora": "3.0.0",
     "readline-sync": "1.4.9",
