@@ -2,6 +2,7 @@ const BigNumber = require('bignumber.js');
 const ora = require('ora');
 const repl = require('repl');
 const { scheduleUsingWallet } = require('../Schedule/helpers');
+const { requestInfo } = require('./actions');
 
 const makeDashboard = require('./dashboard');
 
@@ -221,37 +222,7 @@ const start = (timenode, docker) => {
     help:
       'Retrieve info about the transaction request at the passed in address.',
     async action(txRequestAddr) {
-      if (!eac.Util.checkValidAddress(txRequestAddr)) {
-        console.log('Must pass a valid transaction request address');
-        return;
-      }
-      const txRequest = await eac.transactionRequest(txRequestAddr);
-      try {
-        await txRequest.fillData();
-        const now = await txRequest.now();
-        const networkGasPrice = await util.networkGasPrice();
-        const paymentModifier = await txRequest.claimPaymentModifier();
-
-        console.log(`
-Owner: ${txRequest.owner}
-Claimed By: ${txRequest.isClaimed ? txRequest.claimedBy : 'not claimed'}
----
-Unit: ${Number(txRequest.temporalUnit) === 1 ? 'block' : 'time'}
-Claim Window Begins: ${txRequest.claimWindowStart} (t=${now - txRequest.claimWindowStart})
-Freeze Period Begins: ${txRequest.freezePeriodStart} (t=${now - txRequest.freezePeriodStart})
-Execution Window Begins: ${txRequest.windowStart} (t=${now - txRequest.windowStart})
----
-Bounty: ${txRequest.bounty} (${web3.fromWei(txRequest.bounty, 'gwei')} Gwei)
-Bounty with modifier: ${txRequest.bounty} * ${paymentModifier} = ${txRequest.bounty * paymentModifier} (${web3.fromWei(txRequest.bounty * paymentModifier, 'gwei')} Gwei)
-Deposit: ${txRequest.requiredDeposit} (${web3.fromWei(txRequest.requiredDeposit, 'gwei')} Gwei)
----
-GasPrice: ${txRequest.gasPrice} (${web3.fromWei(txRequest.gasPrice, 'gwei')} Gwei) | Network: ${web3.fromWei(networkGasPrice, 'gwei')} Gwei
-Gas: ${txRequest.callGas}
----
-Now: ${now}`);
-      } catch (err) {
-        console.error(err);
-      }
+      await requestInfo(config, txRequestAddr);
     },
   });
 
