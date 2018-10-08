@@ -4,7 +4,7 @@ const Eac = require('eac.js-lib');
 const { requestInfo } = require('../TimeNode/actions');
 
 const debug = async (options, program) => {
-  const web3 = W3Util.getWeb3FromProviderUrl(program.provider || 'https://mainnet.infura.io');
+  const web3 = W3Util.getWeb3FromProviderUrl(program.provider || 'wss://mainnet.infura.io/ws');
   const eac = Eac(web3);
   const util = new W3Util(web3);
 
