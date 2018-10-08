@@ -10,7 +10,10 @@ const requestInfo = async (config, txRequestAddr) => {
     const now = await txRequest.now();
     const networkGasPrice = await util.networkGasPrice();
     const paymentModifier = await txRequest.claimPaymentModifier();
-    const executed = await new Promise(resolve => txRequest.instance.Executed(null, { fromBlock: 6204398 }).get((err, res) => resolve(res[0])));
+    const executed = await new Promise(
+      resolve => txRequest.instance.Executed(null, { fromBlock: 6204398 })
+        .get((err, res) => resolve(res[0])),
+    );
 
     const maxGasReimbursement = txRequest.callGas * txRequest.gasPrice;
     const logETH = value => `${value} (${web3.fromWei(value)} ETH)`;
