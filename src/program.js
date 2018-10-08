@@ -15,7 +15,6 @@ const splitWallet = require('./Wallet/split');
 
 const schedule = require('./Schedule');
 const timenode = require('./TimeNode');
-const debug = require('./Debug');
 const roptenNode = 'wss://abnormally-just-wombat.quiknode.io/286cd134-837e-44ce-bfd7-d6d7d01632dc/dFQbkQcp3ZCfgUjXghtXLA==/';
 
 const walletHandle = (path, paths) => {
@@ -49,11 +48,6 @@ program
 program
   .command('test')
   .action(() => console.log(program.providers[0]))
-
-program
-  .command('info <tx>')
-  .description('Show scheduled transaction')
-  .action((tx) => catchErrors(debug(tx, program)));
 
 /** Create Wallet */
 program
@@ -105,7 +99,6 @@ program
   .option('--ms <number>', 'Sets the scanning frequency of the TimeNode', 4000)
   .option('--scan <number>', 'Sets the scanning spread', 75)
   .action((options) => catchErrors(timenode(options, program)))
-
 
 
 program.parse(process.argv);
