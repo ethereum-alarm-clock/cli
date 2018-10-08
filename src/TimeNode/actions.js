@@ -34,10 +34,10 @@ const requestInfo = async (config, txRequestAddr) => {
   Deposit: ${txRequest.requiredDeposit} (${web3.fromWei(txRequest.requiredDeposit)} ETH)
   Max Reimbursement: ${maxGasReimbursement} (${web3.fromWei(maxGasReimbursement)} ETH)
   ---
-  Executed at: ${executed.blockNumber}
-  Executed bounty sent: ${logETH(executed.args.bounty)}
-  GasUsed: ${executed.args.measuredGasConsumption}
-  GasUsed Reimbursement: ${logETH(executed.args.measuredGasConsumption * txRequest.gasPrice)}
+  Executed at: ${executed ? executed.blockNumber : '---'}
+  Executed bounty sent: ${executed ? logETH(executed.args.bounty) : '---'}
+  GasUsed: ${executed ? executed.args.measuredGasConsumption : '---'}
+  GasUsed Reimbursement: ${executed ? logETH(executed.args.measuredGasConsumption * txRequest.gasPrice) : '---'}
   ---
   GasPrice: ${txRequest.gasPrice} (${web3.fromWei(txRequest.gasPrice, 'gwei')} Gwei) | Network: ${web3.fromWei(networkGasPrice, 'gwei')} Gwei
   Gas: ${txRequest.callGas}
