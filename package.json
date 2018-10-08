@@ -37,7 +37,7 @@
     "bluebird": "3.5.2",
     "clear": "0.1.0",
     "cli-table2": "0.2.0",
-    "commander": "2.18.0",
+    "commander": "2.19.0",
     "console.table": "0.10.0",
     "dotenv": "6.0.0",
     "eac.js-lib": "2.4.5",
