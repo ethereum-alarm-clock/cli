@@ -1,6 +1,6 @@
 const BigNumber = require('bignumber.js');
 const clear = require('clear');
-const { Config, TimeNode, Util } = require('@ethereum-alarm-clock/timenode-core');
+const { Config, TimeNode } = require('@ethereum-alarm-clock/timenode-core');
 const fs = require('fs');
 const Loki = require('lokijs');
 const Lfsa = require('lokijs/src/loki-fs-structured-adapter.js');
@@ -9,6 +9,7 @@ const Analytics = require('./analytics');
 const FileLogger = require('./logger');
 const Repl = require('./repl');
 const { checkOptionsForWalletAndPassword } = require('../Wallet/utils');
+
 const wei = '1e18';
 
 const timenode = async (options, program) => {
