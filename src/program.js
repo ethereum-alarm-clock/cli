@@ -101,7 +101,7 @@ program
   .option('--maxDeposit <eth>', 'Only claim transactions that require a deposit lower than')
   .option('--minBalance <eth>', 'Only claim transactions if balance of wallet is higher')
   .option('--minProfitability <eth>', 'Only claim transactions with a bounty higher')
-  .option('--maxGasSubsidy <percent>', 'Subsidize a percentage of gas costs on gas spikes. This is any value from 0 to x. For e.g x=200% means that gasPrice subsidy is 2x')
+  .option('--maxGasSubsidy <value>', 'Subsidize a percentage of gas costs on gas spikes. This is any value from 0 to x. For e.g x=200 means that gasPrice subsidy is 2x')
   .option('--usingSmartGasEstimation', 'Trying to match the gasPrice with remaining time for execution')
   .option('--ms <number>', 'Sets the scanning frequency of the TimeNode', 4000)
   .option('--scan <number>', 'Sets the scanning spread', 75)
