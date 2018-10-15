@@ -1,6 +1,6 @@
 const BigNumber = require('bignumber.js');
 const clear = require('clear');
-const { Config, TimeNode } = require('@ethereum-alarm-clock/timenode-core');
+const { Config, TimeNode, Util } = require('@ethereum-alarm-clock/timenode-core');
 const fs = require('fs');
 const Loki = require('lokijs');
 const Lfsa = require('lokijs/src/loki-fs-structured-adapter.js');
@@ -9,6 +9,7 @@ const Analytics = require('./analytics');
 const FileLogger = require('./logger');
 const Repl = require('./repl');
 const { checkOptionsForWalletAndPassword } = require('../Wallet/utils');
+const wei = '1e18';
 
 const timenode = async (options, program) => {
   let providerUrls = program.providers;
@@ -65,6 +66,25 @@ For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate
     autosaveInterval: 5000,
   });
 
+  // Economic Strategy
+  const economicStrategy = {
+    maxDeposit: options.maxDeposit
+      ? new BigNumber(options.maxDeposit).mul(wei)
+      : Config.DEFAULT_ECONOMIC_STRATEGY.maxDeposit,
+    minBalance: options.minBalance
+      ? new BigNumber(options.minBalance).mul(wei)
+      : Config.DEFAULT_ECONOMIC_STRATEGY.minBalance,
+    minProfitability: options.minProfitability
+      ? new BigNumber(options.minProfitability).mul(wei)
+      : Config.DEFAULT_ECONOMIC_STRATEGY.minProfitability,
+    maxGasSubsidy: options.maxGasSubsidy
+      ? options.maxGasSubsidy
+      : Config.DEFAULT_ECONOMIC_STRATEGY.maxGasSubsidy,
+    usingSmartGasEstimation: options.usingSmartGasEstimation
+      ? options.usingSmartGasEstimation
+      : Config.DEFAULT_ECONOMIC_STRATEGY.usingSmartGasEstimation,
+  };
+
   // Load the config.
   const config = new Config({
     autostart: options.autostart,
@@ -76,6 +96,7 @@ For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate
     scanSpread: options.scan,
     statsDb,
     walletStores: encKeystores,
+    economicStrategy,
   });
 
   await config.statsDbLoaded;
@@ -104,22 +125,6 @@ For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate
   }
 
   config.chain = chain;
-
-  // Economic Strategy
-  config.economicStrategy = {
-    maxDeposit: options.maxDeposit
-      ? new BigNumber(config.web3.toWei(options.maxDeposit))
-      : Config.DEFAULT_ECONOMIC_STRATEGY.maxDeposit,
-    minBalance: options.minBalance
-      ? new BigNumber(config.web3.toWei(options.minBalance))
-      : Config.DEFAULT_ECONOMIC_STRATEGY.minBalance,
-    minProfitability: options.minProfitability
-      ? new BigNumber(config.web3.toWei(options.minProfitability))
-      : Config.DEFAULT_ECONOMIC_STRATEGY.minProfitability,
-    maxGasSubsidy: options.maxGasSubsidy
-      ? options.maxGasSubsidy
-      : Config.DEFAULT_ECONOMIC_STRATEGY.maxGasSubsidy,
-  };
 
   console.log('Welcome to the Ethereum Alarm Clock TimeNode CLI\n');
 
