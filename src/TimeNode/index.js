@@ -87,7 +87,7 @@ For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate
     minClaimWindow: Config.DEFAULT_ECONOMIC_STRATEGY.minClaimWindow,
     minClaimWindowBlock: Config.DEFAULT_ECONOMIC_STRATEGY.minClaimWindowBlock,
     minExecutionWindow: Config.DEFAULT_ECONOMIC_STRATEGY.minExecutionWindow,
-    minExecutionWindowBlock: Config.DEFAULT_ECONOMIC_STRATEGY.minExecutionWindowBlock
+    minExecutionWindowBlock: Config.DEFAULT_ECONOMIC_STRATEGY.minExecutionWindowBlock,
   };
 
   // Load the config.
