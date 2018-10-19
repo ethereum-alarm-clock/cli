@@ -84,6 +84,10 @@ For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate
     usingSmartGasEstimation: options.usingSmartGasEstimation
       ? options.usingSmartGasEstimation
       : Config.DEFAULT_ECONOMIC_STRATEGY.usingSmartGasEstimation,
+    minClaimWindow: Config.DEFAULT_ECONOMIC_STRATEGY.minClaimWindow,
+    minClaimWindowBlock: Config.DEFAULT_ECONOMIC_STRATEGY.minClaimWindowBlock,
+    minExecutionWindow: Config.DEFAULT_ECONOMIC_STRATEGY.minExecutionWindow,
+    minExecutionWindowBlock: Config.DEFAULT_ECONOMIC_STRATEGY.minExecutionWindowBlock
   };
 
   // Load the config.
