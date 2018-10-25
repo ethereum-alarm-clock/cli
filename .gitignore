@@ -11,3 +11,4 @@ stats.json*
 keystore
 keystore*
 docker/wallet--*
+docker/.DS_Store
