@@ -1,6 +1,6 @@
 {
   "name": "@ethereum-alarm-clock/cli",
-  "version": "3.5.2",
+  "version": "3.5.3",
   "description": "Command-line tool written in JavaScript to interact with the Ethereum Alarm Clock",
   "main": "index.js",
   "scripts": {
@@ -32,7 +32,7 @@
   },
   "homepage": "https://github.com/ethereum-alarm-clock/eac.js-cli#readme",
   "dependencies": {
-    "@ethereum-alarm-clock/timenode-core": "5.4.2",
+    "@ethereum-alarm-clock/timenode-core": "5.4.3",
     "bignumber.js": "5.0.0",
     "bluebird": "3.5.2",
     "clear": "0.1.0",
