@@ -34,7 +34,7 @@
   "dependencies": {
     "@ethereum-alarm-clock/timenode-core": "5.4.4",
     "bignumber.js": "5.0.0",
-    "bluebird": "3.5.2",
+    "bluebird": "3.5.3",
     "clear": "0.1.0",
     "cli-table2": "0.2.0",
     "commander": "2.19.0",
