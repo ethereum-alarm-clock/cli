@@ -13,9 +13,10 @@
 const { Config } = require('@ethereum-alarm-clock/timenode-core');
 const BigNumber = require('bignumber.js');
 const Bb = require('bluebird');
-const { checkOptionsForWalletAndPassword, loadWalletFromKeystoreFile } = require('../src/Wallet/utils');
 const fs = require('fs');
 const { W3Util } = require('@ethereum-alarm-clock/timenode-core');
+const { EAC } = require('@ethereum-alarm-clock/lib');
+const { checkOptionsForWalletAndPassword, loadWalletFromKeystoreFile } = require('../src/Wallet/utils');
 const program = require('./program');
 
 const getDefaultValues = async (web3) => {
@@ -31,8 +32,8 @@ const getDefaultValues = async (web3) => {
     deposit: 999,
     recipient: '0x00360d2b7D240Ec0643B6D819ba81A09e40E5bCd',
     callData: '0x0',
-  }
-}
+  };
+};
 
 /**
  * MAIN (SPAM_TX)
@@ -43,11 +44,12 @@ const main = async () => {
 
   // Second inits,
   const web3 = W3Util.getWeb3FromProviderUrl(program.providers[0]);
-  const eac = require('eac.js-lib')(web3);
-  const logger = new Config({providerUrls: program.providers}).logger;
+  const eac = new EAC(web3);
+  const config = new Config({ providerUrls: program.providers });
+  const { logger } = config;
 
   // Third wallet,
-  const wallet = loadWalletFromKeystoreFile( web3, program.wallet, program.password);
+  const wallet = loadWalletFromKeystoreFile(web3, program.wallet, program.password);
   wallet.logger = logger;
 
   // Fourth logic,
@@ -60,8 +62,9 @@ const main = async () => {
   const spam = async () => {
     let data;
     let target;
-    let repeat = program.repeat;
-    while(repeat--) {
+    let { repeat } = program;
+
+    while (repeat) {
       const getEndowmentFromValues = (values) => {
         return eac.Util.calcEndowment(
           new BigNumber(values.callGas),
@@ -70,15 +73,13 @@ const main = async () => {
           new BigNumber(values.fee),
           new BigNumber(values.bounty),
         );
-      }
+      };
       const endowment = getEndowmentFromValues(defaultValues);
 
-      let tempUnit = ((repeat % 2) === 0)? 2 : 1;
+      const tempUnit = ((repeat % 2) === 0) ? 2 : 1;
 
       const getRandWindowStart = async (temporalUnit) => {
-        const curBlock = await Bb.fromCallback((cb) => {
-          return web3.eth.getBlock('latest', cb);
-        })
+        const curBlock = await Bb.fromCallback(cb => web3.eth.getBlock('latest', cb));
         const rand = Math.floor(Math.random() * 30);
         if (temporalUnit === 1) {
           return program.lengthMod * (curBlock.number + 25 + rand);
@@ -86,7 +87,7 @@ const main = async () => {
         if (temporalUnit === 2) {
           return program.lengthMod * (curBlock.timestamp + (25 * 12) + (rand * 12));
         }
-      }
+      };
 
       if (tempUnit === 1) {
         target = bScheduler.address;
@@ -102,7 +103,7 @@ const main = async () => {
             defaultValues.fee,
             defaultValues.bounty,
             defaultValues.deposit,
-          ]
+          ],
         );
       } else if (tempUnit === 2) {
         target = tsScheduler.address;
@@ -118,9 +119,11 @@ const main = async () => {
             defaultValues.fee,
             defaultValues.bounty,
             defaultValues.deposit,
-          ]
+          ],
         );
-      } else { throw 'Invalid temporal unit.'; }
+      } else {
+        throw new Error('Invalid temporal unit.');
+      }
 
       try {
         const price = Math.floor(web3.toWei('6', 'gwei') * program.gasPrice);
@@ -133,16 +136,20 @@ const main = async () => {
         });
 
         if (!receipt.status) {
-          throw 'Sending transaction failed.';
+          throw new Error('Sending transaction failed.');
         }
         const addressOf = eac.Util.getTxRequestFromReceipt(receipt);
         console.log(
           `Address of txRequest: ${addressOf} TransactionHash: ${receipt.transactionHash}\n`
         );
         fs.appendFileSync('scheduled.txt', `${addressOf}\n`);
-      } catch (e) { console.error(e); }
+      } catch (e) {
+        console.error(e);
+      }
+
+      repeat -= 1;
     }
-  }
+  };
 
   if (program.recurrent) {
     spam();
@@ -153,6 +160,10 @@ const main = async () => {
     await spam();
     process.exit(0);
   }
-}
+};
 
-try { main(); } catch (e) { console.error(e); }
+try {
+  main();
+} catch (e) {
+  console.error(e);
+}

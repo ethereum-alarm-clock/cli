@@ -1,9 +1,10 @@
 const BigNumber = require('bignumber.js');
 const clear = require('clear');
-const { Config, TimeNode } = require('@ethereum-alarm-clock/timenode-core');
 const fs = require('fs');
 const Loki = require('lokijs');
 const Lfsa = require('lokijs/src/loki-fs-structured-adapter.js');
+const { Config, TimeNode } = require('@ethereum-alarm-clock/timenode-core');
+const { Util } = require('@ethereum-alarm-clock/lib');
 
 const Analytics = require('./analytics');
 const FileLogger = require('./logger');
@@ -33,6 +34,7 @@ const timenode = async (options, program) => {
     options.minProfitability = config.minProfitability || options.minProfitability;
     options.maxGasSubsidy = config.maxGasSubsidy || options.maxGasSubsidy;
     providerUrls = config.providers || providerUrls
+    console.log(providerUrls)
     /* eslint-enable */
   }
   checkOptionsForWalletAndPassword(program);
@@ -44,6 +46,7 @@ const timenode = async (options, program) => {
   }
   console.log('Setting Up...');
   console.log(`Using provider: ${providerUrls[0]}\n`);
+  console.log(providerUrls)
   if (!options.claiming) {
     console.log(`\x1b[33mYou are not using the CLAIMING functionality. This might make your TimeNode unprofitable. Please use the '.startClaiming' command to enable CLAIMING.
 For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate-timenode-risks-b8551bb28f9d\n\x1b[0m`);
@@ -106,7 +109,7 @@ For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate
 
   await config.statsDbLoaded;
 
-  if (!await config.eac.Util.checkNetworkID()) {
+  if (!await config.util.isNetworkSupported()) {
     throw new Error('Unsupported network');
   }
 
@@ -117,7 +120,7 @@ For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate
     options.logFile = `${require('os').homedir()}/.eac.log`;
   }
 
-  const chain = await config.eac.Util.getChainName();
+  const chain = await config.util.getChainName();
 
   let analytics;
   if (!options.analyticsOff) {
@@ -136,7 +139,8 @@ For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate
   console.log('Executing from accounts:');
   await Promise.all(
     config.wallet.getAddresses().map(async (address) => {
-      console.log(`${address} | Balance: ${config.web3.fromWei(await config.eac.Util.getBalance(address))}`);
+      const balance = await config.util.balanceOf(address);
+      console.log(`${address} | Balance: ${config.web3.utils.fromWei(balance.toString())}`);
     }),
   );
 

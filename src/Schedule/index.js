@@ -3,6 +3,7 @@ const clear = require('clear');
 const ora = require('ora');
 const rls = require('readline-sync');
 const { W3Util } = require('@ethereum-alarm-clock/timenode-core');
+const { EAC } = require('@ethereum-alarm-clock/lib');
 
 const { getDefaultValues } = require('./defaultValues');
 const ReadInput = require('./readInput');
@@ -25,7 +26,7 @@ const MINIMUM_PERIOD_BEFORE_SCHEDULE = (tempUnit) => {
 const schedule = async (options, program) => {
   const web3 = W3Util.getWeb3FromProviderUrl(program.providers[0]);
   // eslint-disable-next-line global-require
-  const eac = require('eac.js-lib')(web3);
+  const eac = new EAC(web3);
 
   const defaultValues = await getDefaultValues(web3);
 

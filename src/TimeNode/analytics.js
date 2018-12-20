@@ -22,12 +22,7 @@ class Analytics {
   }
 
   async getActiveNetwork() {
-    this.web3.version.getNetwork((err, res) => {
-      if (err) {
-        return;
-      }
-      this.networkId = res;
-    });
+    this.networkId = await this.web3.eth.net.getId();
   }
 
   initialize() {
@@ -64,7 +59,7 @@ class Analytics {
 
   sendActiveTimeNodeEvent(nodeAddress, networkId = this.networkId) {
     const event = {
-      nodeAddress: this.web3.sha3(nodeAddress).toString(),
+      nodeAddress: this.web3.utils.sha3(nodeAddress).toString(),
       networkId: networkId.toString(),
       eacVersions: this.versions,
       nodeType: 'cli',

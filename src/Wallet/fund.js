@@ -1,6 +1,7 @@
 const ora = require('ora');
 
 const { W3Util } = require('@ethereum-alarm-clock/timenode-core');
+const { EAC } = require('@ethereum-alarm-clock/lib');
 
 const {
   checkOptionsForWalletAndPassword,
@@ -10,7 +11,7 @@ const {
 const fund = async (amt, program) => {
   const web3 = W3Util.getWeb3FromProviderUrl(program.provider);
   // eslint-disable-next-line global-require
-  const eac = require('eac.js-lib')(web3);
+  const eac = new EAC(web3);
 
   checkOptionsForWalletAndPassword(program);
 

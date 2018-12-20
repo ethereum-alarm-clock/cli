@@ -1,11 +1,12 @@
 const ethUtil = require('ethereumjs-util');
 const rls = require('readline-sync');
+const { EAC } = require('@ethereum-alarm-clock/lib');
 
 class ReadInput {
   constructor(web3, options, defaultValues) {
     this.web3 = web3;
     // eslint-disable-next-line global-require
-    this.eac = require('eac.js-lib')(this.web3);
+    this.eac = new EAC(this.web3);
     this.options = options;
     this.defaultValues = defaultValues;
   }

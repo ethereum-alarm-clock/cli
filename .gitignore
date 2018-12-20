@@ -10,3 +10,4 @@ sample-keystore
 stats.json*
 keystore
 keystore*
+docker/wallet--*
