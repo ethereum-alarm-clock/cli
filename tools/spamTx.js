@@ -14,8 +14,8 @@ const { Config } = require('@ethereum-alarm-clock/timenode-core');
 const BigNumber = require('bignumber.js');
 const Bb = require('bluebird');
 const fs = require('fs');
-const { W3Util } = require('@ethereum-alarm-clock/timenode-core');
-const { EAC } = require('@ethereum-alarm-clock/lib');
+
+const { EAC, Util } = require('@ethereum-alarm-clock/lib');
 const { checkOptionsForWalletAndPassword, loadWalletFromKeystoreFile } = require('../src/Wallet/utils');
 const program = require('./program');
 
@@ -23,12 +23,12 @@ const getDefaultValues = async (web3) => {
   const gasPrice = await Bb.fromCallback(cb => web3.eth.getGasPrice(cb));
   return {
     callGas: 100000,
-    callValue: web3.toWei('10', 'gwei'),
+    callValue: web3.utils.toWei('10', 'gwei'),
     windowSizeBlock: 255,
     windowSizeTs: 255 * 12,
     gasPrice,
     fee: 777,
-    bounty: web3.toWei('10', 'gwei'),
+    bounty: web3.utils.toWei('10', 'gwei'),
     deposit: 999,
     recipient: '0x00360d2b7D240Ec0643B6D819ba81A09e40E5bCd',
     callData: '0x0',
@@ -43,7 +43,7 @@ const main = async () => {
   checkOptionsForWalletAndPassword(program);
 
   // Second inits,
-  const web3 = W3Util.getWeb3FromProviderUrl(program.providers[0]);
+  const web3 = Util.getWeb3FromProviderUrl(program.providers[0]);
   const eac = new EAC(web3);
   const config = new Config({ providerUrls: program.providers });
   const { logger } = config;
@@ -66,7 +66,7 @@ const main = async () => {
 
     while (repeat) {
       const getEndowmentFromValues = (values) => {
-        return eac.Util.calcEndowment(
+        return Util.calcEndowment(
           new BigNumber(values.callGas),
           new BigNumber(values.callValue),
           new BigNumber(values.gasPrice),
@@ -126,7 +126,7 @@ const main = async () => {
       }
 
       try {
-        const price = Math.floor(web3.toWei('6', 'gwei') * program.gasPrice);
+        const price = Math.floor(web3.utils.toWei('6', 'gwei') * program.gasPrice);
         const { receipt } = await wallet.sendFromNext({
           to: target,
           value: endowment.toNumber(),
@@ -138,7 +138,7 @@ const main = async () => {
         if (!receipt.status) {
           throw new Error('Sending transaction failed.');
         }
-        const addressOf = eac.Util.getTxRequestFromReceipt(receipt);
+        const addressOf = eac.getTxRequestFromReceipt(receipt);
         console.log(
           `Address of txRequest: ${addressOf} TransactionHash: ${receipt.transactionHash}\n`
         );

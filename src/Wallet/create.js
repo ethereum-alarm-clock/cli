@@ -1,10 +1,11 @@
 const fs = require('fs');
 const rls = require('readline-sync');
-const { Wallet, W3Util } = require('@ethereum-alarm-clock/timenode-core');
+const { Wallet } = require('@ethereum-alarm-clock/timenode-core');
+const { Util } = require('@ethereum-alarm-clock/lib');
 
 const create = (program) => {
   // Create web3
-  const web3 = W3Util.getWeb3FromProviderUrl(program.providers[0]);
+  const web3 = Util.getWeb3FromProviderUrl(program.providers[0]);
 
   let numberOfAccounts = rls.question(
     'How many accounts to create? [1 - 10]\n',

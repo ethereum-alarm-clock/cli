@@ -2,8 +2,8 @@ const BigNumber = require('bignumber.js');
 const clear = require('clear');
 const ora = require('ora');
 const rls = require('readline-sync');
-const { W3Util } = require('@ethereum-alarm-clock/timenode-core');
-const { EAC } = require('@ethereum-alarm-clock/lib');
+const fs = require('fs');
+const { EAC, Util } = require('@ethereum-alarm-clock/lib');
 
 const { getDefaultValues } = require('./defaultValues');
 const ReadInput = require('./readInput');
@@ -24,19 +24,24 @@ const MINIMUM_PERIOD_BEFORE_SCHEDULE = (tempUnit) => {
 };
 
 const schedule = async (options, program) => {
-  const web3 = W3Util.getWeb3FromProviderUrl(program.providers[0]);
+  const web3 = Util.getWeb3FromProviderUrl(program.providers[0]);
   // eslint-disable-next-line global-require
   const eac = new EAC(web3);
+  const util = new Util(web3);
 
   const defaultValues = await getDefaultValues(web3);
 
-  if (!await eac.Util.checkNetworkID()) {
+  if (!await util.isNetworkSupported()) {
     throw new Error('Must be using the Kovan or Ropsten test network.');
   }
 
   checkOptionsForWalletAndPassword(program);
 
   const wallet = loadWalletFromKeystoreFile(web3, program.wallet, program.password);
+
+  const keystore = fs.readFileSync(program.wallet[0], 'utf8');
+
+  web3.eth.accounts.wallet.decrypt([JSON.parse(keystore)], program.password);
 
   // Initiate the shedule parameters.
   let scheduleParams = {};
@@ -60,11 +65,10 @@ const schedule = async (options, program) => {
   const callGas = scheduleParams.callGas || readInput.readCallGas();
   const callValue = scheduleParams.callValue || readInput.readCallValue();
 
-  const currentBlockNumber = await eac.Util.getBlockNumber();
-
-  const windowStart = scheduleParams.windowStart || readInput.readWindowStart(currentBlockNumber);
+  const windowStart = scheduleParams.windowStart || await readInput.readWindowStart();
   const windowSize = scheduleParams.windowSize || readInput.readWindowSize(temporalUnit);
 
+  const currentBlockNumber = await web3.eth.getBlockNumber();
   const soonestScheduleTime = currentBlockNumber + MINIMUM_PERIOD_BEFORE_SCHEDULE(temporalUnit);
   if (windowStart < soonestScheduleTime) {
     throw new Error(`Window start of ${windowStart} too soon.\nSoonest Schedule Time: ${soonestScheduleTime}`);
@@ -76,7 +80,7 @@ const schedule = async (options, program) => {
   const requiredDeposit = scheduleParams.deposit || readInput.readDeposit();
 
   // Calculate the required endowment according to these params.
-  const endowment = eac.Util.calcEndowment(
+  const endowment = Util.calcEndowment(
     new BigNumber(callGas),
     new BigNumber(callValue),
     new BigNumber(gasPrice),
@@ -98,7 +102,7 @@ const schedule = async (options, program) => {
   console.log(`Required Deposit: ${requiredDeposit}`);
   console.log('\n');
   console.log(`Sending from: ${wallet.getAddresses()[0]}`);
-  console.log(`Endowment to send: ${web3.fromWei(endowment.toString())}`);
+  console.log(`Endowment to send: ${web3.utils.fromWei(endowment.toString())}`);
 
   const confirmed = rls.question('Are the above parameters correct? [Y/n]\n');
   if (confirmed.toLowerCase() !== 'y' && confirmed !== '') {
@@ -122,11 +126,11 @@ const schedule = async (options, program) => {
       bounty,
       requiredDeposit,
       temporalUnit,
-    }, web3, eac, wallet);
+    }, web3, eac);
 
     if (success) {
       spinner.succeed(`Transaction successful. Transaction Hash: ${receipt.transactionHash}\n`);
-      console.log(`Address of scheduled transaction: ${eac.Util.getTxRequestFromReceipt(receipt)}`);
+      console.log(`Address of scheduled transaction: ${eac.getTxRequestFromReceipt(receipt)}`);
     } else {
       spinner.fail('Transaction failed.');
     }

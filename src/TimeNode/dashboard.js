@@ -21,7 +21,7 @@ const makeDashboard = (config, timenode) => {
     const costs = config.statsDb.totalCost(address);
     const profit = bounties.minus(costs);
 
-    const formatWeiToEther = wei => config.web3.fromWei(wei, 'ether').toFixed(6);
+    const formatWeiToEther = wei => config.web3.utils.fromWei(wei.toString(), 'ether');
 
     const shortenAddr = addr => `${addr.slice(0, 8)}...${addr.slice(-4)}`;
 

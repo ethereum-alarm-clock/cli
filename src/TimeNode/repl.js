@@ -20,11 +20,11 @@ const start = (timenode, docker) => {
       if (config.wallet) {
         config.wallet.getAccounts().forEach(async (account) => {
           const address = account.getAddressString();
-          console.log(`${address} | Balance: ${web3.fromWei(await eac.Util.getBalance(address))}`);
+          console.log(`${address} | Balance: ${web3.utils.fromWei(await eac.Util.getBalance(address))}`);
         });
       } else {
         const account = web3.eth.defaultAccount;
-        console.log(`${account} | Balance: ${web3.fromWei(await eac.Util.getBalance(account))}`);
+        console.log(`${account} | Balance: ${web3.utils.fromWei(await eac.Util.getBalance(account))}`);
       }
     },
   });
@@ -34,7 +34,7 @@ const start = (timenode, docker) => {
     async action() {
       const block = await util.getBlock('latest');
       const gasPrice = await util.networkGasPrice();
-      const gweiGasPrice = web3.fromWei(gasPrice, 'gwei');
+      const gweiGasPrice = web3.utils.fromWei(gasPrice, 'gwei');
 
       console.log(`BlockNum: ${block.number} | Timestamp: ${block.timestamp} | GasPrice: ${gweiGasPrice} Gwei`);
     },
@@ -140,19 +140,19 @@ const start = (timenode, docker) => {
       const spinner = ora('Sending test transaction to network...').start();
       const scheduler = await eac.scheduler();
 
-      const blockNumber = await eac.Util.getBlockNumber();
+      const blockNumber = await web3.eth.getBlockNumber();
 
       // Set some meaningless defaults
       const recipient = '0x009f7EfeD908c05df5101DA1557b7CaaB38EE4Ce';
       const callData = web3.fromAscii('s0x'.repeat(Math.floor(Math.random() * 10)));
       const windowStart = (new BigNumber(blockNumber)).plus(30);
       const windowSize = 255;
-      const gasPrice = web3.toWei('5', 'gwei');
+      const gasPrice = web3.utils.toWei('5', 'gwei');
       const requiredDeposit = 1;
       const callGas = 100000;
       const callValue = 321;
       const fee = 50;
-      const bounty = web3.toWei('1', 'finney');
+      const bounty = web3.utils.toWei('1', 'finney');
       const temporalUnit = 1;
 
       if (config.wallet) {
@@ -169,11 +169,11 @@ const start = (timenode, docker) => {
             bounty,
             requiredDeposit,
             temporalUnit,
-          }, web3, eac, config.wallet);
+          }, web3, eac);
 
           if (success) {
             spinner.succeed(`Transaction successful. Transaction Hash: ${receipt.transactionHash}\n`);
-            console.log(`Address of scheduled transaction: ${eac.Util.getTxRequestFromReceipt(receipt)}`);
+            console.log(`Address of scheduled transaction: ${eac.getTxRequestFromReceipt(receipt)}`);
           } else {
             spinner.fail('Transaction failed.');
           }
@@ -184,7 +184,7 @@ const start = (timenode, docker) => {
         return;
       }
 
-      const endowment = eac.Util.calcEndowment(
+      const endowment = util.calcEndowment(
         new BigNumber(callGas),
         new BigNumber(callValue),
         new BigNumber(gasPrice),

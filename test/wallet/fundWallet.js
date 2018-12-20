@@ -9,7 +9,7 @@ const fund = (web3, recip, value) => {
       to: recip,
       value,
       gas: 3000000,
-      gasPrice: web3.toWei('100', 'gwei'),
+      gasPrice: web3.utils.toWei('100', 'gwei'),
     },
     (err, txHash) => {
       if (err) reject(err);
@@ -23,7 +23,7 @@ const fund = (web3, recip, value) => {
 };
 
 const fundAccounts = async (web3, etherAmount, wallet) => {
-  const amountInWei = web3.toWei(etherAmount, 'ether');
+  const amountInWei = web3.utils.toWei(etherAmount, 'ether');
 
   return Promise.all(wallet.getAddresses().map(address => fund(web3, address, amountInWei)));
 };

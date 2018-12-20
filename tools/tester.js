@@ -8,8 +8,9 @@ const clear = require('clear');
 const Web3WsProvider = require('web3-providers-ws');
 const ora = require('ora');
 const program = require('commander');
-const { EAC } = require('@ethereum-alarm-clock/lib');
 const Web3 = require('web3');
+
+const { EAC, Util } = require('@ethereum-alarm-clock/lib');
 
 // Parse the command line options using commander.
 program
@@ -53,18 +54,19 @@ const provider = (() => {
 
 const web3 = new Web3(provider);
 const eac = new EAC(web3);
+const util = new Util(web3);
 
 const getDefaultSchedulingValues = async () => {
   const gasPrice = await Bb.fromCallback(callback => web3.eth.getGasPrice(callback));
   return {
     callGas: 100000,
-    callValue: web3.toWei('100', 'gwei'),
+    callValue: web3.utils.toWei('100', 'gwei'),
     windowSizeBlock: 255,
     windowSizeTimestamp: 255 * 15,
     gasPrice,
-    fee: web3.toWei('10', 'gwei'),
+    fee: web3.utils.toWei('10', 'gwei'),
     bounty: gasPrice * 100000,
-    deposit: web3.toWei('20', 'gwei'),
+    deposit: web3.utils.toWei('20', 'gwei'),
     minimumPeriodBeforeSchedule: 25,
     minimumPeriodBeforeScheduleInSeconds: 180,
   };
@@ -95,7 +97,7 @@ const renderTable = async (transactions) => {
     executedAt *= 1;
 
     if (tx.temporalUnit === 2) {
-      executedAt = await eac.Util.getTimestampForBlock(executedAt);
+      executedAt = await util.getTimestampForBlock(executedAt);
     }
 
     return (executedAt - windowStart) + unit;
@@ -118,10 +120,10 @@ const renderTable = async (transactions) => {
 const getDefaultWindowStart = async (scheduleParams) => {
   let defaultWindowStart;
   if (program.block) {
-    const currentBlockNumber = await eac.Util.getBlockNumber();
+    const currentBlockNumber = await web3.eth.getBlockNumber();
     defaultWindowStart = currentBlockNumber + scheduleParams.minimumPeriodBeforeSchedule + 5;
   } else if (program.timestamp) {
-    const currentTimestamp = await eac.Util.getTimestamp();
+    const currentTimestamp = await util.getTimestamp();
     defaultWindowStart = currentTimestamp + scheduleParams.minimumPeriodBeforeScheduleInSeconds + 180;
   }
   return defaultWindowStart;
@@ -158,11 +160,11 @@ const main = async (_) => {
     await renderTable(transactions);
   } else {
     let scheduleParams = await getDefaultSchedulingValues();
-    if (!await eac.Util.checkNetworkID()) {
+    if (!await util.isNetworkSupported()) {
       console.log('error: must be running a localnode on the Ropsten or Kovan networks');
       process.exit(1);
     }
-    if (!await eac.Util.checkForUnlockedAccount()) process.exit(1);
+    if (!await util.checkForUnlockedAccount()) process.exit(1);
     if (program.json) scheduleParams = JSON.parse(program.json);
 
     const eacScheduler = await eac.scheduler();
@@ -218,7 +220,7 @@ const main = async (_) => {
       }
       const windowStartOffset = program.randomizeStart ? getRandomWindowStartOffset() : 0
 
-      const endowment = eac.Util.calcEndowment(
+      const endowment = Util.calcEndowment(
         new BigNumber(callGas),
         new BigNumber(callValue),
         new BigNumber(gasPrice),
@@ -264,7 +266,7 @@ const main = async (_) => {
         if (receipt.status != '0x1') {
           spinner.fail(`Transaction was mined but failed. No transaction scheduled. Hash: ${receipt.transactionHash}`);
         } else {
-          const address = eac.Util.getTxRequestFromReceipt(receipt);
+          const address = eac.getTxRequestFromReceipt(receipt);
           spinner.succeed(`Transaction successful! Hash: ${receipt.transactionHash}, Address: ${address}`);
           succeeded.push(address);
         }

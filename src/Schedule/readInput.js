@@ -1,12 +1,13 @@
 const ethUtil = require('ethereumjs-util');
 const rls = require('readline-sync');
-const { EAC } = require('@ethereum-alarm-clock/lib');
+const { EAC, Util } = require('@ethereum-alarm-clock/lib');
 
 class ReadInput {
   constructor(web3, options, defaultValues) {
     this.web3 = web3;
     // eslint-disable-next-line global-require
     this.eac = new EAC(this.web3);
+    this.util = new Util(this.web3);
     this.options = options;
     this.defaultValues = defaultValues;
   }
@@ -39,7 +40,7 @@ class ReadInput {
     }
     // Validate the address.
     toAddress = ethUtil.addHexPrefix(toAddress);
-    if (!this.eac.Util.checkValidAddress(toAddress)) {
+    if (!this.util.checkValidAddress(toAddress)) {
       throw new Error('Invalid recipient address.');
     }
     return toAddress;
@@ -50,7 +51,7 @@ class ReadInput {
     if (!callData) {
       callData = '0x0';
     }
-    callData = this.web3.toHex(callData);
+    callData = this.web3.utils.toHex(callData);
     return callData;
   }
 
@@ -71,8 +72,9 @@ class ReadInput {
     return windowSize || defaultWindowSize;
   }
 
-  static readWindowStart(curBlockNum) {
-    const defaultWindowStart = curBlockNum + 15 + 5;
+  async readWindowStart() {
+    const currentBlockNumber = await this.web3.eth.getBlockNumber();
+    const defaultWindowStart = currentBlockNumber + 15 + 5;
     const windowStart = rls.question(`What is the windowStart: [press enter for ${defaultWindowStart}]\n`);
     return windowStart || defaultWindowStart;
   }

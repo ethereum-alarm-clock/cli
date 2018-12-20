@@ -1,6 +1,6 @@
 const requestInfo = async (config, txRequestAddr) => {
   const { eac, web3, util } = config;
-  if (!eac.Util.checkValidAddress(txRequestAddr)) {
+  if (!util.checkValidAddress(txRequestAddr)) {
     console.log('Must pass a valid transaction request address');
     return;
   }
@@ -16,7 +16,7 @@ const requestInfo = async (config, txRequestAddr) => {
     );
 
     const maxGasReimbursement = txRequest.callGas * txRequest.gasPrice;
-    const logETH = value => `${value} (${web3.fromWei(value)} ETH)`;
+    const logETH = value => `${value} (${web3.utils.fromWei(value)} ETH)`;
 
     console.log(`
   Owner: ${txRequest.owner}
@@ -29,17 +29,17 @@ const requestInfo = async (config, txRequestAddr) => {
   ---
   Claim Window Size: ${txRequest.claimWindowSize}
   ---
-  Bounty: ${txRequest.bounty} (${web3.fromWei(txRequest.bounty)} ETH)
-  Bounty with modifier: ${txRequest.bounty} * ${paymentModifier} = ${txRequest.bounty * paymentModifier} (${web3.fromWei(txRequest.bounty * paymentModifier / 100)} ETH)
-  Deposit: ${txRequest.requiredDeposit} (${web3.fromWei(txRequest.requiredDeposit)} ETH)
-  Max Reimbursement: ${maxGasReimbursement} (${web3.fromWei(maxGasReimbursement)} ETH)
+  Bounty: ${txRequest.bounty} (${web3.utils.fromWei(txRequest.bounty)} ETH)
+  Bounty with modifier: ${txRequest.bounty} * ${paymentModifier} = ${txRequest.bounty * paymentModifier} (${web3.utils.fromWei(txRequest.bounty * paymentModifier / 100)} ETH)
+  Deposit: ${txRequest.requiredDeposit} (${web3.utils.fromWei(txRequest.requiredDeposit)} ETH)
+  Max Reimbursement: ${maxGasReimbursement} (${web3.utils.fromWei(maxGasReimbursement)} ETH)
   ---
   Executed at: ${executed ? executed.blockNumber : '---'}
   Executed bounty sent: ${executed ? logETH(executed.args.bounty) : '---'}
   GasUsed: ${executed ? executed.args.measuredGasConsumption : '---'}
   GasUsed Reimbursement: ${executed ? logETH(executed.args.measuredGasConsumption * txRequest.gasPrice) : '---'}
   ---
-  GasPrice: ${txRequest.gasPrice} (${web3.fromWei(txRequest.gasPrice, 'gwei')} Gwei) | Network: ${web3.fromWei(networkGasPrice, 'gwei')} Gwei
+  GasPrice: ${txRequest.gasPrice} (${web3.utils.fromWei(txRequest.gasPrice, 'gwei')} Gwei) | Network: ${web3.utils.fromWei(networkGasPrice, 'gwei')} Gwei
   Gas: ${txRequest.callGas}
   ---
   Now: ${now}`);
