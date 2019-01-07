@@ -4,7 +4,6 @@ const fs = require('fs');
 const Loki = require('lokijs');
 const Lfsa = require('lokijs/src/loki-fs-structured-adapter.js');
 const { Config, TimeNode } = require('@ethereum-alarm-clock/timenode-core');
-const { Util } = require('@ethereum-alarm-clock/lib');
 
 const Analytics = require('./analytics');
 const FileLogger = require('./logger');
@@ -46,7 +45,6 @@ const timenode = async (options, program) => {
   }
   console.log('Setting Up...');
   console.log(`Using provider: ${providerUrls[0]}\n`);
-  console.log(providerUrls)
   if (!options.claiming) {
     console.log(`\x1b[33mYou are not using the CLAIMING functionality. This might make your TimeNode unprofitable. Please use the '.startClaiming' command to enable CLAIMING.
 For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate-timenode-risks-b8551bb28f9d\n\x1b[0m`);
