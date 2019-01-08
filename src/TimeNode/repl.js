@@ -77,6 +77,7 @@ const start = (timenode, docker) => {
     help: 'Get claimed transactions pending execution.',
     async action() {
       console.log(`Claimed transactions pending execution:`);
+      const printPending = (address, pending) => console.log(`Account ${address}: ${pending.join(', ') || 'No transactions pending'}.`);
 
       const claimedPendingExecution = timenode.getClaimedNotExecutedTransactions();
 
@@ -84,13 +85,11 @@ const start = (timenode, docker) => {
         const accounts = config.wallet.getAccounts();
         for (let i = 0; i < accounts.length; i++) {
           const address = accounts[i].getAddressString();
-          const pending = claimedPendingExecution[address].join(', ');
-          console.log(`Account ${address}: ${pending || 'No transactions pending'}.`);
+          printPending(address, claimedPendingExecution[address]);
         }
       } else {
         const account = web3.eth.defaultAccount;
-        const pending = claimedPendingExecution[account].join(', ');
-        console.log(`Account ${account}: ${pending || 'No transactions pending'}.`);
+        printPending(account, claimedPendingExecution[account]);
       }
     },
   });
