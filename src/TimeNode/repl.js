@@ -75,18 +75,23 @@ const start = (timenode, docker) => {
 
   replServer.defineCommand('getClaimed', {
     help: 'Get claimed transactions pending execution.',
-    action() {
+    async action() {
+      console.log(`Claimed transactions pending execution:`);
+
       const claimedPendingExecution = timenode.getClaimedNotExecutedTransactions();
 
-      let print = `Claimed transactions pending execution (${claimedPendingExecution.length}): \n`;
-
-      let i = 1;
-      while (i - 1 < claimedPendingExecution.length) {
-        print += `${i}. ${claimedPendingExecution[i - 1]}\n`;
-        i += 1;
+      if (config.wallet) {
+        const accounts = config.wallet.getAccounts();
+        for (let i = 0; i < accounts.length; i++) {
+          const address = accounts[i].getAddressString();
+          const pending = claimedPendingExecution[address].join(', ');
+          console.log(`Account ${address}: ${pending || 'No transactions pending'}.`);
+        }
+      } else {
+        const account = web3.eth.defaultAccount;
+        const pending = claimedPendingExecution[account].join(', ');
+        console.log(`Account ${account}: ${pending || 'No transactions pending'}.`);
       }
-
-      console.log(print);
     },
   });
 
