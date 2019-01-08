@@ -8,7 +8,7 @@ const makeDashboard = require('./dashboard');
 
 const start = (timenode, docker) => {
   const { config } = timenode;
-  const { eac, web3, util } = config;
+  const { eac, web3, util, gasPriceUtil } = config;
 
   console.log(' '); // blank space
   const replServer = repl.start({ prompt: '>> ' });
@@ -20,12 +20,12 @@ const start = (timenode, docker) => {
       if (config.wallet) {
         config.wallet.getAccounts().forEach(async (account) => {
           const address = account.getAddressString();
-          const balance = await eac.util.balanceOf(address);
+          const balance = await util.balanceOf(address);
           console.log(`${address} | Balance: ${web3.utils.fromWei(balance.toString())}`);
         });
       } else {
         const account = web3.eth.defaultAccount;
-        const balance = await eac.util.balanceOf(account);
+        const balance = await util.balanceOf(account);
         console.log(`${account} | Balance: ${web3.utils.fromWei(balance.toString())}`);
       }
     },
@@ -35,8 +35,8 @@ const start = (timenode, docker) => {
     help: 'Get the current network stats',
     async action() {
       const block = await util.getBlock('latest');
-      const gasPrice = await util.networkGasPrice();
-      const gweiGasPrice = web3.utils.fromWei(gasPrice, 'gwei');
+      const gasPrice = await gasPriceUtil.networkGasPrice();
+      const gweiGasPrice = web3.utils.fromWei(gasPrice.toString(), 'gwei');
 
       console.log(`BlockNum: ${block.number} | Timestamp: ${block.timestamp} | GasPrice: ${gweiGasPrice} Gwei`);
     },
