@@ -20,11 +20,13 @@ const start = (timenode, docker) => {
       if (config.wallet) {
         config.wallet.getAccounts().forEach(async (account) => {
           const address = account.getAddressString();
-          console.log(`${address} | Balance: ${web3.utils.fromWei(await eac.Util.getBalance(address))}`);
+          const balance = await eac.util.balanceOf(address);
+          console.log(`${address} | Balance: ${web3.utils.fromWei(balance.toString())}`);
         });
       } else {
         const account = web3.eth.defaultAccount;
-        console.log(`${account} | Balance: ${web3.utils.fromWei(await eac.Util.getBalance(account))}`);
+        const balance = await eac.util.balanceOf(account);
+        console.log(`${account} | Balance: ${web3.utils.fromWei(balance.toString())}`);
       }
     },
   });
