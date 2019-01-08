@@ -97,17 +97,21 @@ const start = (timenode, docker) => {
   replServer.defineCommand('getFailedClaims', {
     help: 'Get unsuccessfully claimed transactions.',
     action() {
-      const transactions = timenode.getUnsucessfullyClaimedTransactions();
+      console.log(`Unsuccessfully claimed transactions:`);
+      const printUnsuccessful = (address, pending) => console.log(`Account ${address}: ${pending.join(', ') || 'No unsuccessfully claimed transactions'}.`);
 
-      let print = `Unsuccessfully claimed transactions (${transactions.length}): \n`;
+      const unsuccessfullyClaimed = timenode.getUnsucessfullyClaimedTransactions();
 
-      let i = 1;
-      while (i - 1 < transactions.length) {
-        print += `${i}. ${transactions[i - 1]}\n`;
-        i += 1;
+      if (config.wallet) {
+        const accounts = config.wallet.getAccounts();
+        for (let i = 0; i < accounts.length; i++) {
+          const address = accounts[i].getAddressString();
+          printUnsuccessful(address, unsuccessfullyClaimed[address]);
+        }
+      } else {
+        const account = web3.eth.defaultAccount;
+        printUnsuccessful(account, unsuccessfullyClaimed[account]);
       }
-
-      console.log(print);
     },
   });
 
