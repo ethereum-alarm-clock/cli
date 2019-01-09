@@ -13,8 +13,6 @@ const {
   loadWalletFromKeystoreFile,
 } = require('../Wallet/utils');
 
-const { scheduleUsingWallet } = require('./helpers');
-
 const MINIMUM_PERIOD_BEFORE_SCHEDULE = (tempUnit) => {
   if (tempUnit === 1) {
     return 15;
