@@ -33,7 +33,6 @@ const timenode = async (options, program) => {
     options.minProfitability = config.minProfitability || options.minProfitability;
     options.maxGasSubsidy = config.maxGasSubsidy || options.maxGasSubsidy;
     providerUrls = config.providers || providerUrls
-    console.log(providerUrls)
     /* eslint-enable */
   }
   checkOptionsForWalletAndPassword(program);

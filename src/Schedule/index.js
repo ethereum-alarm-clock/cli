@@ -109,7 +109,7 @@ const schedule = async (options, program) => {
 
   // Set up the spinner.
   console.log('\n');
-  const spinner = ora('Sending the scheduling transaction...').start();
+  const spinner = ora('Scheduling the transaction...').start();
 
   try {
     const { receipt, success } = await scheduleUsingWallet({
@@ -125,6 +125,7 @@ const schedule = async (options, program) => {
       requiredDeposit,
       temporalUnit,
     }, web3, eac);
+    console.log(receipt)
 
     if (success) {
       spinner.succeed(`Transaction successful. Transaction Hash: ${receipt.transactionHash}\n`);
