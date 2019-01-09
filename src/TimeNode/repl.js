@@ -75,14 +75,14 @@ const start = (timenode, docker) => {
   replServer.defineCommand('getClaimed', {
     help: 'Get claimed transactions pending execution.',
     async action() {
-      console.log(`Claimed transactions pending execution:`);
+      console.log('Claimed transactions pending execution:');
       const printPending = (address, pending) => console.log(`Account ${address}: ${pending.join(', ') || 'No transactions pending'}.`);
 
       const claimedPendingExecution = timenode.getClaimedNotExecutedTransactions();
 
       if (config.wallet) {
         const accounts = config.wallet.getAccounts();
-        for (let i = 0; i < accounts.length; i++) {
+        for (let i = 0; i < accounts.length; i += 1) {
           const address = accounts[i].getAddressString();
           printPending(address, claimedPendingExecution[address]);
         }
@@ -96,14 +96,14 @@ const start = (timenode, docker) => {
   replServer.defineCommand('getFailedClaims', {
     help: 'Get unsuccessfully claimed transactions.',
     action() {
-      console.log(`Unsuccessfully claimed transactions:`);
+      console.log('Unsuccessfully claimed transactions:');
       const printUnsuccessful = (address, pending) => console.log(`Account ${address}: ${pending.join(', ') || 'No unsuccessfully claimed transactions'}.`);
 
       const unsuccessfullyClaimed = timenode.getUnsucessfullyClaimedTransactions();
 
       if (config.wallet) {
         const accounts = config.wallet.getAccounts();
-        for (let i = 0; i < accounts.length; i++) {
+        for (let i = 0; i < accounts.length; i += 1) {
           const address = accounts[i].getAddressString();
           printUnsuccessful(address, unsuccessfullyClaimed[address]);
         }
@@ -118,7 +118,7 @@ const start = (timenode, docker) => {
     help: 'Starts the TimeNode.',
     action() {
       timenode.startScanning();
-      console.log('Started scanning.')
+      console.log('Started scanning.');
     },
   });
 
@@ -126,7 +126,7 @@ const start = (timenode, docker) => {
     help: 'Stops the TimeNode.',
     action() {
       timenode.stopScanning();
-      console.log('Stopped scanning.')
+      console.log('Stopped scanning.');
     },
   });
 
@@ -151,29 +151,28 @@ const start = (timenode, docker) => {
       'Send a test transaction to the network (requires unlocked local account).',
     async action() {
       const spinner = ora('Sending test transaction to network...').start();
-      
+
       const blockNumber = await web3.eth.getBlockNumber();
-      const sender = config.wallet ? config.wallet.getAccounts()[0].getAddressString() : web3.eth.defaultAccount;
-      console.log(sender)
+      const sender = config.wallet ? web3.eth.accounts.wallet[0].address : web3.eth.defaultAccount;
+      console.log(sender);
 
-      // if (config.wallet) {
-      //   wallet.sendFromIndex(0, )
-      // }
-
-      const receipt = await eac.schedule({
+      const params = {
         from: sender,
-        toAddress: '0x009f7EfeD908c05df5101DA1557b7CaaB38EE4Ce',
+        toAddress: '0x981bc3331908602aa4b617182ef85bcc19ab5692',
         callData: web3.utils.fromAscii('s0x'.repeat(Math.floor(Math.random() * 10))),
-        windowStart: new BigNumber(blockNumber + 30),
-        windowSize: new BigNumber(255),
-        gasPrice: web3.utils.toWei('5', 'gwei'),
-        requiredDeposit: new BigNumber(1),
         callGas: new BigNumber(100000),
         callValue: new BigNumber(321),
+        windowSize: new BigNumber(255),
+        windowStart: new BigNumber(blockNumber + 30),
+        gasPrice: web3.utils.toWei('5', 'gwei'),
         fee: new BigNumber(50),
         bounty: web3.utils.toWei('1', 'finney'),
-        timestampScheduling: false
-      });
+        requiredDeposit: new BigNumber(1),
+        temporalUnit: 1,
+      };
+
+      const receipt = await eac.schedule(params);
+
 
       if (receipt.status !== '0x1') {
         spinner.fail('Transaction failed.');

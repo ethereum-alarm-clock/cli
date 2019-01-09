@@ -8,7 +8,7 @@ const { Config, TimeNode } = require('@ethereum-alarm-clock/timenode-core');
 const Analytics = require('./analytics');
 const FileLogger = require('./logger');
 const Repl = require('./repl');
-const { checkOptionsForWalletAndPassword } = require('../Wallet/utils');
+const { checkOptionsForWalletAndPassword, loadWalletFromKeystoreFile } = require('../Wallet/utils');
 
 const wei = '1e18';
 
@@ -109,6 +109,8 @@ For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate
   if (!await config.util.isNetworkSupported()) {
     throw new Error('Unsupported network');
   }
+
+  loadWalletFromKeystoreFile(config.web3, program.wallet, program.password);
 
   // Set up default logfile.
   if (options.logFile === 'default') {

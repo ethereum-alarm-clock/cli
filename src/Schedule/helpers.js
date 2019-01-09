@@ -1,7 +1,5 @@
-const spinner = require('ora');
-
 async function scheduleUsingWallet({
-  recipient,
+  toAddress,
   callData,
   callGas,
   callValue,
@@ -22,7 +20,7 @@ eac) {
   try {
     receipt = await eac.schedule({
       from: web3.eth.accounts.wallet[0].address,
-      toAddress: recipient,
+      toAddress,
       callGas,
       callData,
       callValue,
@@ -35,7 +33,6 @@ eac) {
       timestampScheduling,
     });
   } catch (err) {
-    spinner.fail('Transaction failed.');
     throw err;
   }
 

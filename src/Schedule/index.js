@@ -7,6 +7,7 @@ const { EAC, Util } = require('@ethereum-alarm-clock/lib');
 
 const { getDefaultValues } = require('./defaultValues');
 const ReadInput = require('./readInput');
+const { scheduleUsingWallet } = require('./helpers');
 
 const {
   checkOptionsForWalletAndPassword,
@@ -36,10 +37,7 @@ const schedule = async (options, program) => {
   checkOptionsForWalletAndPassword(program);
 
   const wallet = loadWalletFromKeystoreFile(web3, program.wallet, program.password);
-
-  const keystore = fs.readFileSync(program.wallet[0], 'utf8');
-
-  web3.eth.accounts.wallet.decrypt([JSON.parse(keystore)], program.password);
+  console.log(wallet)
 
   // Initiate the shedule parameters.
   let scheduleParams = {};
@@ -58,7 +56,7 @@ const schedule = async (options, program) => {
   // ask the user for them interactively.
 
   const temporalUnit = scheduleParams.temporalUnit || readInput.readTemporalUnit();
-  const recipient = scheduleParams.recipient || readInput.readRecipientAddress();
+  const toAddress = scheduleParams.recipient || readInput.readRecipientAddress();
   const callData = scheduleParams.callData || readInput.readCallData();
   const callGas = scheduleParams.callGas || readInput.readCallGas();
   const callValue = scheduleParams.callValue || readInput.readCallValue();
@@ -89,7 +87,7 @@ const schedule = async (options, program) => {
   // We have all the input we need, now we confirm with the user.
   clear();
 
-  console.log(`Recipient: ${recipient}`);
+  console.log(`Sending to: ${toAddress}`);
   console.log(`Call Data: ${callData}`);
   console.log(`Call Gas: ${callGas}`);
   console.log(`Window Size: ${windowSize}`);
@@ -99,7 +97,7 @@ const schedule = async (options, program) => {
   console.log(`Bounty: ${bounty}`);
   console.log(`Required Deposit: ${requiredDeposit}`);
   console.log('\n');
-  console.log(`Sending from: ${wallet.getAddresses()[0]}`);
+  console.log(`Sending from: ${wallet[0].address}`);
   console.log(`Endowment to send: ${web3.utils.fromWei(endowment.toString())}`);
 
   const confirmed = rls.question('Are the above parameters correct? [Y/n]\n');
@@ -113,7 +111,7 @@ const schedule = async (options, program) => {
 
   try {
     const { receipt, success } = await scheduleUsingWallet({
-      recipient,
+      toAddress,
       callData,
       callGas,
       callValue,
@@ -125,16 +123,18 @@ const schedule = async (options, program) => {
       requiredDeposit,
       temporalUnit,
     }, web3, eac);
+    console.log(success)
     console.log(receipt)
 
     if (success) {
       spinner.succeed(`Transaction successful. Transaction Hash: ${receipt.transactionHash}\n`);
       console.log(`Address of scheduled transaction: ${eac.getTxRequestFromReceipt(receipt)}`);
     } else {
-      spinner.fail('Transaction failed.');
+      // spinner.fail('Transaction failed.');
     }
   } catch (e) {
-    spinner.fail(`Transaction failed.\n\nError: ${e}`);
+    console.error(e)
+    // spinner.fail(`Transaction failed.\n\nError: ${e}`);
   }
 };
 
