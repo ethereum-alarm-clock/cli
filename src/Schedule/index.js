@@ -2,7 +2,6 @@ const BigNumber = require('bignumber.js');
 const clear = require('clear');
 const ora = require('ora');
 const rls = require('readline-sync');
-const fs = require('fs');
 const { EAC, Util } = require('@ethereum-alarm-clock/lib');
 
 const { getDefaultValues } = require('./defaultValues');
@@ -123,18 +122,15 @@ const schedule = async (options, program) => {
       requiredDeposit,
       temporalUnit,
     }, web3, eac);
-    console.log(success)
-    console.log(receipt)
 
     if (success) {
       spinner.succeed(`Transaction successful. Transaction Hash: ${receipt.transactionHash}\n`);
       console.log(`Address of scheduled transaction: ${eac.getTxRequestFromReceipt(receipt)}`);
     } else {
-      // spinner.fail('Transaction failed.');
+      spinner.fail('Transaction failed.');
     }
   } catch (e) {
-    console.error(e)
-    // spinner.fail(`Transaction failed.\n\nError: ${e}`);
+    spinner.fail(`Transaction failed.\n\nError: ${e}`);
   }
 };
 

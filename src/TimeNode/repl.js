@@ -1,13 +1,15 @@
-const BigNumber = require('bignumber.js');
 const ora = require('ora');
 const repl = require('repl');
-const { requestInfo } = require('./actions');
 
+const { getDefaultValues } = require('../Schedule/defaultValues');
+const { requestInfo } = require('./actions');
 const makeDashboard = require('./dashboard');
 
 const start = (timenode, docker) => {
   const { config } = timenode;
-  const { eac, web3, util, gasPriceUtil } = config;
+  const {
+    eac, web3, util, gasPriceUtil,
+  } = config;
 
   console.log(' '); // blank space
   const replServer = repl.start({ prompt: '>> ' });
@@ -150,39 +152,38 @@ const start = (timenode, docker) => {
     help:
       'Send a test transaction to the network (requires unlocked local account).',
     async action() {
-      const spinner = ora('Sending test transaction to network...').start();
+      const spinner = ora('Sending a test transaction to the network...').start();
 
-      const blockNumber = await web3.eth.getBlockNumber();
       const sender = config.wallet ? web3.eth.accounts.wallet[0].address : web3.eth.defaultAccount;
-      console.log(sender);
+      const blockNumber = await web3.eth.getBlockNumber();
 
-      const params = {
-        from: sender,
-        toAddress: '0x981bc3331908602aa4b617182ef85bcc19ab5692',
-        callData: web3.utils.fromAscii('s0x'.repeat(Math.floor(Math.random() * 10))),
-        callGas: new BigNumber(100000),
-        callValue: new BigNumber(321),
-        windowSize: new BigNumber(255),
-        windowStart: new BigNumber(blockNumber + 30),
-        gasPrice: web3.utils.toWei('5', 'gwei'),
-        fee: new BigNumber(50),
-        bounty: web3.utils.toWei('1', 'finney'),
-        requiredDeposit: new BigNumber(1),
-        temporalUnit: 1,
-      };
+      let receipt;
 
-      const receipt = await eac.schedule(params);
+      const defaultValues = await getDefaultValues(web3);
+      try {
+        receipt = await eac.schedule({
+          from: sender,
+          toAddress: sender, // Send a Tx to self
+          callData: '0x0',
+          windowStart: blockNumber + 100,
+          requiredDeposit: defaultValues.deposit,
+          timestampScheduling: false,
+          ...defaultValues,
+        });
+      } catch (e) {
+        spinner.fail('Unable to schedule the transaction.');
+        console.error(e);
+      }
 
-
-      if (receipt.status !== '0x1') {
+      if (receipt.status !== true) {
         spinner.fail('Transaction failed.');
         return;
       }
 
-      spinner.succeed(`Transaction successful. Transaction Hash: ${receipt.transactionHash}\n`);
+      spinner.succeed(`Transaction successfully scheduled. Transaction Hash: ${receipt.transactionHash}`);
 
       const scheduledTx = eac.transactionRequestFromReceipt(receipt);
-      console.log(`Address of scheduled transaction: ${scheduledTx}`);
+      console.log(`Scheduled transaction address: ${scheduledTx.address}`);
     },
   });
 
