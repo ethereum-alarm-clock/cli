@@ -32,7 +32,7 @@
   },
   "homepage": "https://github.com/ethereum-alarm-clock/eac.js-cli#readme",
   "dependencies": {
-    "@ethereum-alarm-clock/lib": "file:../lib",
+    "@ethereum-alarm-clock/lib": "0.1.0",
     "@ethereum-alarm-clock/timenode-core": "file:../timenode-core",
     "bignumber.js": "5.0.0",
     "bluebird": "3.5.3",
