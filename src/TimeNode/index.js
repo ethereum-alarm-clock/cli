@@ -162,6 +162,8 @@ For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate
     try {
       await TN.startScanning();
     } catch (e) { throw e; }
+  } else {
+    console.log('\n\x1b[33mUse the .start command to start scanning for scheduled transactions\x1b[0m');
   }
 
   if (!options.analyticsOff) {

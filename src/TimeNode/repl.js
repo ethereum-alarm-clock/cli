@@ -70,6 +70,7 @@ const start = (timenode, docker) => {
   replServer.defineCommand('getStats', {
     help: 'Get some interesting stats on your executing accounts.',
     action() {
+      console.log(`\n\x1b[31mTimeNode Started:\x1b[0m ${timenode.scanner.scanning ? 'ON' : 'OFF'}, \x1b[31mClaiming:\x1b[0m ${config.claiming ? 'ON' : 'OFF'}`);
       console.log(makeDashboard(config, timenode).toString());
     },
   });
