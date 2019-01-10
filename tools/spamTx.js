@@ -43,9 +43,9 @@ const main = async () => {
   checkOptionsForWalletAndPassword(program);
 
   // Second inits,
-  const web3 = Util.getWeb3FromProviderUrl(program.providers[0]);
+  const web3 = Util.getWeb3FromProviderUrl(program.provider);
   const eac = new EAC(web3);
-  const config = new Config({ providerUrls: program.providers });
+  const config = new Config({ providerUrls: [program.provider] });
   const { logger } = config;
 
   // Third wallet,
@@ -55,84 +55,55 @@ const main = async () => {
   // Fourth logic,
   const defaultValues = await getDefaultValues(web3);
 
-  const eacScheduler = await eac.scheduler();
-  const bScheduler = eacScheduler.blockScheduler;
-  const tsScheduler = eacScheduler.timestampScheduler;
-
   const spam = async () => {
-    let data;
-    let target;
     let { repeat } = program;
 
     while (repeat) {
-      const getEndowmentFromValues = (values) => {
-        return Util.calcEndowment(
-          new BigNumber(values.callGas),
-          new BigNumber(values.callValue),
-          new BigNumber(values.gasPrice),
-          new BigNumber(values.fee),
-          new BigNumber(values.bounty),
-        );
-      };
-      const endowment = getEndowmentFromValues(defaultValues);
-
       const tempUnit = ((repeat % 2) === 0) ? 2 : 1;
 
       const getRandWindowStart = async (temporalUnit) => {
+        if (temporalUnit !== 1 && temporalUnit !== 2) {
+          throw new Error(`Unsupported temporal unit: ${temporalUnit}`);
+        }
+
         const curBlock = await Bb.fromCallback(cb => web3.eth.getBlock('latest', cb));
         const rand = Math.floor(Math.random() * 30);
+
         if (temporalUnit === 1) {
           return program.lengthMod * (curBlock.number + 25 + rand);
         }
-        if (temporalUnit === 2) {
-          return program.lengthMod * (curBlock.timestamp + (25 * 12) + (rand * 12));
-        }
+
+        return program.lengthMod * (curBlock.timestamp + (25 * 12) + (rand * 12));
       };
 
-      if (tempUnit === 1) {
-        target = bScheduler.address;
-        data = bScheduler.schedule.getData(
-          defaultValues.recipient,
-          defaultValues.callData,
-          [
-            defaultValues.callGas,
-            defaultValues.callValue,
-            defaultValues.windowSizeBlock,
-            await getRandWindowStart(tempUnit),
-            defaultValues.gasPrice,
-            defaultValues.fee,
-            defaultValues.bounty,
-            defaultValues.deposit,
-          ],
-        );
-      } else if (tempUnit === 2) {
-        target = tsScheduler.address;
-        data = tsScheduler.schedule.getData(
-          defaultValues.recipient,
-          defaultValues.callData,
-          [
-            defaultValues.callGas,
-            defaultValues.callValue,
-            defaultValues.windowSizeTs,
-            await getRandWindowStart(tempUnit),
-            defaultValues.gasPrice,
-            defaultValues.fee,
-            defaultValues.bounty,
-            defaultValues.deposit,
-          ],
-        );
-      } else {
-        throw new Error('Invalid temporal unit.');
-      }
+      const {
+        recipient,
+        callData,
+        callGas,
+        callValue,
+        windowSize,
+        gasPrice,
+        fee,
+        bounty,
+        deposit,
+      } = defaultValues;
+
+      const windowStart = await getRandWindowStart(tempUnit);
 
       try {
-        const price = Math.floor(web3.utils.toWei('6', 'gwei') * program.gasPrice);
-        const { receipt } = await wallet.sendFromNext({
-          to: target,
-          value: endowment.toNumber(),
-          gas: 3000000,
-          gasPrice: price,
-          data,
+        const receipt = await eac.schedule({
+          from: web3.eth.accounts.wallet[0].address,
+          toAddress: recipient,
+          windowStart,
+          callData,
+          callGas,
+          callValue,
+          windowSize,
+          gasPrice,
+          fee,
+          bounty,
+          requiredDeposit: deposit,
+          timestampScheduling: tempUnit === 2,
         });
 
         if (!receipt.status) {
@@ -140,7 +111,7 @@ const main = async () => {
         }
         const addressOf = eac.getTxRequestFromReceipt(receipt);
         console.log(
-          `Address of txRequest: ${addressOf} TransactionHash: ${receipt.transactionHash}\n`
+          `Address of txRequest: ${addressOf} TransactionHash: ${receipt.transactionHash}`
         );
         fs.appendFileSync('scheduled.txt', `${addressOf}\n`);
       } catch (e) {
