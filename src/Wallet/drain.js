@@ -2,7 +2,7 @@ const BigNumber = require('bignumber.js');
 const ethUtil = require('ethereumjs-util');
 const ora = require('ora');
 
-const { W3Util } = require('@ethereum-alarm-clock/timenode-core');
+const { EAC, Util } = require('@ethereum-alarm-clock/lib');
 
 const {
   checkOptionsForWalletAndPassword,
@@ -11,9 +11,9 @@ const {
 
 const drain = async (target, program) => {
   // Init Web3
-  const web3 = W3Util.getWeb3FromProviderUrl(program.provider);
+  const web3 = Util.getWeb3FromProviderUrl(program.provider);
   // eslint-disable-next-line global-require
-  const eac = require('eac.js-lib')(web3);
+  const eac = new EAC(web3);
 
   checkOptionsForWalletAndPassword(program);
 

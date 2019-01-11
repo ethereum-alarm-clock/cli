@@ -2,17 +2,16 @@ const BigNumber = require('bignumber.js');
 const clear = require('clear');
 const ora = require('ora');
 const rls = require('readline-sync');
-const { W3Util } = require('@ethereum-alarm-clock/timenode-core');
+const { EAC, Util } = require('@ethereum-alarm-clock/lib');
 
 const { getDefaultValues } = require('./defaultValues');
 const ReadInput = require('./readInput');
+const { scheduleUsingWallet } = require('./helpers');
 
 const {
   checkOptionsForWalletAndPassword,
   loadWalletFromKeystoreFile,
 } = require('../Wallet/utils');
-
-const { scheduleUsingWallet } = require('./helpers');
 
 const MINIMUM_PERIOD_BEFORE_SCHEDULE = (tempUnit) => {
   if (tempUnit === 1) {
@@ -23,13 +22,14 @@ const MINIMUM_PERIOD_BEFORE_SCHEDULE = (tempUnit) => {
 };
 
 const schedule = async (options, program) => {
-  const web3 = W3Util.getWeb3FromProviderUrl(program.providers[0]);
+  const web3 = Util.getWeb3FromProviderUrl(program.providers[0]);
   // eslint-disable-next-line global-require
-  const eac = require('eac.js-lib')(web3);
+  const eac = new EAC(web3);
+  const util = new Util(web3);
 
   const defaultValues = await getDefaultValues(web3);
 
-  if (!await eac.Util.checkNetworkID()) {
+  if (!await util.isNetworkSupported()) {
     throw new Error('Must be using the Kovan or Ropsten test network.');
   }
 
@@ -54,16 +54,15 @@ const schedule = async (options, program) => {
   // ask the user for them interactively.
 
   const temporalUnit = scheduleParams.temporalUnit || readInput.readTemporalUnit();
-  const recipient = scheduleParams.recipient || readInput.readRecipientAddress();
+  const toAddress = scheduleParams.recipient || readInput.readRecipientAddress();
   const callData = scheduleParams.callData || readInput.readCallData();
   const callGas = scheduleParams.callGas || readInput.readCallGas();
   const callValue = scheduleParams.callValue || readInput.readCallValue();
 
-  const currentBlockNumber = await eac.Util.getBlockNumber();
-
-  const windowStart = scheduleParams.windowStart || readInput.readWindowStart(currentBlockNumber);
+  const windowStart = scheduleParams.windowStart || await readInput.readWindowStart();
   const windowSize = scheduleParams.windowSize || readInput.readWindowSize(temporalUnit);
 
+  const currentBlockNumber = await web3.eth.getBlockNumber();
   const soonestScheduleTime = currentBlockNumber + MINIMUM_PERIOD_BEFORE_SCHEDULE(temporalUnit);
   if (windowStart < soonestScheduleTime) {
     throw new Error(`Window start of ${windowStart} too soon.\nSoonest Schedule Time: ${soonestScheduleTime}`);
@@ -75,7 +74,7 @@ const schedule = async (options, program) => {
   const requiredDeposit = scheduleParams.deposit || readInput.readDeposit();
 
   // Calculate the required endowment according to these params.
-  const endowment = eac.Util.calcEndowment(
+  const endowment = Util.calcEndowment(
     new BigNumber(callGas),
     new BigNumber(callValue),
     new BigNumber(gasPrice),
@@ -86,7 +85,7 @@ const schedule = async (options, program) => {
   // We have all the input we need, now we confirm with the user.
   clear();
 
-  console.log(`Recipient: ${recipient}`);
+  console.log(`Sending to: ${toAddress}`);
   console.log(`Call Data: ${callData}`);
   console.log(`Call Gas: ${callGas}`);
   console.log(`Window Size: ${windowSize}`);
@@ -96,8 +95,8 @@ const schedule = async (options, program) => {
   console.log(`Bounty: ${bounty}`);
   console.log(`Required Deposit: ${requiredDeposit}`);
   console.log('\n');
-  console.log(`Sending from: ${wallet.getAddresses()[0]}`);
-  console.log(`Endowment to send: ${web3.fromWei(endowment.toString())}`);
+  console.log(`Sending from: ${wallet[0].address}`);
+  console.log(`Endowment to send: ${web3.utils.fromWei(endowment.toString())}`);
 
   const confirmed = rls.question('Are the above parameters correct? [Y/n]\n');
   if (confirmed.toLowerCase() !== 'y' && confirmed !== '') {
@@ -106,11 +105,11 @@ const schedule = async (options, program) => {
 
   // Set up the spinner.
   console.log('\n');
-  const spinner = ora('Sending the scheduling transaction...').start();
+  const spinner = ora('Scheduling the transaction...').start();
 
   try {
     const { receipt, success } = await scheduleUsingWallet({
-      recipient,
+      toAddress,
       callData,
       callGas,
       callValue,
@@ -121,11 +120,11 @@ const schedule = async (options, program) => {
       bounty,
       requiredDeposit,
       temporalUnit,
-    }, web3, eac, wallet);
+    }, web3, eac);
 
     if (success) {
       spinner.succeed(`Transaction successful. Transaction Hash: ${receipt.transactionHash}\n`);
-      console.log(`Address of scheduled transaction: ${eac.Util.getTxRequestFromReceipt(receipt)}`);
+      console.log(`Address of scheduled transaction: ${eac.getTxRequestFromReceipt(receipt)}`);
     } else {
       spinner.fail('Transaction failed.');
     }

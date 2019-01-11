@@ -1,6 +1,6 @@
 const ora = require('ora');
 
-const { W3Util } = require('@ethereum-alarm-clock/timenode-core');
+const { EAC, Util } = require('@ethereum-alarm-clock/lib');
 
 const {
   checkOptionsForWalletAndPassword,
@@ -8,9 +8,9 @@ const {
 } = require('./utils');
 
 const fund = async (amt, program) => {
-  const web3 = W3Util.getWeb3FromProviderUrl(program.provider);
+  const web3 = Util.getWeb3FromProviderUrl(program.provider);
   // eslint-disable-next-line global-require
-  const eac = require('eac.js-lib')(web3);
+  const eac = new EAC(web3);
 
   checkOptionsForWalletAndPassword(program);
 
@@ -22,7 +22,7 @@ const fund = async (amt, program) => {
 
   const wallet = loadWalletFromKeystoreFile(web3, program.wallet, program.password);
 
-  const wei = web3.toWei(amt, 'ether');
+  const wei = web3.utils.toWei(amt, 'ether');
 
   try {
     const res = await Promise.all(
@@ -32,7 +32,7 @@ const fund = async (amt, program) => {
           to: address,
           value: wei,
           gas: 3000000,
-          gasPrice: web3.toWei('5', 'gwei'),
+          gasPrice: web3.utils.toWei('5', 'gwei'),
         }, (err, txhash) => {
           if (err) reject(err);
           else {

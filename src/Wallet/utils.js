@@ -1,5 +1,4 @@
 const fs = require('fs');
-const { Wallet } = require('@ethereum-alarm-clock/timenode-core');
 
 const checkOptionsForWalletAndPassword = (options) => {
   const hasWallet = options.wallet && typeof options.wallet === 'object' && options.wallet.length;
@@ -21,10 +20,9 @@ const loadWalletFromKeystoreFile = (web3, filePath, password) => {
     keystore = [keystore];
   }
 
-  const wallet = new Wallet(web3);
-  wallet.decrypt(keystore, password);
+  web3.eth.accounts.wallet.decrypt(keystore, password);
 
-  return wallet;
+  return web3.eth.accounts.wallet;
 };
 
 module.exports = {

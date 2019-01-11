@@ -1,14 +1,14 @@
 const BigNumber = require('bignumber.js');
 const clear = require('clear');
-const { Config, TimeNode } = require('@ethereum-alarm-clock/timenode-core');
 const fs = require('fs');
 const Loki = require('lokijs');
 const Lfsa = require('lokijs/src/loki-fs-structured-adapter.js');
+const { Config, TimeNode } = require('@ethereum-alarm-clock/timenode-core');
 
 const Analytics = require('./analytics');
 const FileLogger = require('./logger');
 const Repl = require('./repl');
-const { checkOptionsForWalletAndPassword } = require('../Wallet/utils');
+const { checkOptionsForWalletAndPassword, loadWalletFromKeystoreFile } = require('../Wallet/utils');
 
 const wei = '1e18';
 
@@ -106,9 +106,11 @@ For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate
 
   await config.statsDbLoaded;
 
-  if (!await config.eac.Util.checkNetworkID()) {
+  if (!await config.util.isNetworkSupported()) {
     throw new Error('Unsupported network');
   }
+
+  loadWalletFromKeystoreFile(config.web3, program.wallet, program.password);
 
   // Set up default logfile.
   if (options.logFile === 'default') {
@@ -117,7 +119,7 @@ For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate
     options.logFile = `${require('os').homedir()}/.eac.log`;
   }
 
-  const chain = await config.eac.Util.getChainName();
+  const chain = await config.util.getChainName();
 
   let analytics;
   if (!options.analyticsOff) {
@@ -136,7 +138,8 @@ For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate
   console.log('Executing from accounts:');
   await Promise.all(
     config.wallet.getAddresses().map(async (address) => {
-      console.log(`${address} | Balance: ${config.web3.fromWei(await config.eac.Util.getBalance(address))}`);
+      const balance = await config.util.balanceOf(address);
+      console.log(`${address} | Balance: ${config.web3.utils.fromWei(balance.toString())}`);
     }),
   );
 
@@ -159,6 +162,8 @@ For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate
     try {
       await TN.startScanning();
     } catch (e) { throw e; }
+  } else {
+    console.log('\n\x1b[33mUse the .start command to start scanning for scheduled transactions\x1b[0m');
   }
 
   if (!options.analyticsOff) {

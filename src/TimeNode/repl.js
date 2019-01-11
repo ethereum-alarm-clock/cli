@@ -1,14 +1,15 @@
-const BigNumber = require('bignumber.js');
 const ora = require('ora');
 const repl = require('repl');
-const { scheduleUsingWallet } = require('../Schedule/helpers');
-const { requestInfo } = require('./actions');
 
+const { getDefaultValues } = require('../Schedule/defaultValues');
+const { requestInfo } = require('./actions');
 const makeDashboard = require('./dashboard');
 
 const start = (timenode, docker) => {
   const { config } = timenode;
-  const { eac, web3, util } = config;
+  const {
+    eac, web3, util, gasPriceUtil,
+  } = config;
 
   console.log(' '); // blank space
   const replServer = repl.start({ prompt: '>> ' });
@@ -20,11 +21,13 @@ const start = (timenode, docker) => {
       if (config.wallet) {
         config.wallet.getAccounts().forEach(async (account) => {
           const address = account.getAddressString();
-          console.log(`${address} | Balance: ${web3.fromWei(await eac.Util.getBalance(address))}`);
+          const balance = await util.balanceOf(address);
+          console.log(`${address} | Balance: ${web3.utils.fromWei(balance.toString())}`);
         });
       } else {
         const account = web3.eth.defaultAccount;
-        console.log(`${account} | Balance: ${web3.fromWei(await eac.Util.getBalance(account))}`);
+        const balance = await util.balanceOf(account);
+        console.log(`${account} | Balance: ${web3.utils.fromWei(balance.toString())}`);
       }
     },
   });
@@ -33,8 +36,8 @@ const start = (timenode, docker) => {
     help: 'Get the current network stats',
     async action() {
       const block = await util.getBlock('latest');
-      const gasPrice = await util.networkGasPrice();
-      const gweiGasPrice = web3.fromWei(gasPrice, 'gwei');
+      const gasPrice = await gasPriceUtil.networkGasPrice();
+      const gweiGasPrice = web3.utils.fromWei(gasPrice.toString(), 'gwei');
 
       console.log(`BlockNum: ${block.number} | Timestamp: ${block.timestamp} | GasPrice: ${gweiGasPrice} Gwei`);
     },
@@ -67,41 +70,50 @@ const start = (timenode, docker) => {
   replServer.defineCommand('getStats', {
     help: 'Get some interesting stats on your executing accounts.',
     action() {
+      console.log(`\n\x1b[31mTimeNode Started:\x1b[0m ${timenode.scanner.scanning ? 'ON' : 'OFF'}, \x1b[31mClaiming:\x1b[0m ${config.claiming ? 'ON' : 'OFF'}`);
       console.log(makeDashboard(config, timenode).toString());
     },
   });
 
   replServer.defineCommand('getClaimed', {
     help: 'Get claimed transactions pending execution.',
-    action() {
+    async action() {
+      console.log('Claimed transactions pending execution:');
+      const printPending = (address, pending) => console.log(`Account ${address}: ${pending.join(', ') || 'No transactions pending'}.`);
+
       const claimedPendingExecution = timenode.getClaimedNotExecutedTransactions();
 
-      let print = `Claimed transactions pending execution (${claimedPendingExecution.length}): \n`;
-
-      let i = 1;
-      while (i - 1 < claimedPendingExecution.length) {
-        print += `${i}. ${claimedPendingExecution[i - 1]}\n`;
-        i += 1;
+      if (config.wallet) {
+        const accounts = config.wallet.getAccounts();
+        for (let i = 0; i < accounts.length; i += 1) {
+          const address = accounts[i].getAddressString();
+          printPending(address, claimedPendingExecution[address]);
+        }
+      } else {
+        const account = web3.eth.defaultAccount;
+        printPending(account, claimedPendingExecution[account]);
       }
-
-      console.log(print);
     },
   });
 
   replServer.defineCommand('getFailedClaims', {
     help: 'Get unsuccessfully claimed transactions.',
     action() {
-      const transactions = timenode.getUnsucessfullyClaimedTransactions();
+      console.log('Unsuccessfully claimed transactions:');
+      const printUnsuccessful = (address, pending) => console.log(`Account ${address}: ${pending.join(', ') || 'No unsuccessfully claimed transactions'}.`);
 
-      let print = `Unsuccessfully claimed transactions (${transactions.length}): \n`;
+      const unsuccessfullyClaimed = timenode.getUnsucessfullyClaimedTransactions();
 
-      let i = 1;
-      while (i - 1 < transactions.length) {
-        print += `${i}. ${transactions[i - 1]}\n`;
-        i += 1;
+      if (config.wallet) {
+        const accounts = config.wallet.getAccounts();
+        for (let i = 0; i < accounts.length; i += 1) {
+          const address = accounts[i].getAddressString();
+          printUnsuccessful(address, unsuccessfullyClaimed[address]);
+        }
+      } else {
+        const account = web3.eth.defaultAccount;
+        printUnsuccessful(account, unsuccessfullyClaimed[account]);
       }
-
-      console.log(print);
     },
   });
 
@@ -109,6 +121,7 @@ const start = (timenode, docker) => {
     help: 'Starts the TimeNode.',
     action() {
       timenode.startScanning();
+      console.log('Started scanning.');
     },
   });
 
@@ -116,6 +129,7 @@ const start = (timenode, docker) => {
     help: 'Stops the TimeNode.',
     action() {
       timenode.stopScanning();
+      console.log('Stopped scanning.');
     },
   });
 
@@ -123,6 +137,7 @@ const start = (timenode, docker) => {
     help: 'Starts the TimeNode claiming.',
     action() {
       timenode.startClaiming();
+      console.log('Started claiming.');
     },
   });
 
@@ -130,6 +145,7 @@ const start = (timenode, docker) => {
     help: 'Stops the TimeNode claiming.',
     action() {
       timenode.stopClaiming();
+      console.log('Stopped claiming.');
     },
   });
 
@@ -137,87 +153,41 @@ const start = (timenode, docker) => {
     help:
       'Send a test transaction to the network (requires unlocked local account).',
     async action() {
-      const spinner = ora('Sending test transaction to network...').start();
-      const scheduler = await eac.scheduler();
+      const spinner = ora('Sending a test transaction to the network...').start();
 
-      const blockNumber = await eac.Util.getBlockNumber();
+      const sender = config.wallet ? web3.eth.accounts.wallet[0].address : web3.eth.defaultAccount;
+      const blockNumber = await web3.eth.getBlockNumber();
 
-      // Set some meaningless defaults
-      const recipient = '0x009f7EfeD908c05df5101DA1557b7CaaB38EE4Ce';
-      const callData = web3.fromAscii('s0x'.repeat(Math.floor(Math.random() * 10)));
-      const windowStart = (new BigNumber(blockNumber)).plus(30);
-      const windowSize = 255;
-      const gasPrice = web3.toWei('5', 'gwei');
-      const requiredDeposit = 1;
-      const callGas = 100000;
-      const callValue = 321;
-      const fee = 50;
-      const bounty = web3.toWei('1', 'finney');
-      const temporalUnit = 1;
+      let receipt;
 
-      if (config.wallet) {
-        try {
-          const { receipt, success } = await scheduleUsingWallet({
-            recipient,
-            callData,
-            callGas,
-            callValue,
-            windowSize,
-            windowStart,
-            gasPrice,
-            fee,
-            bounty,
-            requiredDeposit,
-            temporalUnit,
-          }, web3, eac, config.wallet);
+      const defaultValues = await getDefaultValues(web3);
+      try {
+        receipt = await eac.schedule({
+          from: sender,
+          toAddress: sender, // Send a Tx to self
+          callData: '0x0',
+          windowStart: blockNumber + 100,
+          requiredDeposit: defaultValues.deposit,
+          timestampScheduling: false,
+          ...defaultValues,
+        });
+      } catch (e) {
+        spinner.fail('Unable to schedule the transaction.');
+        console.error(e);
+      }
 
-          if (success) {
-            spinner.succeed(`Transaction successful. Transaction Hash: ${receipt.transactionHash}\n`);
-            console.log(`Address of scheduled transaction: ${eac.Util.getTxRequestFromReceipt(receipt)}`);
-          } else {
-            spinner.fail('Transaction failed.');
-          }
-        } catch (e) {
-          spinner.fail(`Transaction failed.\n\nError: ${e}`);
-        }
-
+      if (receipt.status !== true) {
+        spinner.fail('Transaction failed.');
         return;
       }
 
-      const endowment = eac.Util.calcEndowment(
-        new BigNumber(callGas),
-        new BigNumber(callValue),
-        new BigNumber(gasPrice),
-        new BigNumber(fee),
-        new BigNumber(bounty),
-      );
+      spinner.succeed(`Transaction successfully scheduled. Transaction Hash: ${receipt.transactionHash}`);
 
-      scheduler.initSender({
-        from: web3.eth.defaultAccount,
-        gas: 3000000,
-        value: endowment,
-      });
-
-      scheduler.blockSchedule(
-        recipient,
-        callData,
-        callGas,
-        callValue,
-        windowSize,
-        windowStart,
-        gasPrice,
-        fee, // fee
-        bounty, // bounty
-        requiredDeposit,
-      ).then((receipt) => {
-        if (receipt.status !== '0x1') {
-          spinner.fail('Transaction failed.');
-          return;
-        }
-        spinner.succeed(`Transaction mined! Hash - ${receipt.transactionHash}`);
-      }).catch(err => spinner.fail(err));
+      const scheduledTx = eac.transactionRequestFromReceipt(receipt);
+      console.log(`Scheduled transaction address: ${scheduledTx.address}`);
     },
   });
+
   replServer.defineCommand('requestInfo', {
     help:
       'Retrieve info about the transaction request at the passed in address.',

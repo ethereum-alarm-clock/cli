@@ -3,7 +3,7 @@ const program = require('commander');
 const walletHandle = (path, paths) => {
   paths.push(path);
   return paths;
-}
+};
 
 program
   .version(require('../package.json').version)
@@ -15,6 +15,6 @@ program
   .option('--lengthMod [num]', '', 1)
   .option('--recurrent [secs]', '', 0)
   .option('--gasPrice <multiple>', '', 1)
-  .parse(process.argv)
+  .parse(process.argv);
 
 module.exports = program;
