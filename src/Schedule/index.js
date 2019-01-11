@@ -36,7 +36,6 @@ const schedule = async (options, program) => {
   checkOptionsForWalletAndPassword(program);
 
   const wallet = loadWalletFromKeystoreFile(web3, program.wallet, program.password);
-  console.log(wallet)
 
   // Initiate the shedule parameters.
   let scheduleParams = {};
