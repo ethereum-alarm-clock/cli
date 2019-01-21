@@ -35,7 +35,9 @@ const start = (timenode, docker) => {
   replServer.defineCommand('network', {
     help: 'Get the current network stats',
     async action() {
+      console.log('getting block')
       const block = await util.getBlock('latest');
+      console.log('got block')
       const gasPrice = await gasPriceUtil.networkGasPrice();
       const gweiGasPrice = web3.utils.fromWei(gasPrice.toString(), 'gwei');
 
@@ -156,11 +158,15 @@ const start = (timenode, docker) => {
       const spinner = ora('Sending a test transaction to the network...').start();
 
       const sender = config.wallet ? web3.eth.accounts.wallet[0].address : web3.eth.defaultAccount;
+      console.log('getting block number...');
       const blockNumber = await web3.eth.getBlockNumber();
+      console.log('got block number.');
 
       let receipt;
 
       const defaultValues = await getDefaultValues(web3);
+      console.log('got default values.')
+      console.log('scheduling...')      
       try {
         receipt = await eac.schedule({
           from: sender,
