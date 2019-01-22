@@ -35,12 +35,11 @@ const start = (timenode, docker) => {
   replServer.defineCommand('network', {
     help: 'Get the current network stats',
     async action() {
-      console.log('getting block')
-      const block = await util.getBlock('latest');
-      console.log('got block')
+      const block = await web3.eth.getBlock('latest');
       const gasPrice = await gasPriceUtil.networkGasPrice();
       const gweiGasPrice = web3.utils.fromWei(gasPrice.toString(), 'gwei');
 
+      console.log(`Provider: ${config.activeProviderUrl}`);
       console.log(`BlockNum: ${block.number} | Timestamp: ${block.timestamp} | GasPrice: ${gweiGasPrice} Gwei`);
     },
   });
