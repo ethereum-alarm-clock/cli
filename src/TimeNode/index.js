@@ -32,6 +32,7 @@ const timenode = async (options, program) => {
     options.minBalance = config.minBalance || options.minBalance;
     options.minProfitability = config.minProfitability || options.minProfitability;
     options.maxGasSubsidy = config.maxGasSubsidy || options.maxGasSubsidy;
+    options.directTxPool = config.directTxPool || options.directTxPool;
     providerUrls = config.providers || providerUrls
     /* eslint-enable */
   }
@@ -102,6 +103,7 @@ For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate
     statsDb,
     walletStores: encKeystores,
     economicStrategy,
+    directTxPool: options.directTxPool,
   });
 
   await config.statsDbLoaded;

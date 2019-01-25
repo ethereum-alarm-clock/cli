@@ -105,6 +105,7 @@ program
   .option('--usingSmartGasEstimation', 'Trying to match the gasPrice with remaining time for execution')
   .option('--ms <number>', 'Sets the scanning frequency of the TimeNode', 4000)
   .option('--scan <number>', 'Sets the scanning spread', 75)
+  .option('--directTxPool', '(experimental) Use direct transaction pool watcher instead of node pool watcher')
   .action((options) => catchErrors(timenode(options, program)))
 
 
