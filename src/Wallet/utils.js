@@ -2,7 +2,6 @@ const fs = require('fs');
 
 const checkOptionsForWalletAndPassword = (options) => {
   const hasWallet = options.wallet && typeof options.wallet === 'object' && options.wallet.length;
-  console.log(options)
   if (!hasWallet || !options.password) {
     const msg = 'Please provide --wallet and --password flags!';
     if (options.logger) {
