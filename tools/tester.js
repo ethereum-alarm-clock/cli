@@ -218,7 +218,7 @@ const main = async (_) => {
       if (program.randomizeBounty) {
         bounty += getRandomBountyModifier();
       }
-      const windowStartOffset = program.randomizeStart ? getRandomWindowStartOffset() : 0
+      const windowStartOffset = program.randomizeStart ? getRandomWindowStartOffset() : 0;
 
       const endowment = Util.calcEndowment(
         new BigNumber(callGas),

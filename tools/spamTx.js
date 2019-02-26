@@ -11,7 +11,6 @@
  */
 
 const { Config } = require('@ethereum-alarm-clock/timenode-core');
-const BigNumber = require('bignumber.js');
 const Bb = require('bluebird');
 const fs = require('fs');
 

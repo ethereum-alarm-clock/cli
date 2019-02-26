@@ -71,13 +71,13 @@ For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate
   // Economic Strategy
   const economicStrategy = {
     maxDeposit: options.maxDeposit
-      ? new BigNumber(options.maxDeposit).mul(wei)
+      ? new BigNumber(options.maxDeposit).times(wei)
       : Config.DEFAULT_ECONOMIC_STRATEGY.maxDeposit,
     minBalance: options.minBalance
-      ? new BigNumber(options.minBalance).mul(wei)
+      ? new BigNumber(options.minBalance).times(wei)
       : Config.DEFAULT_ECONOMIC_STRATEGY.minBalance,
     minProfitability: options.minProfitability
-      ? new BigNumber(options.minProfitability).mul(wei)
+      ? new BigNumber(options.minProfitability).times(wei)
       : Config.DEFAULT_ECONOMIC_STRATEGY.minProfitability,
     maxGasSubsidy: options.maxGasSubsidy
       ? options.maxGasSubsidy
