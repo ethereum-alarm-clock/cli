@@ -3,6 +3,7 @@ node_modules/*
 scheduled.txt
 test_wallet*
 password
+password.txt
 .vscode/.eac.log
 .eac.log*
 wallet2

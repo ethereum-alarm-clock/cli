@@ -11,7 +11,7 @@ program
   .option('-n, --repeat [num]', '', 1)
   .option('--save', '', false)
   .option('--wallet [path]', '', walletHandle, [])
-  .option('--password [string]', '')
+  .option('--password [path]', '')
   .option('--lengthMod [num]', '', 1)
   .option('--recurrent [secs]', '', 0)
   .option('--gasPrice <multiple>', '', 1)

@@ -2,7 +2,7 @@
 
 /**
  * To run
- *  ./tools/spamTx.js --wallet <wallet_file> --password <string> --repeat <num_txs>
+ *  ./tools/spamTx.js --wallet <wallet_file> --password <path> --repeat <num_txs>
  *
  * Will alternate between transactions using block number and timestamps as the
  * temporal unit. Creates transactions so that they will immediately be in the claim

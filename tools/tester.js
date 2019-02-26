@@ -28,7 +28,7 @@ program
     return paths;
   }, [])
   .option('-i, --walletIndex [number]", "if not using a wallet file, choose index of web3 provider account (defaults to index 0)')
-  .option('-p, --password [string]', 'the password to unlock your keystore file(s) (For multiple wallets, all wallets must have the same password')
+  .option('-p, --password [path]', 'Path to the password to unlock your keystore file(s) (For multiple wallets, all wallets must have the same password)')
   .option('-n, --repeat [number]', 'specify the number of transaction to send', 1)
   .option('-s, --stats', 'generates stats based on tx history')
   .option('--windowStart [number]', 'define the windowStart for transactions')

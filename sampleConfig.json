@@ -6,7 +6,7 @@
     "minBalance": 0,
     "minProfitability": 0,
     "maxGasSubsidy": 100,
-    "password": "password",
+    "password": "password.txt",
     "providers": [
         "ws://localhost:8546",
         "ws://kovan.infura.io/ws",

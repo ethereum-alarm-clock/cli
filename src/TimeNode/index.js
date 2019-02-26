@@ -18,7 +18,7 @@ const timenode = async (options, program) => {
   if (program.config) {
     const config = JSON.parse(fs.readFileSync(program.config));
     /* eslint-disable */
-    program.password = fs.readFileSync(config.password).toString() || program.password;
+    program.password = config.password || program.password;
     program.wallet = config.wallet || program.wallet;
 
     // TimeNode specific configurations
@@ -91,13 +91,15 @@ For more info on claiming, see: https://blog.chronologic.network/how-to-mitigate
     minExecutionWindowBlock: Config.DEFAULT_ECONOMIC_STRATEGY.minExecutionWindowBlock,
   };
 
+  const password = fs.readFileSync(program.password, 'utf8').trim();
+
   // Load the config.
   const config = new Config({
     autostart: options.autostart,
     claiming: options.claiming,
     logger: new FileLogger(options.logFile, options.logLevel),
     ms: options.ms,
-    password: program.password,
+    password,
     providerUrls,
     scanSpread: options.scan,
     statsDb,
