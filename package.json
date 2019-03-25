@@ -42,7 +42,7 @@
     "console.table": "0.10.0",
     "dotenv": "6.2.0",
     "ethereumjs-util": "6.1.0",
-    "keen-tracking": "4.0.7",
+    "keen-tracking": "4.3.1",
     "lokijs": "1.5.6",
     "moment": "2.23.0",
     "ora": "3.1.0",
