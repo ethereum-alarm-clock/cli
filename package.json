@@ -40,7 +40,7 @@
     "cli-table2": "0.2.0",
     "commander": "2.19.0",
     "console.table": "0.10.0",
-    "dotenv": "6.2.0",
+    "dotenv": "8.0.0",
     "ethereumjs-util": "6.1.0",
     "keen-tracking": "4.0.7",
     "lokijs": "1.5.6",
