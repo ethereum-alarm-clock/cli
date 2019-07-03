@@ -49,7 +49,7 @@
     "readline-sync": "1.4.9",
     "web3": "1.0.0-beta.37",
     "web3-providers-ws": "1.0.0-beta.37",
-    "websocket": "1.0.28"
+    "websocket": "1.0.29"
   },
   "engines": {
     "node": ">=8"
