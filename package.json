@@ -43,7 +43,7 @@
     "dotenv": "6.2.0",
     "ethereumjs-util": "6.1.0",
     "keen-tracking": "4.0.7",
-    "lokijs": "1.5.6",
+    "lokijs": "1.5.8",
     "moment": "2.23.0",
     "ora": "3.1.0",
     "readline-sync": "1.4.9",
